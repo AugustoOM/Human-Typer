@@ -63,6 +63,8 @@ npm run tauri build
 
 Los instaladores se generan en `src-tauri/target/release/bundle/`. Para distribuirlos públicamente conviene configurar firma y notarización en macOS y firma de código en Windows.
 
+En CI o en una sesión de macOS sin acceso de automatización a Finder, usá `CI=true npm run tauri build`; Tauri omitirá la decoración visual del DMG, pero generará un instalador válido.
+
 ## Uso
 
 1. Pegá o escribí el contenido en **Tu texto**.
@@ -76,10 +78,10 @@ La aplicación bloquea la edición y los ajustes mientras una ejecución está a
 
 ## Atajos y mecanismos de seguridad
 
-| Acción | Atajo global | Alternativa |
-| --- | --- | --- |
-| Pausar / reanudar | `F8` | Botón **Pausar / Reanudar** |
-| Cancelar | `Esc` | Botón **Cancelar** |
+| Acción            | Atajo global | Alternativa                 |
+| ----------------- | ------------ | --------------------------- |
+| Pausar / reanudar | `F8`         | Botón **Pausar / Reanudar** |
+| Cancelar          | `Esc`        | Botón **Cancelar**          |
 
 Los atajos se registran al iniciar. Si otro programa ya reservó alguno, Human Typer muestra una advertencia y mantiene disponibles los botones. El motor consulta la cancelación cada 25 ms, incluso durante pausas largas. Además, una ejecución se detiene ante el primer error de entrada, al superar ocho horas o al cerrar el proceso.
 
@@ -98,12 +100,12 @@ Durante desarrollo puede aparecer `Terminal`, `iTerm`, tu IDE o el binario de de
 
 ## Compatibilidad
 
-| Sistema | Estado | Notas |
-| --- | --- | --- |
-| macOS 12+ | Objetivo principal | Requiere Accesibilidad. Los binarios distribuidos deben firmarse. |
-| Windows 11 | Objetivo principal | Algunas aplicaciones elevadas no aceptan eventos de procesos sin elevar. |
-| Linux X11 | Compatible | Requiere una sesión gráfica y las dependencias de Tauri. |
-| Linux Wayland | Experimental | La inyección y los atajos globales dependen del compositor y sus políticas. |
+| Sistema       | Estado             | Notas                                                                       |
+| ------------- | ------------------ | --------------------------------------------------------------------------- |
+| macOS 12+     | Objetivo principal | Requiere Accesibilidad. Los binarios distribuidos deben firmarse.           |
+| Windows 11    | Objetivo principal | Algunas aplicaciones elevadas no aceptan eventos de procesos sin elevar.    |
+| Linux X11     | Compatible         | Requiere una sesión gráfica y las dependencias de Tauri.                    |
+| Linux Wayland | Experimental       | La inyección y los atajos globales dependen del compositor y sus políticas. |
 
 En campos protegidos, aplicaciones con privilegios elevados, juegos o escritorios remotos, el sistema operativo o la aplicación de destino puede bloquear eventos simulados.
 
