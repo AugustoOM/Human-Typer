@@ -1,154 +1,167 @@
 # Human Typer
 
-Human Typer es una utilidad de escritorio liviana que reproduce un texto carácter por carácter en el campo activo de otra aplicación. El ritmo base, su variación aleatoria y las pausas de puntuación son configurables para producir una cadencia natural sin introducir errores deliberados.
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+[![Latest release](https://img.shields.io/github/v/release/AugustoOM/Human-Typer)](https://github.com/AugustoOM/Human-Typer/releases/latest)
 
-Está construida con Tauri 2, React 19, TypeScript y Rust. Funciona completamente en el dispositivo: no hay servidor, cuenta, telemetría ni almacenamiento permanente del texto.
+Human Typer is a lightweight desktop utility that types text character by character into the active field of another application. Its base speed, random timing variation, and punctuation pauses are configurable, producing a natural cadence without deliberately introducing mistakes.
 
-> Usá la automatización únicamente en aplicaciones y campos donde tengas autorización. `Esc` detiene la escritura desde cualquier aplicación.
+It is built with Tauri 2, React 19, TypeScript, and Rust. Everything runs locally on your device: there is no server, account, telemetry, or permanent storage of your text.
 
-## Estado del proyecto
+> Only use automation in applications and fields where you are authorized to do so. Press `Esc` to stop typing from any application.
 
-La versión inicial incluye:
+## Features
 
-- escritura individual de cada carácter, incluidos Unicode, acentos, `ñ`, `¿`, `¡`, símbolos, espacios, tabulaciones y saltos de línea;
-- velocidades predefinidas y ajuste fino entre 15 y 350 ms desde la interfaz;
-- variación aleatoria y pequeñas oscilaciones naturales;
-- pausas opcionales después de `. , ; : ? !` y saltos de línea;
-- cuenta regresiva configurable de 1 a 30 segundos;
-- progreso, porcentaje y estados visibles;
-- pausa/reanudación con `F8` y cancelación inmediata con `Esc`, aun sin foco;
-- botones equivalentes dentro de la aplicación;
-- temas claro, oscuro y automático según el sistema;
-- preferencias locales; el contenido escrito no se persiste;
-- límites de seguridad de 250.000 caracteres y ocho horas por ejecución.
+- Types every character individually instead of pasting the whole text.
+- Supports Unicode, accented characters, `ñ`, `¿`, `¡`, symbols, spaces, tabs, and line breaks.
+- Includes predefined speeds and fine-grained adjustment from 15 to 350 ms.
+- Adds random timing variation and subtle natural fluctuations.
+- Supports optional pauses after `. , ; : ? !` and line breaks.
+- Provides a configurable countdown from 1 to 30 seconds.
+- Displays status, character progress, and percentage.
+- Pauses or resumes globally with `F8` and cancels immediately with `Esc`.
+- Includes equivalent controls inside the application.
+- Supports light, dark, and system themes.
+- Saves preferences locally without persisting the text.
+- Enforces safety limits of 250,000 characters and eight hours per run.
 
-## Capturas
+## Download
 
-El espacio para capturas está preparado en [`docs/screenshots`](docs/screenshots). Las imágenes finales deben capturarse desde los binarios firmados de macOS y Windows para reflejar la decoración nativa de cada plataforma.
+Prebuilt installers are available on the [GitHub Releases page](https://github.com/AugustoOM/Human-Typer/releases/latest):
 
-## Requisitos
+- Windows 11, 64-bit: NSIS `.exe` installer.
+- macOS, Apple Silicon: `.dmg` image.
 
-- Node.js 22 LTS (Vite también admite Node 20.19 o superior);
-- npm 10 o superior;
-- Rust 1.85 o superior;
-- [prerrequisitos de Tauri 2](https://v2.tauri.app/start/prerequisites/) para el sistema operativo.
+The current binaries are not code-signed. Windows SmartScreen or macOS Gatekeeper may therefore display a warning. Public distribution should use signed and, on macOS, notarized builds.
 
-En Linux también se necesitan las bibliotecas de desarrollo indicadas por Tauri para WebKitGTK.
+## Screenshots
 
-## Instalación y desarrollo
+The screenshot directory is prepared at [`docs/screenshots`](docs/screenshots). Final screenshots should be captured from signed macOS and Windows builds so they accurately show each platform's native window decoration.
+
+## Requirements
+
+- Node.js 22 LTS; Vite also supports Node.js 20.19 or newer.
+- npm 10 or newer.
+- Rust 1.85 or newer.
+- The [Tauri 2 prerequisites](https://v2.tauri.app/start/prerequisites/) for your operating system.
+
+Linux additionally requires the WebKitGTK development libraries listed by Tauri.
+
+## Installation and development
 
 ```bash
 npm install
 npm run tauri dev
 ```
 
-El primer arranque descarga y compila las dependencias Rust, por lo que puede tardar algunos minutos.
+The first launch downloads and compiles the Rust dependencies, so it may take a few minutes.
 
-### Scripts útiles
+### Useful scripts
 
 ```bash
-npm run dev           # frontend Vite en el navegador (sin motor nativo)
-npm run typecheck     # comprobación TypeScript estricta
-npm run lint          # ESLint
-npm test              # tests unitarios del frontend
-npm run check         # typecheck + lint + tests
+npm run dev           # Run the Vite frontend without the native typing engine
+npm run typecheck     # Check strict TypeScript types
+npm run lint          # Run ESLint
+npm test              # Run frontend unit tests
+npm run check         # Run typecheck, lint, and frontend tests
 cargo test --manifest-path src-tauri/Cargo.toml
 ```
 
-## Compilación
+## Building
 
 ```bash
 npm run tauri build
 ```
 
-Los instaladores se generan en `src-tauri/target/release/bundle/`. Para distribuirlos públicamente conviene configurar firma y notarización en macOS y firma de código en Windows.
+Installers are generated under `src-tauri/target/release/bundle/`. Configure macOS signing and notarization and Windows code signing before distributing production builds.
 
-En CI o en una sesión de macOS sin acceso de automatización a Finder, usá `CI=true npm run tauri build`; Tauri omitirá la decoración visual del DMG, pero generará un instalador válido.
+In CI or a macOS session that cannot automate Finder, run `CI=true npm run tauri build`. Tauri will omit the DMG's visual Finder customization while still producing a valid installer.
 
-## Uso
+## Usage
 
-1. Pegá o escribí el contenido en **Tu texto**.
-2. Elegí una velocidad o ajustá el deslizador en milisegundos.
-3. Configurá la variación, la cuenta regresiva y las pausas de puntuación.
-4. Presioná **Comenzar**.
-5. Durante la cuenta regresiva, enfocá el campo de texto de destino.
-6. Usá `F8` para pausar/reanudar o `Esc` para cancelar.
+1. Paste or enter content in **Your text**.
+2. Select a speed preset or adjust the delay slider in milliseconds.
+3. Configure timing variation, the countdown, and punctuation pauses.
+4. Select **Start**.
+5. Focus the target text field during the countdown.
+6. Press `F8` to pause or resume, or `Esc` to cancel.
 
-La aplicación bloquea la edición y los ajustes mientras una ejecución está activa, evitando que el progreso deje de corresponder con el texto enviado.
+Editing and settings are locked while a run is active so the displayed progress always matches the text being typed.
 
-## Atajos y mecanismos de seguridad
+## Shortcuts and safety
 
-| Acción            | Atajo global | Alternativa                 |
-| ----------------- | ------------ | --------------------------- |
-| Pausar / reanudar | `F8`         | Botón **Pausar / Reanudar** |
-| Cancelar          | `Esc`        | Botón **Cancelar**          |
+| Action         | Global shortcut | In-app alternative        |
+| -------------- | --------------- | ------------------------- |
+| Pause / resume | `F8`            | **Pause / Resume** button |
+| Cancel         | `Esc`           | **Cancel** button         |
 
-Los atajos se registran al iniciar. Si otro programa ya reservó alguno, Human Typer muestra una advertencia y mantiene disponibles los botones. El motor consulta la cancelación cada 25 ms, incluso durante pausas largas. Además, una ejecución se detiene ante el primer error de entrada, al superar ocho horas o al cerrar el proceso.
+Shortcuts are registered when the application starts. If another program has already reserved one, Human Typer displays a warning and keeps the in-app buttons available. The engine checks for cancellation every 25 ms, including during longer pauses. A run also stops on the first input error, after eight hours, or when the process closes.
 
-`Esc` es un atajo global intencional mientras Human Typer está abierto. Si interfiere con otra utilidad, cerrá Human Typer cuando no lo uses.
+`Esc` intentionally acts as a global shortcut while Human Typer is open. Close Human Typer when it is not in use if this conflicts with another utility.
 
-## Permisos de macOS
+## macOS permissions
 
-macOS requiere autorización para generar eventos de teclado:
+macOS requires permission to generate keyboard events:
 
-1. Abrí **Configuración del Sistema**.
-2. Entrá en **Privacidad y seguridad → Accesibilidad**.
-3. Activá **Human Typer**.
-4. Si estaba abierta, cerrá y volvé a abrir la aplicación.
+1. Open **System Settings**.
+2. Go to **Privacy & Security → Accessibility**.
+3. Enable **Human Typer**.
+4. Quit and reopen the application if it was already running.
 
-Durante desarrollo puede aparecer `Terminal`, `iTerm`, tu IDE o el binario de depuración en lugar de Human Typer. Autorizá el proceso que ejecuta `npm run tauri dev`. La aplicación comprueba este permiso antes de empezar y muestra instrucciones si falta.
+During development, the list may show Terminal, iTerm, your IDE, or the debug binary instead of Human Typer. Enable the process that runs `npm run tauri dev`. The application checks this permission before typing and displays instructions when it is missing.
 
-## Compatibilidad
+## Compatibility
 
-| Sistema       | Estado             | Notas                                                                       |
-| ------------- | ------------------ | --------------------------------------------------------------------------- |
-| macOS 12+     | Objetivo principal | Requiere Accesibilidad. Los binarios distribuidos deben firmarse.           |
-| Windows 11    | Objetivo principal | Algunas aplicaciones elevadas no aceptan eventos de procesos sin elevar.    |
-| Linux X11     | Compatible         | Requiere una sesión gráfica y las dependencias de Tauri.                    |
-| Linux Wayland | Experimental       | La inyección y los atajos globales dependen del compositor y sus políticas. |
+| System        | Status         | Notes                                                                     |
+| ------------- | -------------- | ------------------------------------------------------------------------- |
+| macOS 12+     | Primary target | Requires Accessibility permission. Distributed binaries should be signed. |
+| Windows 11    | Primary target | Elevated applications may reject events from a non-elevated process.      |
+| Linux X11     | Supported      | Requires a graphical session and the Tauri system dependencies.           |
+| Linux Wayland | Experimental   | Input injection and global shortcuts depend on compositor policy.         |
 
-En campos protegidos, aplicaciones con privilegios elevados, juegos o escritorios remotos, el sistema operativo o la aplicación de destino puede bloquear eventos simulados.
+Protected fields, elevated applications, games, and remote desktop software may reject simulated input.
 
-## Arquitectura
+## Architecture
 
 ```text
 src/
-├── components/            # interfaz y controles pequeños
-├── hooks/                 # preferencias, tema y puente con Tauri
-├── lib/                   # lógica pura y tests
-├── types/                 # contratos TypeScript
+├── components/            # Small UI components and controls
+├── hooks/                 # Preferences, theme, and the Tauri bridge
+├── lib/                   # Pure logic and tests
+├── types/                 # TypeScript contracts
 ├── App.tsx
 └── main.tsx
 src-tauri/
 ├── src/
-│   ├── lib.rs             # comandos, estado y atajos globales
-│   ├── platform.rs        # permisos específicos del sistema
-│   └── typing_engine.rs   # cuenta regresiva, ritmo y entrada Unicode
-├── capabilities/          # permisos mínimos de Tauri
+│   ├── lib.rs             # Commands, shared state, and global shortcuts
+│   ├── platform.rs        # Platform-specific permission checks
+│   └── typing_engine.rs   # Countdown, timing, and Unicode input
+├── capabilities/          # Minimal Tauri permissions
 ├── Cargo.toml
 └── tauri.conf.json
 ```
 
-React invoca comandos Tauri y escucha eventos de estado. Un worker nativo mantiene la cuenta regresiva y el bucle de escritura; `enigo` genera cada carácter por separado. El estado sincronizado del worker permite que los atajos globales pausen o cancelen sin depender del foco del WebView.
+React invokes Tauri commands and listens for state events. A native worker owns the countdown and typing loop, while `enigo` emits each character separately. Synchronized worker state lets global shortcuts pause or cancel without relying on WebView focus.
 
-## Persistencia y privacidad
+## Persistence and privacy
 
-Solo se guardan velocidad, variación, cuenta regresiva, tema y preferencia de puntuación mediante `localStorage`. El área de texto vive exclusivamente en memoria y se pierde al cerrar o recargar la aplicación.
+Only the speed, variation, countdown, theme, and punctuation preference are stored in `localStorage`. Text exists only in memory and is discarded when the application closes or reloads.
 
-- no se realizan solicitudes con el contenido;
-- no se incluyen analytics, crash reporting ni cuentas;
-- no se guardan logs del texto;
-- la política de contenido de Tauri restringe recursos externos.
+- Text is never sent over the network.
+- There are no analytics, crash reporting services, or user accounts.
+- Text is never written to logs.
+- Tauri's content security policy restricts external resources.
 
-## Pruebas
+## Testing
 
-La lógica pura cubre conteo Unicode, progreso, persistencia y estimaciones. Rust prueba los componentes de retraso, el límite mínimo, la puntuación y las transiciones principales de control. Las pulsaciones reales se validan manualmente por plataforma porque automatizarlas produciría tests frágiles y podría escribir en aplicaciones equivocadas.
+Pure frontend logic tests cover Unicode counting, progress, persistence, and duration estimates. Rust tests cover delay components, the minimum delay, punctuation, and the main control-state transitions. Real keystrokes are validated manually on each platform because automating them would create fragile tests and could type into the wrong application.
 
 ```bash
 npm run check
 cargo test --manifest-path src-tauri/Cargo.toml
 ```
 
-## Licencia
+## License
 
-Todavía no se definió una licencia de distribución. Agregá una antes de publicar el repositorio como software abierto.
+Copyright © 2026 AugustoOM.
+
+Human Typer is free software licensed under the [GNU General Public License version 3](LICENSE), identified by the SPDX expression `GPL-3.0-only`. You may use, study, modify, and redistribute it under the terms of that license. Distributed modified versions must preserve the same freedoms and provide the corresponding source as required by the GPL.
