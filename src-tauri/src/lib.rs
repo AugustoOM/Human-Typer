@@ -1,14 +1,106 @@
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+mod platform;
+mod typing_engine;
+
+use serde::Serialize;
+use tauri::Manager;
+use typing_engine::{TypingController, TypingRequest};
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct RuntimeInfo {
+    platform: &'static str,
+    shortcut_warning: Option<String>,
+    accessibility_granted: bool,
+}
+
 #[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+fn start_typing(
+    app: tauri::AppHandle,
+    controller: tauri::State<'_, TypingController>,
+    request: TypingRequest,
+) -> Result<(), String> {
+    typing_engine::start_typing(app, controller, request)
+}
+
+#[tauri::command]
+fn toggle_pause(app: tauri::AppHandle, controller: tauri::State<'_, TypingController>) {
+    controller.toggle_pause(&app);
+}
+
+#[tauri::command]
+fn cancel_typing(app: tauri::AppHandle, controller: tauri::State<'_, TypingController>) {
+    controller.cancel(&app);
+}
+
+#[tauri::command]
+fn get_runtime_info(controller: tauri::State<'_, TypingController>) -> RuntimeInfo {
+    RuntimeInfo {
+        platform: std::env::consts::OS,
+        shortcut_warning: controller.shortcut_warning(),
+        accessibility_granted: platform::accessibility_granted(),
+    }
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
-        .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![greet])
+    #[cfg(desktop)]
+    let pause_shortcut =
+        tauri_plugin_global_shortcut::Shortcut::new(None, tauri_plugin_global_shortcut::Code::F8);
+    #[cfg(desktop)]
+    let cancel_shortcut = tauri_plugin_global_shortcut::Shortcut::new(
+        None,
+        tauri_plugin_global_shortcut::Code::Escape,
+    );
+
+    let builder = tauri::Builder::default().manage(TypingController::default());
+
+    #[cfg(desktop)]
+    let builder = {
+        use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
+
+        let handler_pause = pause_shortcut;
+        let handler_cancel = cancel_shortcut;
+        builder.plugin(
+            tauri_plugin_global_shortcut::Builder::new()
+                .with_handler(move |app, shortcut, event| {
+                    if event.state() != ShortcutState::Pressed {
+                        return;
+                    }
+                    let controller = app.state::<TypingController>();
+                    if shortcut == &handler_pause {
+                        controller.toggle_pause(app);
+                    } else if shortcut == &handler_cancel {
+                        controller.cancel(app);
+                    }
+                })
+                .build(),
+        )
+        .setup(move |app| {
+            let shortcuts = app.global_shortcut();
+            let mut unavailable = Vec::new();
+            if shortcuts.register(pause_shortcut).is_err() {
+                unavailable.push("F8");
+            }
+            if shortcuts.register(cancel_shortcut).is_err() {
+                unavailable.push("Esc");
+            }
+            if !unavailable.is_empty() {
+                app.state::<TypingController>().set_shortcut_warning(format!(
+                    "No se pudieron registrar los atajos globales: {}. Los botones de la app siguen disponibles.",
+                    unavailable.join(", ")
+                ));
+            }
+            Ok(())
+        })
+    };
+
+    builder
+        .invoke_handler(tauri::generate_handler![
+            start_typing,
+            toggle_pause,
+            cancel_typing,
+            get_runtime_info
+        ])
         .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .expect("Human Typer no pudo iniciar");
 }
