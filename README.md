@@ -39,8 +39,8 @@ The screenshot directory is prepared at [`docs/screenshots`](docs/screenshots). 
 
 ## Requirements
 
-- Node.js 22 LTS; Vite also supports Node.js 20.19 or newer.
-- npm 10 or newer.
+- Node.js 26 or newer. The repository pins 26.8.1 in `.nvmrc`.
+- npm 11.12.1 or newer.
 - Rust 1.85 or newer.
 - The [Tauri 2 prerequisites](https://v2.tauri.app/start/prerequisites/) for your operating system.
 
