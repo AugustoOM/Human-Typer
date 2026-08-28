@@ -29,7 +29,6 @@
     "targets": "all",
     "copyright": "Copyright © 2026 AugustoOM",
     "license": "GPL-3.0-only",
-    "licenseFile": "../LICENSE",
     "resources": {
       "../LICENSE": "LICENSE"
     },

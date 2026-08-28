@@ -40,8 +40,8 @@ The screenshot directory is prepared at [`docs/screenshots`](docs/screenshots). 
 ## Requirements
 
 - Node.js 26 or newer. The repository pins 26.8.1 in `.nvmrc`.
-- npm 11.12.1 or newer.
-- Rust 1.85 or newer.
+- npm 12 or newer. The repository declares npm 12.0.2 in `package.json`.
+- Rust 1.98 or newer. The repository pins 1.98.0 in `rust-toolchain.toml`.
 - The [Tauri 2 prerequisites](https://v2.tauri.app/start/prerequisites/) for your operating system.
 
 Linux additionally requires the WebKitGTK development libraries listed by Tauri.

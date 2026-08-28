@@ -36,8 +36,11 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
 
+      - name: Set up npm
+        run: npm install --global npm@12.0.2
+
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@1.98.0
         with:
           targets: ${{ matrix.target }}
 
@@ -52,7 +55,7 @@ jobs:
           tagName: v__VERSION__
           releaseName: Human Typer v__VERSION__
           releaseBody: |
-            Primera versión de Human Typer.
+            Human Typer 0.2.0 incorpora una interfaz renovada y actualiza la base de desarrollo a Node.js 26, npm 12 y Rust 1.98.
 
             Descargas:
             - Windows: instalador `.exe` de 64 bits.
