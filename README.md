@@ -109,6 +109,8 @@ macOS requires permission to generate keyboard events:
 
 During development, the list may show Terminal, iTerm, your IDE, or the debug binary instead of Human Typer. Enable the process that runs `npm run tauri dev`. The application checks this permission before typing and displays instructions when it is missing.
 
+If Human Typer appears enabled but the app still reports that permission is missing, quit it completely and reopen the same `.app` that you authorized. Unsigned development builds can receive a new code identity after recompilation; in that case, remove the old Human Typer entry with the `−` button, add the exact current `.app` with `+`, enable it, and reopen the app. Prefer copying the latest build to `/Applications` and always launching that copy.
+
 ## Compatibility
 
 | System        | Status         | Notes                                                                     |

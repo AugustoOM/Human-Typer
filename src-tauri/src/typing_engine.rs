@@ -176,8 +176,9 @@ pub fn start_typing(
     request: TypingRequest,
 ) -> Result<(), String> {
     if !platform::accessibility_granted() {
+        platform::request_accessibility();
         return Err(
-            "Human Typer necesita permiso de Accesibilidad. Abrí Configuración del Sistema → Privacidad y seguridad → Accesibilidad, habilitá Human Typer y volvé a intentarlo."
+            "Human Typer necesita permiso de Accesibilidad. Habilitalo en Configuración del Sistema → Privacidad y seguridad → Accesibilidad. Si ya aparece habilitado, quitá y volvé a abrir Human Typer; una compilación nueva puede necesitar que retires y agregues nuevamente la app."
                 .into(),
         );
     }

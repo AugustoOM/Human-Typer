@@ -48,6 +48,10 @@ export function TypingStatusPanel({
       className={`status-card status-${state.status}`}
       aria-live="polite"
     >
+      <div className="status-section-heading">
+        <span className="eyebrow">CONTROL / 03</span>
+        <span>Registro de ejecución</span>
+      </div>
       <div className="status-main">
         <div className="status-copy">
           <span className="status-dot" />

@@ -18,8 +18,8 @@ export function TextComposer({
     <section className="card composer-card" aria-labelledby="text-heading">
       <div className="section-heading">
         <div>
-          <span className="eyebrow">CONTENIDO</span>
-          <h2 id="text-heading">Tu texto</h2>
+          <span className="eyebrow">ENTRADA / 01</span>
+          <h2 id="text-heading">Contenido de la secuencia</h2>
         </div>
         <div className="composer-actions">
           <span className="character-count">

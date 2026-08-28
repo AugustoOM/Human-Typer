@@ -25,7 +25,7 @@ export function TypingSettings({
     <section className="card settings-card" aria-labelledby="settings-heading">
       <div className="section-heading settings-title">
         <div>
-          <span className="eyebrow">COMPORTAMIENTO</span>
+          <span className="eyebrow">AJUSTE / 02</span>
           <h2 id="settings-heading">Ritmo de escritura</h2>
         </div>
         <span className="settings-summary">

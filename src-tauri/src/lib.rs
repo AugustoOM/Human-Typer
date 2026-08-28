@@ -41,6 +41,11 @@ fn get_runtime_info(controller: tauri::State<'_, TypingController>) -> RuntimeIn
     }
 }
 
+#[tauri::command]
+fn request_accessibility() -> bool {
+    platform::request_accessibility()
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     #[cfg(desktop)]
@@ -99,7 +104,8 @@ pub fn run() {
             start_typing,
             toggle_pause,
             cancel_typing,
-            get_runtime_info
+            get_runtime_info,
+            request_accessibility
         ])
         .run(tauri::generate_context!())
         .expect("Human Typer no pudo iniciar");

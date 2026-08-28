@@ -20,23 +20,38 @@ export function useTypingEngine() {
   const [state, setState] = useState<TypingState>(INITIAL_STATE);
   const [runtimeInfo, setRuntimeInfo] = useState<RuntimeInfo | null>(null);
 
+  const refreshRuntimeInfo = useCallback(async () => {
+    try {
+      setRuntimeInfo(await invoke<RuntimeInfo>("get_runtime_info"));
+    } catch (error) {
+      setState((current) => ({
+        ...current,
+        status: "error",
+        message: friendlyError(error),
+      }));
+    }
+  }, []);
+
   useEffect(() => {
     const unlisten = listen<TypingState>("typing-state", (event) =>
       setState(event.payload),
     );
-    invoke<RuntimeInfo>("get_runtime_info")
-      .then(setRuntimeInfo)
-      .catch((error: unknown) => {
-        setState((current) => ({
-          ...current,
-          status: "error",
-          message: friendlyError(error),
-        }));
-      });
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === "visible") {
+        void refreshRuntimeInfo();
+      }
+    };
+
+    void refreshRuntimeInfo();
+    window.addEventListener("focus", refreshWhenVisible);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+
     return () => {
       void unlisten.then((dispose) => dispose());
+      window.removeEventListener("focus", refreshWhenVisible);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
     };
-  }, []);
+  }, [refreshRuntimeInfo]);
 
   const start = useCallback(async (request: TypingRequest) => {
     setState({
@@ -74,5 +89,21 @@ export function useTypingEngine() {
     }
   }, []);
 
-  return { state, runtimeInfo, start, togglePause, cancel };
+  const requestAccessibility = useCallback(async () => {
+    try {
+      await invoke<boolean>("request_accessibility");
+      await refreshRuntimeInfo();
+    } catch (error) {
+      setState((current) => ({ ...current, message: friendlyError(error) }));
+    }
+  }, [refreshRuntimeInfo]);
+
+  return {
+    state,
+    runtimeInfo,
+    start,
+    togglePause,
+    cancel,
+    requestAccessibility,
+  };
 }
