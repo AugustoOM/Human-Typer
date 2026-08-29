@@ -55,7 +55,7 @@ jobs:
           tagName: v__VERSION__
           releaseName: Human Typer v__VERSION__
           releaseBody: |
-            Human Typer 0.2.0 incorpora una interfaz renovada y actualiza la base de desarrollo a Node.js 26, npm 12 y Rust 1.98.
+            Human Typer 0.3.0 presenta una interfaz más clara, tipografía más grande y contrastada, y un nuevo icono amarillo alineado con la identidad visual de la aplicación.
 
             Descargas:
             - Windows: instalador `.exe` de 64 bits.
