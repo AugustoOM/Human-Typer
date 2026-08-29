@@ -19,8 +19,8 @@ interface TypingStatusPanelProps {
 }
 
 const statusLabels = {
-  idle: "Listo para comenzar",
-  countdown: "Preparando escritura",
+  idle: "Listo",
+  countdown: "Preparando",
   typing: "Escribiendo",
   paused: "En pausa",
   completed: "Completado",
@@ -46,12 +46,9 @@ export function TypingStatusPanel({
   return (
     <section
       className={`status-card status-${state.status}`}
+      aria-label="Control de escritura"
       aria-live="polite"
     >
-      <div className="status-section-heading">
-        <span className="eyebrow">CONTROL / 03</span>
-        <span>Registro de ejecución</span>
-      </div>
       <div className="status-main">
         <div className="status-copy">
           <span className="status-dot" />

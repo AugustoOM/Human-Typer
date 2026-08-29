@@ -24,13 +24,7 @@ export function TypingSettings({
   return (
     <section className="card settings-card" aria-labelledby="settings-heading">
       <div className="section-heading settings-title">
-        <div>
-          <span className="eyebrow">AJUSTE / 02</span>
-          <h2 id="settings-heading">Ritmo de escritura</h2>
-        </div>
-        <span className="settings-summary">
-          Natural, con pequeñas variaciones
-        </span>
+        <h2 id="settings-heading">Ritmo</h2>
       </div>
 
       <div className="setting-block full-width">
@@ -89,7 +83,6 @@ export function TypingSettings({
               <label htmlFor="variation">Variación</label>
               <strong>±{preferences.variationMs} ms</strong>
             </div>
-            <p>Evita un ritmo mecánico entre teclas.</p>
             <input
               id="variation"
               className="range"
@@ -112,10 +105,9 @@ export function TypingSettings({
           </div>
           <div className="panel-content">
             <div className="setting-label-row">
-              <label htmlFor="countdown">Cuenta regresiva</label>
+              <label htmlFor="countdown">Espera</label>
               <strong>{preferences.countdownSeconds} s</strong>
             </div>
-            <p>Tiempo para enfocar el campo de destino.</p>
             <input
               id="countdown"
               className="range"
@@ -140,11 +132,7 @@ export function TypingSettings({
           <Gauge size={18} />
         </span>
         <span className="toggle-copy">
-          <strong>Pausas después de puntuación</strong>
-          <small>
-            Agrega una pausa natural tras comas, puntos, signos y saltos de
-            línea.
-          </small>
+          <strong>Pausas de puntuación</strong>
         </span>
         <input
           type="checkbox"

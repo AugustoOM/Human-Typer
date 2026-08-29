@@ -31,7 +31,7 @@ function App() {
   const runtimeWarning =
     runtimeInfo?.shortcutWarning ??
     (needsAccessibility
-      ? "Para escribir en otras aplicaciones, habilitá Human Typer en Configuración del Sistema → Privacidad y seguridad → Accesibilidad. Si ya está activado, cerrá y volvé a abrir la app."
+      ? "Permití el acceso en Privacidad y seguridad → Accesibilidad. Reiniciá la app después de activarlo."
       : null);
   const operationalState = active
     ? state.status === "paused"
@@ -54,28 +54,14 @@ function App() {
   return (
     <div className="app-frame">
       <aside className="app-rail" aria-label="Identificación de la estación">
-        <div className="rail-brand">
-          <BrandMark />
-          <span>Human Typer</span>
-        </div>
-        <strong>HT</strong>
-        <small>TYPE-LAB / LOCAL</small>
+        <BrandMark />
       </aside>
 
       <main className="app-shell">
         <header className="app-header">
-          <div>
-            <p className="stamp">
-              Estación de escritura / automatización local
-            </p>
-            <h1>
-              Human <span>Typer</span>
-            </h1>
-            <p className="header-deck">
-              Convertí cualquier texto en pulsaciones reales, con un ritmo
-              natural y bajo tu control.
-            </p>
-          </div>
+          <h1>
+            Human <span>Typer</span>
+          </h1>
           <div className="header-controls">
             <ThemePicker
               value={preferences.theme}
@@ -99,7 +85,7 @@ function App() {
                   type="button"
                   onClick={() => void requestAccessibility()}
                 >
-                  Solicitar / comprobar permiso
+                  Comprobar permiso
                 </button>
               )}
             </div>
@@ -128,13 +114,6 @@ function App() {
           onTogglePause={() => void togglePause()}
           onCancel={() => void cancel()}
         />
-
-        <footer>
-          <span>100% local · El contenido no se guarda ni se envía</span>
-          <span className="platform-note">
-            <kbd>F8</kbd> pausa / reanuda · <kbd>Esc</kbd> detiene
-          </span>
-        </footer>
       </main>
     </div>
   );

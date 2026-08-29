@@ -5,7 +5,7 @@ export const SPEED_PRESETS = {
   fast: { label: "Rápida", delay: 55 },
   normal: { label: "Normal", delay: 85 },
   slow: { label: "Lenta", delay: 140 },
-  custom: { label: "Personalizada", delay: null },
+  custom: { label: "Manual", delay: null },
 } as const;
 
 export function countCharacters(text: string): number {

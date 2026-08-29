@@ -1,4 +1,4 @@
-import { Eraser, LockKeyhole } from "lucide-react";
+import { Eraser } from "lucide-react";
 import { countCharacters } from "../lib/typing";
 
 interface TextComposerProps {
@@ -17,10 +17,7 @@ export function TextComposer({
   return (
     <section className="card composer-card" aria-labelledby="text-heading">
       <div className="section-heading">
-        <div>
-          <span className="eyebrow">ENTRADA / 01</span>
-          <h2 id="text-heading">Contenido de la secuencia</h2>
-        </div>
+        <h2 id="text-heading">Texto</h2>
         <div className="composer-actions">
           <span className="character-count">
             {countCharacters(text).toLocaleString("es")} caracteres
@@ -41,14 +38,10 @@ export function TextComposer({
         value={text}
         onChange={(event) => onChange(event.currentTarget.value)}
         disabled={disabled}
-        placeholder="Pegá o escribí acá el texto que querés reproducir…"
+        placeholder="Pegá o escribí el texto…"
         spellCheck="true"
         autoFocus
       />
-      <div className="privacy-note">
-        <LockKeyhole size={14} />
-        <span>Tu texto permanece en este dispositivo y no se guarda.</span>
-      </div>
     </section>
   );
 }
