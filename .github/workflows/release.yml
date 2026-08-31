@@ -128,7 +128,9 @@ jobs:
           tagName: v__VERSION__
           releaseName: Human Typer v__VERSION__
           releaseBody: |
-            Human Typer 0.3.1 corrige la firma del paquete para macOS. La aplicación ahora recibe una firma ad hoc válida cuando no hay credenciales de Apple y admite firma Developer ID con notarización cuando están configuradas.
+            Human Typer 0.4.0 incorpora la protección opcional de ventana objetivo en macOS y Windows. Al activarla, la escritura se pausa automáticamente si otra ventana recibe el foco y sólo continúa cuando el usuario vuelve al objetivo y presiona F8.
+
+            En macOS, el paquete conserva la firma ad hoc válida y admite firma Developer ID con notarización cuando están configuradas las credenciales de Apple.
 
             Descargas:
             - Windows: instalador `.exe` de 64 bits.
