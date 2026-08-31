@@ -15,6 +15,7 @@ export interface Preferences {
   variationMs: number;
   countdownSeconds: number;
   punctuationPauses: boolean;
+  pauseOnFocusLoss: boolean;
   speedPreset: SpeedPreset;
   theme: ThemePreference;
 }
@@ -33,10 +34,12 @@ export interface TypingRequest {
   variationMs: number;
   countdownSeconds: number;
   punctuationPauses: boolean;
+  pauseOnFocusLoss: boolean;
 }
 
 export interface RuntimeInfo {
   platform: string;
   shortcutWarning: string | null;
   accessibilityGranted: boolean;
+  focusGuardSupported: boolean;
 }

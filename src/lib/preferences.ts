@@ -7,6 +7,7 @@ export const DEFAULT_PREFERENCES: Preferences = {
   variationMs: 35,
   countdownSeconds: 5,
   punctuationPauses: true,
+  pauseOnFocusLoss: false,
   speedPreset: "normal",
   theme: "system",
 };
@@ -43,6 +44,10 @@ export function parsePreferences(raw: string | null): Preferences {
         typeof value.punctuationPauses === "boolean"
           ? value.punctuationPauses
           : true,
+      pauseOnFocusLoss:
+        typeof value.pauseOnFocusLoss === "boolean"
+          ? value.pauseOnFocusLoss
+          : false,
       speedPreset: speedPresets.includes(value.speedPreset as SpeedPreset)
         ? (value.speedPreset as SpeedPreset)
         : "normal",

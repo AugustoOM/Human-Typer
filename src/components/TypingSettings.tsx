@@ -1,16 +1,18 @@
-import { Clock3, Gauge, Sparkles } from "lucide-react";
+import { Clock3, Gauge, PanelsTopLeft, Sparkles } from "lucide-react";
 import { SPEED_PRESETS } from "../lib/typing";
 import type { Preferences, SpeedPreset } from "../types";
 
 interface TypingSettingsProps {
   preferences: Preferences;
   disabled: boolean;
+  focusGuardSupported: boolean;
   onChange: (patch: Partial<Preferences>) => void;
 }
 
 export function TypingSettings({
   preferences,
   disabled,
+  focusGuardSupported,
   onChange,
 }: TypingSettingsProps) {
   function selectPreset(preset: SpeedPreset) {
@@ -140,6 +142,35 @@ export function TypingSettings({
           disabled={disabled}
           onChange={(event) =>
             onChange({ punctuationPauses: event.currentTarget.checked })
+          }
+        />
+        <span className="switch" aria-hidden="true" />
+      </label>
+
+      <label
+        className={
+          disabled || !focusGuardSupported
+            ? "toggle-row disabled"
+            : "toggle-row"
+        }
+      >
+        <span className="panel-icon">
+          <PanelsTopLeft size={18} />
+        </span>
+        <span className="toggle-copy">
+          <strong>Proteger ventana objetivo</strong>
+          <small>
+            {focusGuardSupported
+              ? "Pausa si otra ventana recibe el foco"
+              : "Disponible en macOS y Windows"}
+          </small>
+        </span>
+        <input
+          type="checkbox"
+          checked={preferences.pauseOnFocusLoss}
+          disabled={disabled || !focusGuardSupported}
+          onChange={(event) =>
+            onChange({ pauseOnFocusLoss: event.currentTarget.checked })
           }
         />
         <span className="switch" aria-hidden="true" />

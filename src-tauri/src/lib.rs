@@ -11,6 +11,7 @@ struct RuntimeInfo {
     platform: &'static str,
     shortcut_warning: Option<String>,
     accessibility_granted: bool,
+    focus_guard_supported: bool,
 }
 
 #[tauri::command]
@@ -38,6 +39,7 @@ fn get_runtime_info(controller: tauri::State<'_, TypingController>) -> RuntimeIn
         platform: std::env::consts::OS,
         shortcut_warning: controller.shortcut_warning(),
         accessibility_granted: platform::accessibility_granted(),
+        focus_guard_supported: platform::focus_guard_supported(),
     }
 }
 

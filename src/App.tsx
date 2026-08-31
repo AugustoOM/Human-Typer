@@ -48,6 +48,7 @@ function App() {
       variationMs: preferences.variationMs,
       countdownSeconds: preferences.countdownSeconds,
       punctuationPauses: preferences.punctuationPauses,
+      pauseOnFocusLoss: preferences.pauseOnFocusLoss,
     });
   }
 
@@ -102,6 +103,7 @@ function App() {
           <TypingSettings
             preferences={preferences}
             disabled={active}
+            focusGuardSupported={runtimeInfo?.focusGuardSupported ?? false}
             onChange={updatePreferences}
           />
         </div>

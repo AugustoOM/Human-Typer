@@ -13,11 +13,13 @@ describe("preferences", () => {
         baseDelayMs: -5,
         variationMs: 30,
         countdownSeconds: 99,
+        pauseOnFocusLoss: true,
         theme: "neon",
       }),
     );
     expect(parsed.baseDelayMs).toBe(15);
     expect(parsed.countdownSeconds).toBe(30);
+    expect(parsed.pauseOnFocusLoss).toBe(true);
     expect(parsed.theme).toBe("system");
   });
 });

@@ -82,11 +82,17 @@ export function TypingStatusPanel({
       {state.message && (
         <div
           className={
-            state.status === "error" ? "state-message error" : "state-message"
+            state.status === "error"
+              ? "state-message error"
+              : state.status === "paused"
+                ? "state-message attention"
+                : "state-message"
           }
         >
           {state.status === "error" ? (
             <AlertTriangle size={16} />
+          ) : state.status === "paused" ? (
+            <Pause size={16} />
           ) : (
             <CheckCircle2 size={16} />
           )}

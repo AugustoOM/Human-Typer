@@ -16,6 +16,7 @@ It is built with Tauri 2, React 19, TypeScript, and Rust. Everything runs locall
 - Includes predefined speeds and fine-grained adjustment from 15 to 350 ms.
 - Adds random timing variation and subtle natural fluctuations.
 - Supports optional pauses after `. , ; : ? !` and line breaks.
+- Can lock onto the target window and pause automatically if focus moves elsewhere on macOS or Windows.
 - Provides a configurable countdown from 1 to 30 seconds.
 - Displays status, character progress, and percentage.
 - Pauses or resumes globally with `F8` and cancels immediately with `Esc`.
@@ -91,9 +92,10 @@ In CI or a macOS session that cannot automate Finder, run `CI=true npm run tauri
 1. Paste or enter content in **Your text**.
 2. Select a speed preset or adjust the delay slider in milliseconds.
 3. Configure timing variation, the countdown, and punctuation pauses.
-4. Select **Start**.
-5. Focus the target text field during the countdown.
-6. Press `F8` to pause or resume, or `Esc` to cancel.
+4. Optionally enable **Protect target window** to prevent typing into another window if focus changes.
+5. Select **Start**.
+6. Focus the target text field during the countdown. With target protection enabled, the foreground window at the end of the countdown becomes the target.
+7. Press `F8` to pause or resume, or `Esc` to cancel. After an automatic focus-loss pause, return to the target window before pressing `F8`.
 
 Editing and settings are locked while a run is active so the displayed progress always matches the text being typed.
 
@@ -156,7 +158,7 @@ React invokes Tauri commands and listens for state events. A native worker owns 
 
 ## Persistence and privacy
 
-Only the speed, variation, countdown, theme, and punctuation preference are stored in `localStorage`. Text exists only in memory and is discarded when the application closes or reloads.
+Only the speed, variation, countdown, theme, punctuation, and target-window protection preferences are stored in `localStorage`. Text exists only in memory and is discarded when the application closes or reloads.
 
 - Text is never sent over the network.
 - There are no analytics, crash reporting services, or user accounts.

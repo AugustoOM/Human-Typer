@@ -41,6 +41,7 @@ pub struct TypingRequest {
     pub variation_ms: u64,
     pub countdown_seconds: u64,
     pub punctuation_pauses: bool,
+    pub pause_on_focus_loss: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -175,6 +176,9 @@ pub fn start_typing(
     controller: tauri::State<'_, TypingController>,
     request: TypingRequest,
 ) -> Result<(), String> {
+    if request.pause_on_focus_loss && !platform::focus_guard_supported() {
+        return Err("La protección de ventana sólo está disponible en macOS y Windows.".into());
+    }
     if !platform::accessibility_granted() {
         platform::request_accessibility();
         return Err(
@@ -223,10 +227,29 @@ fn run_typing(
                 message: None,
             },
         );
-        if !interruptible_sleep(controller, generation, Duration::from_secs(1), false) {
+        if !interruptible_sleep(
+            &app,
+            controller,
+            generation,
+            Duration::from_secs(1),
+            false,
+            None,
+        ) {
             return;
         }
     }
+
+    let focus_target = if request.pause_on_focus_loss {
+        match platform::FocusedWindow::capture() {
+            Ok(target) => Some(target),
+            Err(error) => {
+                finish_with_error(&app, controller, generation, error);
+                return;
+            }
+        }
+    } else {
+        None
+    };
 
     {
         let mut runtime = controller.lock();
@@ -263,7 +286,7 @@ fn run_typing(
             return;
         }
 
-        if !wait_until_ready(controller, generation) {
+        if !wait_until_ready(&app, controller, generation, focus_target.as_ref()) {
             return;
         }
 
@@ -295,7 +318,14 @@ fn run_typing(
             request.punctuation_pauses,
             &mut rng,
         );
-        if !interruptible_sleep(controller, generation, delay, true) {
+        if !interruptible_sleep(
+            &app,
+            controller,
+            generation,
+            delay,
+            true,
+            focus_target.as_ref(),
+        ) {
             return;
         }
     }
@@ -331,8 +361,19 @@ fn is_generation_active(controller: &TypingController, generation: u64) -> bool 
     runtime.generation == generation && runtime.status != TypingStatus::Cancelled
 }
 
-fn wait_until_ready(controller: &TypingController, generation: u64) -> bool {
+fn wait_until_ready(
+    app: &AppHandle,
+    controller: &TypingController,
+    generation: u64,
+    focus_target: Option<&platform::FocusedWindow>,
+) -> bool {
     loop {
+        if let Some(target) = focus_target
+            && !target.is_active()
+        {
+            pause_for_focus_loss(app, controller, generation);
+        }
+
         let status = {
             let runtime = controller.lock();
             if runtime.generation != generation || runtime.status == TypingStatus::Cancelled {
@@ -348,14 +389,16 @@ fn wait_until_ready(controller: &TypingController, generation: u64) -> bool {
 }
 
 fn interruptible_sleep(
+    app: &AppHandle,
     controller: &TypingController,
     generation: u64,
     duration: Duration,
     respect_pause: bool,
+    focus_target: Option<&platform::FocusedWindow>,
 ) -> bool {
     let mut remaining = duration;
     while !remaining.is_zero() {
-        if respect_pause && !wait_until_ready(controller, generation) {
+        if respect_pause && !wait_until_ready(app, controller, generation, focus_target) {
             return false;
         }
         if !is_generation_active(controller, generation) {
@@ -366,6 +409,27 @@ fn interruptible_sleep(
         remaining = remaining.saturating_sub(slice);
     }
     true
+}
+
+fn pause_for_focus_loss(app: &AppHandle, controller: &TypingController, generation: u64) {
+    if let Some(event) = focus_loss_event(controller, generation) {
+        emit_event(app, event);
+    }
+}
+
+fn focus_loss_event(controller: &TypingController, generation: u64) -> Option<TypingEvent> {
+    let mut runtime = controller.lock();
+    if runtime.generation != generation || runtime.status != TypingStatus::Typing {
+        return None;
+    }
+    runtime.status = TypingStatus::Paused;
+    Some(event_from_runtime(
+        &runtime,
+        Some(
+            "Pausa automática: la ventana objetivo perdió el foco. Volvé a ella y presioná F8 para continuar."
+                .into(),
+        ),
+    ))
 }
 
 fn finish_with_error(
@@ -473,5 +537,18 @@ mod tests {
             runtime.status = TypingStatus::Cancelled;
             assert!(!runtime.status.is_active());
         }
+    }
+
+    #[test]
+    fn focus_loss_pauses_an_active_run_only_once() {
+        let controller = TypingController::default();
+        let generation = controller.begin(12).unwrap();
+        controller.lock().status = TypingStatus::Typing;
+
+        let event = focus_loss_event(&controller, generation).unwrap();
+        assert_eq!(event.status, TypingStatus::Paused);
+        assert!(event.message.unwrap().contains("ventana objetivo"));
+        assert!(focus_loss_event(&controller, generation).is_none());
+        assert!(focus_loss_event(&controller, generation.wrapping_add(1)).is_none());
     }
 }
