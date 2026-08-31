@@ -31,7 +31,7 @@ Prebuilt installers are available on the [GitHub Releases page](https://github.c
 - Windows 11, 64-bit: NSIS `.exe` installer.
 - macOS, Apple Silicon: `.dmg` image.
 
-The current binaries are not code-signed. Windows SmartScreen or macOS Gatekeeper may therefore display a warning. Public distribution should use signed and, on macOS, notarized builds.
+Windows binaries are not code-signed, so SmartScreen may display a warning. The macOS release workflow always applies at least an ad-hoc signature so Gatekeeper does not misidentify the downloaded app as damaged. Without a Developer ID signature and notarization, macOS can still require the user to approve the first launch from **Privacy & Security** or by Control-clicking the app and selecting **Open**.
 
 ## Screenshots
 
@@ -73,6 +73,16 @@ npm run tauri build
 ```
 
 Installers are generated under `src-tauri/target/release/bundle/`. Configure macOS signing and notarization and Windows code signing before distributing production builds.
+
+The release workflow uses an ad-hoc macOS signature when Apple credentials are unavailable. For normal Gatekeeper approval without a manual exception, add all of these GitHub Actions secrets:
+
+- `APPLE_CERTIFICATE`: base64-encoded Developer ID Application `.p12` certificate.
+- `APPLE_CERTIFICATE_PASSWORD`: password used to export the certificate.
+- `APPLE_ID`: Apple Developer account email.
+- `APPLE_PASSWORD`: app-specific password for that Apple ID.
+- `APPLE_TEAM_ID`: Apple Developer team identifier.
+
+The workflow rejects a partial configuration, imports the Developer ID certificate, notarizes the app through Tauri, and verifies the DMG, bundle signature, Gatekeeper assessment, and stapled notarization ticket. If none of the five secrets exist, it verifies the ad-hoc signature instead.
 
 In CI or a macOS session that cannot automate Finder, run `CI=true npm run tauri build`. Tauri will omit the DMG's visual Finder customization while still producing a valid installer.
 
