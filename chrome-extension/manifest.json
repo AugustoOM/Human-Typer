@@ -16,5 +16,11 @@
   "action": {
     "default_popup": "popup.html",
     "default_title": "Human Typer"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "humantyper@desktop.app",
+      "strict_min_version": "109.0"
+    }
   }
 }
