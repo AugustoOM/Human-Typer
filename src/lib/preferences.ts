@@ -8,6 +8,8 @@ export const DEFAULT_PREFERENCES: Preferences = {
   countdownSeconds: 5,
   punctuationPauses: true,
   pauseOnFocusLoss: false,
+  soundNotification: true,
+  desktopNotification: true,
   speedPreset: "normal",
   theme: "system",
 };
@@ -48,6 +50,14 @@ export function parsePreferences(raw: string | null): Preferences {
         typeof value.pauseOnFocusLoss === "boolean"
           ? value.pauseOnFocusLoss
           : false,
+      soundNotification:
+        typeof value.soundNotification === "boolean"
+          ? value.soundNotification
+          : true,
+      desktopNotification:
+        typeof value.desktopNotification === "boolean"
+          ? value.desktopNotification
+          : true,
       speedPreset: speedPresets.includes(value.speedPreset as SpeedPreset)
         ? (value.speedPreset as SpeedPreset)
         : "normal",

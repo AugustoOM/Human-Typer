@@ -5,6 +5,7 @@ import { TextComposer } from "./components/TextComposer";
 import { ThemePicker } from "./components/ThemePicker";
 import { TypingSettings } from "./components/TypingSettings";
 import { TypingStatusPanel } from "./components/TypingStatusPanel";
+import { WebCompanionModal } from "./components/WebCompanionModal";
 import { usePreferences } from "./hooks/usePreferences";
 import { useTheme } from "./hooks/useTheme";
 import { useTypingEngine } from "./hooks/useTypingEngine";
@@ -13,6 +14,7 @@ import "./App.css";
 
 function App() {
   const [text, setText] = useState("");
+  const [webCompanionOpen, setWebCompanionOpen] = useState(false);
   const { preferences, updatePreferences } = usePreferences();
   const {
     state,
@@ -21,7 +23,7 @@ function App() {
     togglePause,
     cancel,
     requestAccessibility,
-  } = useTypingEngine();
+  } = useTypingEngine(preferences);
   useTheme(preferences.theme);
 
   const active = isActiveStatus(state.status);
@@ -115,6 +117,14 @@ function App() {
           onStart={beginTyping}
           onTogglePause={() => void togglePause()}
           onCancel={() => void cancel()}
+          onOpenWebCompanion={() => setWebCompanionOpen(true)}
+        />
+
+        <WebCompanionModal
+          isOpen={webCompanionOpen}
+          onClose={() => setWebCompanionOpen(false)}
+          text={text}
+          preferences={preferences}
         />
       </main>
     </div>

@@ -702,9 +702,295 @@ textarea:disabled {
   color: var(--red);
 }
 
+.button.accent-bg {
+  background: color-mix(in srgb, var(--yellow) 28%, var(--paper-bright));
+  color: var(--ink);
+  border-color: var(--line);
+  font-weight: 700;
+}
+
+.button.accent-bg:hover:not(:disabled) {
+  background: var(--yellow);
+}
+
+.button.accent-bg .spark-icon {
+  margin-right: 4px;
+  font-size: 1.1em;
+}
+
 .button:disabled {
   cursor: default;
   opacity: 0.38;
+}
+
+.settings-subgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.toggle-row.compact {
+  padding: 10px 12px;
+  min-height: auto;
+}
+
+.toggle-row.compact .toggle-copy strong {
+  font-size: 0.88rem;
+}
+
+/* Modal de Segundo Plano (Google Docs / Web) */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(18, 16, 13, 0.68);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-container {
+  background: var(--paper-bright);
+  color: var(--ink);
+  border: 3px solid var(--line);
+  box-shadow: 12px 12px 0 var(--line);
+  width: min(720px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 2px solid var(--thin);
+}
+
+.modal-title-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.modal-icon-badge {
+  background: var(--yellow);
+  color: #1d1a16;
+  padding: 8px;
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.modal-subtitle {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 4px;
+}
+
+.modal-close-btn:hover {
+  color: var(--ink);
+}
+
+.modal-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.feature-banner {
+  display: flex;
+  gap: 14px;
+  padding: 14px 18px;
+  background: color-mix(in srgb, var(--yellow) 15%, var(--paper));
+  border: 2px dashed var(--line);
+  border-radius: 6px;
+  align-items: center;
+}
+
+.feature-icon {
+  color: var(--yellow);
+  flex-shrink: 0;
+}
+
+.feature-banner strong {
+  display: block;
+  font-size: 0.98rem;
+  margin-bottom: 2px;
+}
+
+.feature-banner p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.methods-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.method-card {
+  background: var(--paper-2);
+  border: 2px solid var(--line);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.method-header {
+  margin-bottom: 8px;
+}
+
+.step-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  background: var(--ink);
+  color: var(--paper-bright);
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+
+.method-card h4 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.method-desc {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+
+.step-list {
+  margin: 0 0 16px;
+  padding-left: 20px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  line-height: 1.4;
+}
+
+.step-list strong {
+  color: var(--ink);
+}
+
+.bookmark-drag-wrap {
+  margin: 8px 0;
+}
+
+.draggable-bookmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--yellow);
+  color: #1d1a16;
+  border: 2px solid var(--line);
+  padding: 8px 14px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  text-decoration: none;
+  border-radius: 4px;
+  cursor: grab;
+  box-shadow: 2px 2px 0 var(--line);
+}
+
+.draggable-bookmark:active {
+  cursor: grabbing;
+}
+
+.action-btn {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 2px solid var(--line);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.05s ease, background 0.15s ease;
+}
+
+.action-btn.primary {
+  background: var(--ink);
+  color: var(--paper-bright);
+}
+
+.action-btn.primary:hover {
+  opacity: 0.9;
+}
+
+.action-btn.secondary {
+  background: var(--paper-bright);
+  color: var(--ink);
+}
+
+.action-btn.secondary:hover {
+  background: var(--paper);
+}
+
+.action-btn.copied {
+  background: var(--green);
+  color: white;
+  border-color: var(--green);
+}
+
+.modal-tip-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.84rem;
+  color: var(--muted);
+  padding: 10px 14px;
+  background: var(--paper-2);
+  border-left: 3px solid var(--yellow);
+}
+
+.modal-footer {
+  padding: 14px 24px;
+  border-top: 2px solid var(--thin);
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 720px) {
+  .methods-grid {
+    grid-template-columns: 1fr;
+  }
+  .settings-subgrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 kbd {

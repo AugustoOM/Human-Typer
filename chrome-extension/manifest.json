@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Human Typer - Segundo Plano",
+  "version": "1.0.0",
+  "description": "Escribe automáticamente con ritmo humano en Google Docs, Word Online y cualquier web en segundo plano.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "notifications"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Human Typer"
+  }
+}

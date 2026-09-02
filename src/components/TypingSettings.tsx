@@ -1,4 +1,4 @@
-import { Clock3, Gauge, PanelsTopLeft, Sparkles } from "lucide-react";
+import { Bell, Clock3, Gauge, PanelsTopLeft, Sparkles, Volume2 } from "lucide-react";
 import { SPEED_PRESETS } from "../lib/typing";
 import type { Preferences, SpeedPreset } from "../types";
 
@@ -26,7 +26,7 @@ export function TypingSettings({
   return (
     <section className="card settings-card" aria-labelledby="settings-heading">
       <div className="section-heading settings-title">
-        <h2 id="settings-heading">Ritmo</h2>
+        <h2 id="settings-heading">Ritmo y Opciones</h2>
       </div>
 
       <div className="setting-block full-width">
@@ -135,6 +135,7 @@ export function TypingSettings({
         </span>
         <span className="toggle-copy">
           <strong>Pausas de puntuación</strong>
+          <small>Pausas naturales en puntos, comas y saltos de línea</small>
         </span>
         <input
           type="checkbox"
@@ -175,6 +176,44 @@ export function TypingSettings({
         />
         <span className="switch" aria-hidden="true" />
       </label>
+
+      <div className="settings-subgrid">
+        <label className={disabled ? "toggle-row compact disabled" : "toggle-row compact"}>
+          <span className="panel-icon">
+            <Volume2 size={18} />
+          </span>
+          <span className="toggle-copy">
+            <strong>Sonido al finalizar</strong>
+          </span>
+          <input
+            type="checkbox"
+            checked={preferences.soundNotification}
+            disabled={disabled}
+            onChange={(event) =>
+              onChange({ soundNotification: event.currentTarget.checked })
+            }
+          />
+          <span className="switch" aria-hidden="true" />
+        </label>
+
+        <label className={disabled ? "toggle-row compact disabled" : "toggle-row compact"}>
+          <span className="panel-icon">
+            <Bell size={18} />
+          </span>
+          <span className="toggle-copy">
+            <strong>Notificación al terminar</strong>
+          </span>
+          <input
+            type="checkbox"
+            checked={preferences.desktopNotification}
+            disabled={disabled}
+            onChange={(event) =>
+              onChange({ desktopNotification: event.currentTarget.checked })
+            }
+          />
+          <span className="switch" aria-hidden="true" />
+        </label>
+      </div>
     </section>
   );
 }

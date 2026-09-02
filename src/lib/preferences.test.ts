@@ -20,6 +20,8 @@ describe("preferences", () => {
     expect(parsed.baseDelayMs).toBe(15);
     expect(parsed.countdownSeconds).toBe(30);
     expect(parsed.pauseOnFocusLoss).toBe(true);
+    expect(parsed.soundNotification).toBe(true);
+    expect(parsed.desktopNotification).toBe(true);
     expect(parsed.theme).toBe("system");
   });
 });

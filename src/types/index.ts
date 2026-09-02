@@ -16,6 +16,8 @@ export interface Preferences {
   countdownSeconds: number;
   punctuationPauses: boolean;
   pauseOnFocusLoss: boolean;
+  soundNotification: boolean;
+  desktopNotification: boolean;
   speedPreset: SpeedPreset;
   theme: ThemePreference;
 }
