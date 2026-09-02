@@ -33,14 +33,31 @@
 
       <div class="settings-block">
         <div class="setting-row">
-          <label>Velocidad base</label>
-          <strong id="speed-val">65 ms</strong>
+          <label>Velocidad de escritura</label>
+          <strong id="speed-val">120 ms (Normal)</strong>
         </div>
-        <input type="range" id="speed-slider" min="15" max="300" step="5" value="65" />
+
+        <div class="preset-buttons" role="group" aria-label="Velocidades predefinidas">
+          <button type="button" class="preset-btn" data-speed="35">⚡ Muy Rápido</button>
+          <button type="button" class="preset-btn" data-speed="65">🚀 Rápido</button>
+          <button type="button" class="preset-btn active" data-speed="120">✍️ Normal</button>
+          <button type="button" class="preset-btn" data-speed="220">🐢 Lento</button>
+          <button type="button" class="preset-btn" data-speed="380">🦥 Muy Lento</button>
+        </div>
+
+        <input type="range" id="speed-slider" min="15" max="800" step="5" value="120" />
         <div class="speed-labels">
-          <span>Rápido</span>
-          <span>Lento</span>
+          <span>15 ms (Ultra Rápido)</span>
+          <span>800 ms (Pausado)</span>
         </div>
+      </div>
+
+      <div class="settings-block compact">
+        <div class="setting-row">
+          <label>Variación humana</label>
+          <strong id="variation-val">±35 ms</strong>
+        </div>
+        <input type="range" id="variation-slider" min="0" max="150" step="5" value="35" />
       </div>
 
       <div class="options-grid">

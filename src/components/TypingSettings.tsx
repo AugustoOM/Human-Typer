@@ -57,7 +57,7 @@ export function TypingSettings({
           className="range"
           type="range"
           min="15"
-          max="350"
+          max="800"
           step="5"
           value={preferences.baseDelayMs}
           disabled={disabled}

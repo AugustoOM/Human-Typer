@@ -10,9 +10,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const statusPercent = document.getElementById("status-percent");
   const progressBar = document.getElementById("progress-bar");
 
+  const variationSlider = document.getElementById("variation-slider");
+  const variationVal = document.getElementById("variation-val");
+  const presetBtns = document.querySelectorAll(".preset-btn");
+
   // Cargar preferencias guardadas
   chrome.storage.local.get(
-    ["savedText", "speed", "pausePunct", "notifySound"],
+    ["savedText", "speed", "variation", "pausePunct", "notifySound"],
     (res) => {
       if (res.savedText) {
         textInput.value = res.savedText;
@@ -20,7 +24,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       if (res.speed) {
         speedSlider.value = res.speed;
-        speedVal.innerText = `${res.speed} ms`;
+        updateSpeedLabel(res.speed);
+      }
+      if (res.variation !== undefined && variationSlider && variationVal) {
+        variationSlider.value = res.variation;
+        variationVal.innerText = `±${res.variation} ms`;
       }
       if (res.pausePunct !== undefined) pausePunct.checked = res.pausePunct;
       if (res.notifySound !== undefined) notifySound.checked = res.notifySound;
@@ -33,15 +41,48 @@ document.addEventListener("DOMContentLoaded", () => {
     startBtn.disabled = len === 0;
   }
 
+  function getSpeedDescriptor(ms) {
+    if (ms <= 45) return "Ultra Rápido";
+    if (ms <= 85) return "Rápido";
+    if (ms <= 160) return "Normal / Humano";
+    if (ms <= 280) return "Lento";
+    return "Muy Lento / Pausado";
+  }
+
+  function updateSpeedLabel(ms) {
+    speedVal.innerText = `${ms} ms (${getSpeedDescriptor(ms)})`;
+    presetBtns.forEach((btn) => {
+      btn.classList.toggle("active", Number(btn.dataset.speed) === Number(ms));
+    });
+  }
+
+  presetBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const spd = Number(btn.dataset.speed);
+      speedSlider.value = spd;
+      updateSpeedLabel(spd);
+      chrome.storage.local.set({ speed: spd });
+    });
+  });
+
   textInput.addEventListener("input", () => {
     updateCharCount();
     chrome.storage.local.set({ savedText: textInput.value });
   });
 
   speedSlider.addEventListener("input", () => {
-    speedVal.innerText = `${speedSlider.value} ms`;
-    chrome.storage.local.set({ speed: Number(speedSlider.value) });
+    const spd = Number(speedSlider.value);
+    updateSpeedLabel(spd);
+    chrome.storage.local.set({ speed: spd });
   });
+
+  if (variationSlider && variationVal) {
+    variationSlider.addEventListener("input", () => {
+      const v = Number(variationSlider.value);
+      variationVal.innerText = `±${v} ms`;
+      chrome.storage.local.set({ variation: v });
+    });
+  }
 
   pausePunct.addEventListener("change", () => {
     chrome.storage.local.set({ pausePunct: pausePunct.checked });
@@ -58,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const config = {
       text,
       baseDelayMs: Number(speedSlider.value),
-      variationMs: 25,
+      variationMs: variationSlider ? Number(variationSlider.value) : 35,
       punctuationPauses: pausePunct.checked,
       notifySound: notifySound.checked,
     };

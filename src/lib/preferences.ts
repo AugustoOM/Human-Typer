@@ -19,6 +19,7 @@ const speedPresets: SpeedPreset[] = [
   "fast",
   "normal",
   "slow",
+  "verySlow",
   "custom",
 ];
 const themes: ThemePreference[] = ["system", "light", "dark"];
