@@ -1,5 +1,5 @@
 export type ThemePreference = "system" | "light" | "dark";
-export type SpeedPreset = "veryFast" | "fast" | "normal" | "slow" | "custom";
+export type SpeedPreset = "veryFast" | "fast" | "normal" | "slow" | "verySlow" | "custom";
 
 export type TypingStatus =
   | "idle"
@@ -16,6 +16,8 @@ export interface Preferences {
   countdownSeconds: number;
   punctuationPauses: boolean;
   pauseOnFocusLoss: boolean;
+  soundNotification: boolean;
+  desktopNotification: boolean;
   speedPreset: SpeedPreset;
   theme: ThemePreference;
 }

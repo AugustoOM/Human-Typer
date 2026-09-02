@@ -16,6 +16,7 @@ interface TypingStatusPanelProps {
   onStart: () => void;
   onTogglePause: () => void;
   onCancel: () => void;
+  onOpenWebCompanion: () => void;
 }
 
 const statusLabels = {
@@ -35,6 +36,7 @@ export function TypingStatusPanel({
   onStart,
   onTogglePause,
   onCancel,
+  onOpenWebCompanion,
 }: TypingStatusPanelProps) {
   const active =
     state.status === "countdown" ||
@@ -106,6 +108,7 @@ export function TypingStatusPanel({
           type="button"
           onClick={onStart}
           disabled={!textLength || active}
+          title="Escribir en la ventana activa con teclado nativo"
         >
           {state.status === "completed" || state.status === "cancelled" ? (
             <RotateCcw size={18} />
@@ -114,8 +117,20 @@ export function TypingStatusPanel({
           )}
           {state.status === "completed" || state.status === "cancelled"
             ? "Escribir de nuevo"
-            : "Comenzar"}
+            : "Comenzar (Escritorio)"}
         </button>
+
+        <button
+          className="button accent-bg"
+          type="button"
+          onClick={onOpenWebCompanion}
+          disabled={!textLength}
+          title="Escribir en segundo plano en Google Docs, Word Online o cualquier web mientras navegas o miras videos"
+        >
+          <span className="spark-icon">⚡</span>
+          Segundo Plano (Docs / Web)
+        </button>
+
         <button
           className="button secondary"
           type="button"
