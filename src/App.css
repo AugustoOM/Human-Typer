@@ -939,7 +939,9 @@ textarea:disabled {
   font-weight: 700;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: transform 0.05s ease, background 0.15s ease;
+  transition:
+    transform 0.05s ease,
+    background 0.15s ease;
 }
 
 .action-btn.primary {

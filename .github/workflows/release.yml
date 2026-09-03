@@ -128,7 +128,11 @@ jobs:
           tagName: v__VERSION__
           releaseName: Human Typer v__VERSION__
           releaseBody: |
-            Human Typer incorpora la escritura en segundo plano con extensión para Google Docs y páginas web, selector de velocidades avanzadas, notificaciones al finalizar y protección de ventana objetivo.
+            Human Typer 0.5.0 incorpora un compañero web para escribir en Google Docs, Word Online y otros editores sin mantener el foco en la ventana, con extensión compatible con Chrome, Edge y Firefox incluida dentro de la aplicación.
+
+            También suma nuevos presets de velocidad lenta y pausada, control de variación en la extensión y avisos sonoros y de escritorio al finalizar.
+
+            En macOS, el paquete conserva la firma ad hoc válida y admite firma Developer ID con notarización cuando están configuradas las credenciales de Apple.
 
             Descargas:
             - Windows: instalador `.exe` de 64 bits.

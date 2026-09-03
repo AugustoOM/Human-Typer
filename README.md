@@ -17,6 +17,8 @@ It is built with Tauri 2, React 19, TypeScript, and Rust. Everything runs locall
 - Adds random timing variation and subtle natural fluctuations.
 - Supports optional pauses after `. , ; : ? !` and line breaks.
 - Can lock onto the target window and pause automatically if focus moves elsewhere on macOS or Windows.
+- Includes a bundled Chrome, Edge, and Firefox web companion for background typing in browser-based editors.
+- Can play a completion chime and show a desktop notification when a run finishes.
 - Provides a configurable countdown from 1 to 30 seconds.
 - Displays status, character progress, and percentage.
 - Pauses or resumes globally with `F8` and cancels immediately with `Esc`.

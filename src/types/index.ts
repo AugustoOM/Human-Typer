@@ -1,5 +1,6 @@
 export type ThemePreference = "system" | "light" | "dark";
-export type SpeedPreset = "veryFast" | "fast" | "normal" | "slow" | "verySlow" | "custom";
+export type SpeedPreset =
+  "veryFast" | "fast" | "normal" | "slow" | "verySlow" | "custom";
 
 export type TypingStatus =
   | "idle"

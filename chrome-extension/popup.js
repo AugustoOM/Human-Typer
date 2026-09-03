@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       if (res.pausePunct !== undefined) pausePunct.checked = res.pausePunct;
       if (res.notifySound !== undefined) notifySound.checked = res.notifySound;
-    }
+    },
   );
 
   function updateCharCount() {
@@ -104,7 +104,10 @@ document.addEventListener("DOMContentLoaded", () => {
       notifySound: notifySound.checked,
     };
 
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    const [tab] = await chrome.tabs.query({
+      active: true,
+      currentWindow: true,
+    });
     if (!tab || !tab.id) {
       statusText.innerText = "No se detectó pestaña activa";
       return;
@@ -152,13 +155,14 @@ function injectTypingScript(config) {
     padding: "16px 20px",
     borderRadius: "12px",
     boxShadow: "0 12px 30px rgba(0, 0, 0, 0.6), 0 0 0 2px #eab308",
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontFamily:
+      "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: "13px",
     minWidth: "300px",
     display: "flex",
     flexDirection: "column",
     gap: "10px",
-    userSelect: "none"
+    userSelect: "none",
   });
 
   panel.innerHTML = `
@@ -216,7 +220,9 @@ function injectTypingScript(config) {
         o.start(now + i * 0.1);
         o.stop(now + i * 0.1 + 0.9);
       });
-    } catch (e) {}
+    } catch {
+      // El audio puede estar bloqueado hasta que exista interacción del usuario.
+    }
   }
 
   function getTarget() {
@@ -228,16 +234,26 @@ function injectTypingScript(config) {
         const el = doc.activeElement || doc.body;
         if (el) return { element: el, document: doc, isDocs: true };
       }
-    } catch (e) {}
+    } catch {
+      // Algunos editores aíslan su iframe y no permiten inspeccionarlo.
+    }
 
     // 2. Elemento activo
     const active = document.activeElement;
-    if (active && active !== document.body && active !== panel && !panel.contains(active)) {
+    if (
+      active &&
+      active !== document.body &&
+      active !== panel &&
+      !panel.contains(active)
+    ) {
       return { element: active, document: document, isDocs: false };
     }
 
     // 3. Fallback editable
-    const el = document.querySelector("[contenteditable='true'], textarea, input[type='text']") || document.body;
+    const el =
+      document.querySelector(
+        "[contenteditable='true'], textarea, input[type='text']",
+      ) || document.body;
     return { element: el, document: document, isDocs: false };
   }
 
@@ -250,37 +266,104 @@ function injectTypingScript(config) {
     if (targetInfo.isDocs) {
       try {
         if (char === "\n") {
-          target.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", code: "Enter", keyCode: 13, which: 13, bubbles: true }));
-          target.dispatchEvent(new KeyboardEvent("keypress", { key: "Enter", code: "Enter", keyCode: 13, which: 13, bubbles: true }));
-          doc.execCommand("insertParagraph", false, null) || doc.execCommand("insertLineBreak", false, null);
-          target.dispatchEvent(new KeyboardEvent("keyup", { key: "Enter", code: "Enter", keyCode: 13, which: 13, bubbles: true }));
+          target.dispatchEvent(
+            new KeyboardEvent("keydown", {
+              key: "Enter",
+              code: "Enter",
+              keyCode: 13,
+              which: 13,
+              bubbles: true,
+            }),
+          );
+          target.dispatchEvent(
+            new KeyboardEvent("keypress", {
+              key: "Enter",
+              code: "Enter",
+              keyCode: 13,
+              which: 13,
+              bubbles: true,
+            }),
+          );
+          if (!doc.execCommand("insertParagraph", false, null)) {
+            doc.execCommand("insertLineBreak", false, null);
+          }
+          target.dispatchEvent(
+            new KeyboardEvent("keyup", {
+              key: "Enter",
+              code: "Enter",
+              keyCode: 13,
+              which: 13,
+              bubbles: true,
+            }),
+          );
           return;
         }
 
         const charCode = char.charCodeAt(0);
-        target.dispatchEvent(new KeyboardEvent("keydown", { key: char, charCode, keyCode: charCode, which: charCode, bubbles: true }));
-        target.dispatchEvent(new KeyboardEvent("keypress", { key: char, charCode, keyCode: charCode, which: charCode, bubbles: true }));
+        target.dispatchEvent(
+          new KeyboardEvent("keydown", {
+            key: char,
+            charCode,
+            keyCode: charCode,
+            which: charCode,
+            bubbles: true,
+          }),
+        );
+        target.dispatchEvent(
+          new KeyboardEvent("keypress", {
+            key: char,
+            charCode,
+            keyCode: charCode,
+            which: charCode,
+            bubbles: true,
+          }),
+        );
         doc.execCommand("insertText", false, char);
-        target.dispatchEvent(new KeyboardEvent("keyup", { key: char, charCode, keyCode: charCode, which: charCode, bubbles: true }));
+        target.dispatchEvent(
+          new KeyboardEvent("keyup", {
+            key: char,
+            charCode,
+            keyCode: charCode,
+            which: charCode,
+            bubbles: true,
+          }),
+        );
         return;
-      } catch (e) {}
+      } catch {
+        // Si Google Docs rechaza los eventos, se prueban los métodos genéricos.
+      }
     }
 
     // execCommand estándar
     try {
       if (char === "\n") {
-        target.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", code: "Enter", keyCode: 13, bubbles: true }));
-        doc.execCommand("insertParagraph", false, null) || doc.execCommand("insertLineBreak", false, null);
+        target.dispatchEvent(
+          new KeyboardEvent("keydown", {
+            key: "Enter",
+            code: "Enter",
+            keyCode: 13,
+            bubbles: true,
+          }),
+        );
+        if (!doc.execCommand("insertParagraph", false, null)) {
+          doc.execCommand("insertLineBreak", false, null);
+        }
         return;
       }
       if (doc.execCommand("insertText", false, char)) return;
-    } catch (e) {}
+    } catch {
+      // Se continúa con la inserción directa para campos y contenteditable.
+    }
 
     // Textarea / Input
-    if (target instanceof HTMLTextAreaElement || target instanceof HTMLInputElement) {
+    if (
+      target instanceof HTMLTextAreaElement ||
+      target instanceof HTMLInputElement
+    ) {
       const start = target.selectionStart ?? target.value.length;
       const end = target.selectionEnd ?? target.value.length;
-      target.value = target.value.substring(0, start) + char + target.value.substring(end);
+      target.value =
+        target.value.substring(0, start) + char + target.value.substring(end);
       target.selectionStart = target.selectionEnd = start + 1;
       target.dispatchEvent(new Event("input", { bubbles: true }));
       return;
@@ -305,10 +388,36 @@ function injectTypingScript(config) {
 
     // Eventos genéricos
     const code = char.charCodeAt(0);
-    target.dispatchEvent(new KeyboardEvent("keydown", { key: char, keyCode: code, which: code, bubbles: true }));
-    target.dispatchEvent(new InputEvent("beforeinput", { inputType: "insertText", data: char, bubbles: true }));
-    target.dispatchEvent(new InputEvent("input", { inputType: "insertText", data: char, bubbles: true }));
-    target.dispatchEvent(new KeyboardEvent("keyup", { key: char, keyCode: code, which: code, bubbles: true }));
+    target.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: char,
+        keyCode: code,
+        which: code,
+        bubbles: true,
+      }),
+    );
+    target.dispatchEvent(
+      new InputEvent("beforeinput", {
+        inputType: "insertText",
+        data: char,
+        bubbles: true,
+      }),
+    );
+    target.dispatchEvent(
+      new InputEvent("input", {
+        inputType: "insertText",
+        data: char,
+        bubbles: true,
+      }),
+    );
+    target.dispatchEvent(
+      new KeyboardEvent("keyup", {
+        key: char,
+        keyCode: code,
+        which: code,
+        bubbles: true,
+      }),
+    );
   }
 
   function isPunct(c) {
@@ -335,7 +444,7 @@ function injectTypingScript(config) {
         setTimeout(function() { self.postMessage('tick'); }, e.data);
       };`,
     ],
-    { type: "application/javascript" }
+    { type: "application/javascript" },
   );
   const worker = new Worker(URL.createObjectURL(blob));
 

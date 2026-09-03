@@ -6,6 +6,27 @@ import tseslint from "typescript-eslint";
 export default tseslint.config(
   { ignores: ["dist", "src-tauri/target", "chrome-extension"] },
   js.configs.recommended,
+  {
+    files: ["chrome-extension/**/*.js"],
+    languageOptions: {
+      ecmaVersion: 2022,
+      globals: {
+        Blob: "readonly",
+        chrome: "readonly",
+        console: "readonly",
+        document: "readonly",
+        Event: "readonly",
+        HTMLInputElement: "readonly",
+        HTMLTextAreaElement: "readonly",
+        InputEvent: "readonly",
+        KeyboardEvent: "readonly",
+        setTimeout: "readonly",
+        URL: "readonly",
+        window: "readonly",
+        Worker: "readonly",
+      },
+    },
+  },
   ...tseslint.configs.recommended,
   {
     files: ["**/*.{ts,tsx}"],
