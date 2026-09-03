@@ -36,7 +36,7 @@ export function generateWebCompanionScript(
               "¡Escritura finalizada con éxito! Se escribieron todos los caracteres.",
             starting: "Comenzando en",
             clickTarget: "Hacé clic donde quieras escribir",
-            typing: "⚡ Escribiendo en segundo plano...",
+            typing: "Escribiendo en segundo plano...",
             cancelled: "Cancelado",
             paused: "En pausa",
             completed: "¡Completado con éxito!",
@@ -57,7 +57,7 @@ export function generateWebCompanionScript(
               "Typing completed successfully! All characters were typed.",
             starting: "Starting in",
             clickTarget: "Click where you want to type",
-            typing: "⚡ Typing in the background...",
+            typing: "Typing in the background...",
             cancelled: "Cancelled",
             paused: "Paused",
             completed: "Completed successfully!",
@@ -88,15 +88,15 @@ export function generateWebCompanionScript(
     bottom: "20px",
     right: "20px",
     zIndex: "9999999",
-    background: "rgba(18, 20, 24, 0.95)",
-    color: "#f3f4f6",
-    padding: "16px 20px",
+    background: "#fffdf8",
+    color: "#2d2a25",
+    padding: "16px",
+    border: "1px solid #d8d0c2",
     borderRadius: "14px",
-    boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.15)",
+    boxShadow: "0 18px 48px rgba(66, 57, 44, 0.18)",
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: "13px",
-    backdropFilter: "blur(12px)",
-    minWidth: "280px",
+    minWidth: "310px",
     display: "flex",
     flexDirection: "column",
     gap: "10px",
@@ -104,24 +104,25 @@ export function generateWebCompanionScript(
   });
 
   panel.innerHTML = \`
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
-      <span style="font-weight: 700; color: #60a5fa; display: flex; align-items: center; gap: 6px;">
-        ⚡ Human Typer <span style="font-size: 11px; background: rgba(96,165,250,0.2); padding: 2px 6px; border-radius: 6px;">\${config.labels.background}</span>
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #d8d0c2; padding-bottom: 10px;">
+      <span style="font-weight: 700; color: #2d2a25; display: flex; align-items: center; gap: 7px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6a2 2 0 0 1 2 -2h16a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-16a2 2 0 0 1 -2 -2z"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M7 16h10"/></svg>
+        Human Typer <span style="font-size: 10px; background: #f4e7c9; color: #6f572c; padding: 3px 7px; border-radius: 999px;">\${config.labels.background}</span>
       </span>
-      <button id="ht-close-btn" style="background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 16px;">✕</button>
+      <button id="ht-close-btn" aria-label="Close" style="display:grid;place-items:center;background:none;border:none;color:#6f6a60;cursor:pointer;padding:4px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 6l-12 12M6 6l12 12"/></svg></button>
     </div>
-    <div id="ht-status-text" style="color: #e5e7eb; font-weight: 500;">\${config.labels.ready}</div>
-    <div style="background: rgba(255,255,255,0.1); border-radius: 6px; height: 6px; overflow: hidden;">
-      <div id="ht-progress-bar" style="width: 0%; height: 100%; background: #3b82f6; transition: width 0.1s linear;"></div>
+    <div id="ht-status-text" style="color: #2d2a25; font-weight: 600;">\${config.labels.ready}</div>
+    <div style="background: #d8d0c2; border-radius: 999px; height: 5px; overflow: hidden;">
+      <div id="ht-progress-bar" style="width: 0%; height: 100%; background: #c99535; transition: width 0.1s linear;"></div>
     </div>
-    <div style="display: flex; justify-content: space-between; font-size: 11px; color: #9ca3af;">
+    <div style="display: flex; justify-content: space-between; font-size: 11px; color: #6f6a60;">
       <span id="ht-count-text">0 / \${config.text.length} \${config.labels.characters}</span>
       <span id="ht-percent-text">0%</span>
     </div>
     <div style="display: flex; gap: 8px; margin-top: 4px;">
-      <button id="ht-start-btn" style="flex: 1; background: #2563eb; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer;">\${config.labels.start3}</button>
-      <button id="ht-pause-btn" style="display: none; flex: 1; background: #374151; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer;">\${config.labels.pause}</button>
-      <button id="ht-cancel-btn" style="display: none; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer;">\${config.labels.cancel}</button>
+      <button id="ht-start-btn" style="flex: 1; background: #2d2a25; color: #fffdf8; border: 1px solid #2d2a25; padding: 8px 12px; border-radius: 9px; font-weight: 600; cursor: pointer;">\${config.labels.start3}</button>
+      <button id="ht-pause-btn" style="display: none; flex: 1; background: #2d2a25; color: #fffdf8; border: 1px solid #2d2a25; padding: 8px 12px; border-radius: 9px; font-weight: 600; cursor: pointer;">\${config.labels.pause}</button>
+      <button id="ht-cancel-btn" style="display: none; background: #f5e4de; color: #a65345; border: 1px solid #e5c9c1; padding: 8px 12px; border-radius: 9px; font-weight: 600; cursor: pointer;">\${config.labels.cancel}</button>
     </div>
   \`;
 
@@ -353,8 +354,8 @@ export function generateWebCompanionScript(
       });
     }
 
-    statusText.innerHTML = "✅ <strong>" + config.labels.completed + "</strong>";
-    progressBar.style.background = "#10b981";
+    statusText.innerHTML = "<strong>" + config.labels.completed + "</strong>";
+    progressBar.style.background = "#55765c";
     pauseBtn.style.display = "none";
     cancelBtn.style.display = "none";
     startBtn.style.display = "block";
@@ -375,7 +376,7 @@ export function generateWebCompanionScript(
   pauseBtn.onclick = () => {
     isPaused = !isPaused;
     pauseBtn.innerText = isPaused ? config.labels.resume : config.labels.pause;
-    pauseBtn.style.background = isPaused ? "#2563eb" : "#374151";
+    pauseBtn.style.background = isPaused ? "#c99535" : "#2d2a25";
   };
 
   cancelBtn.onclick = () => {

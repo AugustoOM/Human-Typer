@@ -5,20 +5,20 @@ document.addEventListener("DOMContentLoaded", () => {
       textToType: "Text to type",
       placeholder: "Paste or type the text to enter in the document...",
       typingSpeed: "Typing speed",
-      veryFast: "⚡ Very Fast",
-      fast: "🚀 Fast",
-      normal: "✍️ Normal",
-      slow: "🐢 Slow",
-      verySlow: "🦥 Very Slow",
+      veryFast: "Very Fast",
+      fast: "Fast",
+      normal: "Normal",
+      slow: "Slow",
+      verySlow: "Very Slow",
       ultraFastRange: "15 ms (Ultra Fast)",
       pausedRange: "800 ms (Paused)",
       humanVariation: "Human variation",
       punctuationPauses: "Punctuation pauses",
       completionSound: "Completion sound",
       ready: "Ready to start in this tab",
-      startTyping: "▶ Start Typing",
-      pauseButton: "⏸ Pause",
-      cancelButton: "✕ Cancel",
+      startTyping: "Start Typing",
+      pauseButton: "Pause",
+      cancelButton: "Cancel",
       characters: "characters",
       ultraFast: "Ultra Fast",
       fastSpeed: "Fast",
@@ -26,9 +26,9 @@ document.addEventListener("DOMContentLoaded", () => {
       slowSpeed: "Slow",
       verySlowPaused: "Very Slow / Paused",
       noTab: "No active tab detected",
-      started: "⚡ Typing started on the page",
+      started: "Typing started on the page",
       running: "Running",
-      sent: "✓ Sent to tab",
+      sent: "Sent to tab",
       invalidTab: "Error: make sure you are on a valid tab",
     },
     es: {
@@ -37,20 +37,20 @@ document.addEventListener("DOMContentLoaded", () => {
       placeholder:
         "Pegá o escribí el texto que debe ingresarse en el documento...",
       typingSpeed: "Velocidad de escritura",
-      veryFast: "⚡ Muy rápida",
-      fast: "🚀 Rápida",
-      normal: "✍️ Normal",
-      slow: "🐢 Lenta",
-      verySlow: "🦥 Muy lenta",
+      veryFast: "Muy rápida",
+      fast: "Rápida",
+      normal: "Normal",
+      slow: "Lenta",
+      verySlow: "Muy lenta",
       ultraFastRange: "15 ms (Ultrarrápida)",
       pausedRange: "800 ms (Pausada)",
       humanVariation: "Variación humana",
       punctuationPauses: "Pausas de puntuación",
       completionSound: "Sonido al finalizar",
       ready: "Listo para comenzar en esta pestaña",
-      startTyping: "▶ Comenzar a escribir",
-      pauseButton: "⏸ Pausar",
-      cancelButton: "✕ Cancelar",
+      startTyping: "Comenzar a escribir",
+      pauseButton: "Pausar",
+      cancelButton: "Cancelar",
       characters: "caracteres",
       ultraFast: "Ultrarrápida",
       fastSpeed: "Rápida",
@@ -58,9 +58,9 @@ document.addEventListener("DOMContentLoaded", () => {
       slowSpeed: "Lenta",
       verySlowPaused: "Muy lenta / Pausada",
       noTab: "No se detectó una pestaña activa",
-      started: "⚡ Escritura iniciada en la página",
+      started: "Escritura iniciada en la página",
       running: "En curso",
-      sent: "✓ Enviado a la pestaña",
+      sent: "Enviado a la pestaña",
       invalidTab: "Error: asegurate de estar en una pestaña válida",
     },
   };
@@ -77,13 +77,44 @@ document.addEventListener("DOMContentLoaded", () => {
   const statusPercent = document.getElementById("status-percent");
   const progressBar = document.getElementById("progress-bar");
   const languageBtn = document.getElementById("language-btn");
+  const languageLabel = document.getElementById("language-label");
 
   const variationSlider = document.getElementById("variation-slider");
   const variationVal = document.getElementById("variation-val");
   const presetBtns = document.querySelectorAll(".preset-btn");
+  const extensionStorage = globalThis.chrome?.storage?.local;
+
+  function getStoredPreferences(keys, callback) {
+    if (extensionStorage) {
+      extensionStorage.get(keys, callback);
+      return;
+    }
+
+    const values = Object.fromEntries(
+      keys.map((key) => {
+        const storedValue = localStorage.getItem(`human-typer:${key}`);
+        return [
+          key,
+          storedValue === null ? undefined : JSON.parse(storedValue),
+        ];
+      }),
+    );
+    callback(values);
+  }
+
+  function savePreferences(patch) {
+    if (extensionStorage) {
+      extensionStorage.set(patch);
+      return;
+    }
+
+    Object.entries(patch).forEach(([key, value]) => {
+      localStorage.setItem(`human-typer:${key}`, JSON.stringify(value));
+    });
+  }
 
   // Load saved preferences
-  chrome.storage.local.get(
+  getStoredPreferences(
     [
       "savedText",
       "speed",
@@ -120,14 +151,14 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
       element.placeholder = t(element.dataset.i18nPlaceholder);
     });
-    languageBtn.textContent = language === "en" ? "🌐 ES" : "🌐 EN";
+    languageLabel.textContent = language === "en" ? "ES" : "EN";
     updateCharCount();
     updateSpeedLabel(Number(speedSlider.value));
   }
 
   languageBtn.addEventListener("click", () => {
     language = language === "en" ? "es" : "en";
-    chrome.storage.local.set({ language });
+    savePreferences({ language });
     applyLanguage();
   });
 
@@ -157,35 +188,35 @@ document.addEventListener("DOMContentLoaded", () => {
       const spd = Number(btn.dataset.speed);
       speedSlider.value = spd;
       updateSpeedLabel(spd);
-      chrome.storage.local.set({ speed: spd });
+      savePreferences({ speed: spd });
     });
   });
 
   textInput.addEventListener("input", () => {
     updateCharCount();
-    chrome.storage.local.set({ savedText: textInput.value });
+    savePreferences({ savedText: textInput.value });
   });
 
   speedSlider.addEventListener("input", () => {
     const spd = Number(speedSlider.value);
     updateSpeedLabel(spd);
-    chrome.storage.local.set({ speed: spd });
+    savePreferences({ speed: spd });
   });
 
   if (variationSlider && variationVal) {
     variationSlider.addEventListener("input", () => {
       const v = Number(variationSlider.value);
       variationVal.innerText = `±${v} ms`;
-      chrome.storage.local.set({ variation: v });
+      savePreferences({ variation: v });
     });
   }
 
   pausePunct.addEventListener("change", () => {
-    chrome.storage.local.set({ pausePunct: pausePunct.checked });
+    savePreferences({ pausePunct: pausePunct.checked });
   });
 
   notifySound.addEventListener("change", () => {
-    chrome.storage.local.set({ notifySound: notifySound.checked });
+    savePreferences({ notifySound: notifySound.checked });
   });
 
   startBtn.addEventListener("click", async () => {
@@ -245,7 +276,7 @@ function injectTypingScript(config) {
           cancel: "Cancelar",
           starting: "Comenzando en",
           clickDocument: "Hacé clic en el documento",
-          typing: "⚡ Escribiendo en segundo plano...",
+          typing: "Escribiendo en segundo plano...",
           typingCancelled: "Escritura cancelada",
           paused: "En pausa (pulsá Reanudar)",
           completed: "¡Texto completado con éxito!",
@@ -259,7 +290,7 @@ function injectTypingScript(config) {
           cancel: "Cancel",
           starting: "Starting in",
           clickDocument: "Click in the document",
-          typing: "⚡ Typing in the background...",
+          typing: "Typing in the background...",
           typingCancelled: "Typing cancelled",
           paused: "Paused (click Resume)",
           completed: "Text completed successfully!",
@@ -277,15 +308,16 @@ function injectTypingScript(config) {
     bottom: "24px",
     right: "24px",
     zIndex: "99999999",
-    background: "#181a1f",
-    color: "#f3f4f6",
-    padding: "16px 20px",
-    borderRadius: "12px",
-    boxShadow: "0 12px 30px rgba(0, 0, 0, 0.6), 0 0 0 2px #eab308",
+    background: "#fffdf8",
+    color: "#2d2a25",
+    padding: "16px",
+    border: "1px solid #d8d0c2",
+    borderRadius: "14px",
+    boxShadow: "0 18px 48px rgba(66, 57, 44, 0.18)",
     fontFamily:
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: "13px",
-    minWidth: "300px",
+    minWidth: "310px",
     display: "flex",
     flexDirection: "column",
     gap: "10px",
@@ -293,23 +325,24 @@ function injectTypingScript(config) {
   });
 
   panel.innerHTML = `
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 8px;">
-      <span style="font-weight: 800; color: #facc15; display: flex; align-items: center; gap: 6px;">
-        ⚡ Human Typer <span style="font-size: 11px; background: rgba(234,179,8,0.2); color: #fef08a; padding: 2px 6px; border-radius: 4px;">${labels.background}</span>
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #d8d0c2; padding-bottom: 10px;">
+      <span style="font-weight: 700; color: #2d2a25; display: flex; align-items: center; gap: 7px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6a2 2 0 0 1 2 -2h16a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-16a2 2 0 0 1 -2 -2z"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M7 16h10"/></svg>
+        Human Typer <span style="font-size: 10px; background: #f4e7c9; color: #6f572c; padding: 3px 7px; border-radius: 999px;">${labels.background}</span>
       </span>
-      <button id="ht-close-btn" style="background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 16px;">✕</button>
+      <button id="ht-close-btn" aria-label="Close" style="display:grid;place-items:center;background: none; border: none; color: #6f6a60; cursor: pointer; padding:4px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 6l-12 12M6 6l12 12"/></svg></button>
     </div>
-    <div id="ht-status-text" style="color: #e5e7eb; font-weight: 600;">${labels.startingPage}</div>
-    <div style="background: rgba(255,255,255,0.1); border-radius: 6px; height: 6px; overflow: hidden;">
-      <div id="ht-progress-bar" style="width: 0%; height: 100%; background: #eab308; transition: width 0.1s linear;"></div>
+    <div id="ht-status-text" style="color: #2d2a25; font-weight: 600;">${labels.startingPage}</div>
+    <div style="background: #d8d0c2; border-radius: 999px; height: 5px; overflow: hidden;">
+      <div id="ht-progress-bar" style="width: 0%; height: 100%; background: #c99535; transition: width 0.1s linear;"></div>
     </div>
-    <div style="display: flex; justify-content: space-between; font-size: 11px; color: #9ca3af;">
+    <div style="display: flex; justify-content: space-between; font-size: 11px; color: #6f6a60;">
       <span id="ht-count-text">0 / ${config.text.length} ${labels.characters}</span>
       <span id="ht-percent-text">0%</span>
     </div>
     <div style="display: flex; gap: 8px; margin-top: 4px;">
-      <button id="ht-pause-btn" style="flex: 1; background: #374151; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">${labels.pause}</button>
-      <button id="ht-cancel-btn" style="background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">${labels.cancel}</button>
+      <button id="ht-pause-btn" style="flex: 1; background: #2d2a25; color: #fffdf8; border: 1px solid #2d2a25; padding: 8px 12px; border-radius: 9px; font-weight: 600; cursor: pointer;">${labels.pause}</button>
+      <button id="ht-cancel-btn" style="background: #f5e4de; color: #a65345; border: 1px solid #e5c9c1; padding: 8px 12px; border-radius: 9px; font-weight: 600; cursor: pointer;">${labels.cancel}</button>
     </div>
   `;
 
@@ -621,8 +654,8 @@ function injectTypingScript(config) {
       });
     }
 
-    statusText.innerHTML = `✅ <strong>${labels.completed}</strong>`;
-    progressBar.style.background = "#10b981";
+    statusText.innerHTML = `<strong>${labels.completed}</strong>`;
+    progressBar.style.background = "#55765c";
     pauseBtn.style.display = "none";
     cancelBtn.style.display = "none";
 
@@ -634,7 +667,7 @@ function injectTypingScript(config) {
   pauseBtn.onclick = () => {
     isPaused = !isPaused;
     pauseBtn.innerText = isPaused ? labels.resume : labels.pause;
-    pauseBtn.style.background = isPaused ? "#2563eb" : "#374151";
+    pauseBtn.style.background = isPaused ? "#c99535" : "#2d2a25";
   };
 
   cancelBtn.onclick = () => {

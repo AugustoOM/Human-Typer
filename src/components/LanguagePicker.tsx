@@ -1,4 +1,4 @@
-import { Languages } from "lucide-react";
+import { IconLanguage } from "@tabler/icons-react";
 import type { LanguagePreference } from "../types";
 
 interface LanguagePickerProps {
@@ -16,7 +16,7 @@ export function LanguagePicker({ value, onChange }: LanguagePickerProps) {
       aria-label={value === "en" ? "Cambiar a español" : "Switch to English"}
       title={value === "en" ? "Español" : "English"}
     >
-      <Languages size={16} />
+      <IconLanguage size={16} />
       {value === "en" ? "ES" : "EN"}
     </button>
   );

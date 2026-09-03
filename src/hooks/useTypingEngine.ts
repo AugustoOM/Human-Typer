@@ -34,8 +34,8 @@ function friendlyError(
   ) {
     return tr(
       language,
-      "You are running Human Typer in a browser. To type in Google Docs or other websites, click the yellow '⚡ Background Mode (Docs / Web)' button. The green button is for the installed desktop app.",
-      "Estás usando Human Typer en el navegador. Para escribir en Google Docs u otras páginas, hacé clic en el botón amarillo '⚡ Segundo plano (Docs / Web)'. El botón verde es para la aplicación de escritorio instalada.",
+      "You are running Human Typer in a browser. To type in Google Docs or other websites, use 'Background Mode (Docs / Web)'. Native typing is available in the installed desktop app.",
+      "Estás usando Human Typer en el navegador. Para escribir en Google Docs u otras páginas, usá 'Segundo plano (Docs / Web)'. La escritura nativa está disponible en la aplicación de escritorio instalada.",
     );
   }
   return tr(
