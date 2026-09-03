@@ -3,6 +3,7 @@ import { join, resourceDir } from "@tauri-apps/api/path";
 import { Check, Copy, Download, Info, Sparkles, X, Zap } from "lucide-react";
 import { downloadExtensionZip } from "../lib/extensionPacker";
 import { generateWebCompanionScript } from "../lib/webCompanion";
+import { tr } from "../lib/i18n";
 import type { Preferences } from "../types";
 
 interface WebCompanionModalProps {
@@ -37,12 +38,21 @@ export function WebCompanionModal({
 
   if (!isOpen) return null;
 
+  const language = preferences.language;
+
   const scriptCode = generateWebCompanionScript({
-    text: text || "Sample text for Human Typer...",
+    text:
+      text ||
+      tr(
+        language,
+        "Sample text for Human Typer...",
+        "Texto de ejemplo para Human Typer...",
+      ),
     baseDelayMs: preferences.baseDelayMs,
     variationMs: preferences.variationMs,
     punctuationPauses: preferences.punctuationPauses,
     notifyOnComplete: preferences.desktopNotification,
+    language,
   });
 
   function handleCopyScript() {
@@ -82,11 +92,18 @@ export function WebCompanionModal({
             </div>
             <div>
               <h3 id="web-modal-title">
-                Background Typing (Google Docs / Web / Word Online)
+                {tr(
+                  language,
+                  "Background Typing (Google Docs / Web / Word Online)",
+                  "Escritura en segundo plano (Google Docs / Web / Word Online)",
+                )}
               </h3>
               <p className="modal-subtitle">
-                Keep typing in your web document while watching videos or
-                browsing other tabs.
+                {tr(
+                  language,
+                  "Keep typing in your web document while watching videos or browsing other tabs.",
+                  "Seguí escribiendo en tu documento web mientras mirás videos o navegás en otras pestañas.",
+                )}
               </p>
             </div>
           </div>
@@ -94,7 +111,7 @@ export function WebCompanionModal({
             type="button"
             className="modal-close-btn"
             onClick={onClose}
-            aria-label="Close dialog"
+            aria-label={tr(language, "Close dialog", "Cerrar ventana")}
           >
             <X size={20} />
           </button>
@@ -104,12 +121,19 @@ export function WebCompanionModal({
           <div className="feature-banner">
             <Sparkles size={20} className="feature-icon" />
             <div>
-              <strong>100% Focus Independent</strong>
+              <strong>
+                {tr(
+                  language,
+                  "100% Focus Independent",
+                  "100% independiente del foco",
+                )}
+              </strong>
               <p>
-                This method injects human-paced typing directly into the
-                document. You can switch windows, watch YouTube in full screen,
-                or play without interruptions or interference with your
-                keyboard.
+                {tr(
+                  language,
+                  "This method injects human-paced typing directly into the document. You can switch windows, watch YouTube in full screen, or play without interruptions or interference with your keyboard.",
+                  "Este método inyecta la escritura con ritmo humano directamente en el documento. Podés cambiar de ventana, ver YouTube en pantalla completa o jugar sin interrupciones ni interferencias con tu teclado.",
+                )}
               </p>
             </div>
           </div>
@@ -117,12 +141,27 @@ export function WebCompanionModal({
           <div className="methods-grid">
             <div className="method-card">
               <div className="method-header">
-                <div className="step-badge">Recommended · One Click</div>
-                <h4>Extension for Chrome, Edge, and Firefox</h4>
+                <div className="step-badge">
+                  {tr(
+                    language,
+                    "Recommended · One Click",
+                    "Recomendado · Un clic",
+                  )}
+                </div>
+                <h4>
+                  {tr(
+                    language,
+                    "Extension for Chrome, Edge, and Firefox",
+                    "Extensión para Chrome, Edge y Firefox",
+                  )}
+                </h4>
               </div>
               <p className="method-desc">
-                Adds a permanent ⚡ button to your browser for Google Docs and
-                any website:
+                {tr(
+                  language,
+                  "Adds a permanent ⚡ button to your browser for Google Docs and any website:",
+                  "Agrega un botón ⚡ permanente al navegador para Google Docs y cualquier web:",
+                )}
               </p>
               <div
                 style={{
@@ -139,22 +178,47 @@ export function WebCompanionModal({
                 >
                   {downloadedZip ? <Check size={18} /> : <Download size={18} />}
                   {downloadedZip
-                    ? "Extension Downloaded!"
-                    : "Download Extension (.ZIP)"}
+                    ? tr(
+                        language,
+                        "Extension Downloaded!",
+                        "¡Extensión descargada!",
+                      )
+                    : tr(
+                        language,
+                        "Download Extension (.ZIP)",
+                        "Descargar extensión (.ZIP)",
+                      )}
                 </button>
               </div>
 
               <ol className="step-list">
                 <li>
-                  Open <strong>chrome://extensions</strong>, or Firefox's{" "}
-                  <strong>about:debugging</strong> page.
+                  {tr(language, "Open", "Abrí")}{" "}
+                  <strong>chrome://extensions</strong>,{" "}
+                  {tr(language, "or Firefox's", "o la página de Firefox")}{" "}
+                  <strong>about:debugging</strong>.
                 </li>
                 <li>
-                  Enable <strong>"Developer mode"</strong> (top right).
+                  {tr(language, "Enable", "Activá")}{" "}
+                  <strong>
+                    {tr(
+                      language,
+                      '"Developer mode"',
+                      '"Modo de desarrollador"',
+                    )}
+                  </strong>{" "}
+                  {tr(language, "(top right).", "(arriba a la derecha).")}
                 </li>
                 <li>
-                  Click <strong>"Load unpacked"</strong> and select the
-                  extracted extension folder.
+                  {tr(language, "Click", "Pulsá")}{" "}
+                  <strong>
+                    {tr(language, '"Load unpacked"', '"Cargar descomprimida"')}
+                  </strong>{" "}
+                  {tr(
+                    language,
+                    "and select the extracted extension folder.",
+                    "y seleccioná la carpeta extraída de la extensión.",
+                  )}
                 </li>
               </ol>
               <button
@@ -164,31 +228,54 @@ export function WebCompanionModal({
               >
                 {copiedExtensionPath ? <Check size={18} /> : <Copy size={18} />}
                 {copiedExtensionPath
-                  ? "Folder Path Copied!"
-                  : "Copy Extension Folder Path"}
+                  ? tr(language, "Folder Path Copied!", "¡Ruta copiada!")
+                  : tr(
+                      language,
+                      "Copy Extension Folder Path",
+                      "Copiar ruta de la extensión",
+                    )}
               </button>
             </div>
 
             <div className="method-card">
               <div className="method-header">
-                <div className="step-badge">Alternative · No Installation</div>
+                <div className="step-badge">
+                  {tr(
+                    language,
+                    "Alternative · No Installation",
+                    "Alternativa · Sin instalar",
+                  )}
+                </div>
                 <h4>
-                  Paste into Console (<kbd>F12</kbd>)
+                  {tr(language, "Paste into Console", "Pegar en la consola")} ({" "}
+                  <kbd>F12</kbd>)
                 </h4>
               </div>
               <p className="method-desc">
-                Type instantly in any active tab without installing anything:
+                {tr(
+                  language,
+                  "Type instantly in any active tab without installing anything:",
+                  "Escribí al instante en cualquier pestaña activa sin instalar nada:",
+                )}
               </p>
               <ol className="step-list">
                 <li>
-                  Open your <strong>Google Docs</strong> document.
+                  {tr(language, "Open your", "Abrí tu documento de")}{" "}
+                  <strong>Google Docs</strong>.
                 </li>
                 <li>
-                  Press <kbd>F12</kbd> (or right-click → <em>Inspect</em> →{" "}
-                  <strong>Console</strong>).
+                  {tr(language, "Press", "Presioná")} <kbd>F12</kbd> ({" "}
+                  {tr(language, "or right-click", "o clic derecho")} →{" "}
+                  <em>{tr(language, "Inspect", "Inspeccionar")}</em> →{" "}
+                  <strong>{tr(language, "Console", "Consola")}</strong>).
                 </li>
                 <li>
-                  Paste the generated code and press <kbd>Enter</kbd>.
+                  {tr(
+                    language,
+                    "Paste the generated code and press",
+                    "Pegá el código generado y presioná",
+                  )}{" "}
+                  <kbd>Enter</kbd>.
                 </li>
               </ol>
               <button
@@ -197,7 +284,13 @@ export function WebCompanionModal({
                 onClick={handleCopyScript}
               >
                 {copiedCode ? <Check size={18} /> : <Copy size={18} />}
-                {copiedCode ? "Code Copied!" : "Copy Code for Console"}
+                {copiedCode
+                  ? tr(language, "Code Copied!", "¡Código copiado!")
+                  : tr(
+                      language,
+                      "Copy Code for Console",
+                      "Copiar código para la consola",
+                    )}
               </button>
             </div>
           </div>
@@ -205,16 +298,18 @@ export function WebCompanionModal({
           <div className="modal-tip-box">
             <Info size={16} />
             <span>
-              Includes your current speed ({preferences.baseDelayMs} ms),
-              variation (±{preferences.variationMs} ms), punctuation pauses, and
-              sound and desktop notifications on completion.
+              {tr(
+                language,
+                `Includes your current speed (${preferences.baseDelayMs} ms), variation (±${preferences.variationMs} ms), punctuation pauses, and sound and desktop notifications on completion.`,
+                `Incluye tus ajustes actuales de velocidad (${preferences.baseDelayMs} ms), variación (±${preferences.variationMs} ms), pausas de puntuación y avisos con sonido y notificación al finalizar.`,
+              )}
             </span>
           </div>
         </div>
 
         <footer className="modal-footer">
           <button type="button" className="button secondary" onClick={onClose}>
-            Got it
+            {tr(language, "Got it", "Entendido")}
           </button>
         </footer>
       </div>

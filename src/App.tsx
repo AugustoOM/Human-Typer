@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AlertTriangle } from "lucide-react";
 import { BrandMark } from "./components/BrandMark";
+import { LanguagePicker } from "./components/LanguagePicker";
 import { TextComposer } from "./components/TextComposer";
 import { ThemePicker } from "./components/ThemePicker";
 import { TypingSettings } from "./components/TypingSettings";
@@ -10,6 +11,7 @@ import { usePreferences } from "./hooks/usePreferences";
 import { useTheme } from "./hooks/useTheme";
 import { useTypingEngine } from "./hooks/useTypingEngine";
 import { countCharacters, isActiveStatus } from "./lib/typing";
+import { localizeNativeMessage, tr } from "./lib/i18n";
 import "./App.css";
 
 function App() {
@@ -25,23 +27,32 @@ function App() {
     requestAccessibility,
   } = useTypingEngine(preferences);
   useTheme(preferences.theme);
+  useEffect(() => {
+    document.documentElement.lang = preferences.language;
+  }, [preferences.language]);
 
   const active = isActiveStatus(state.status);
   const textLength = countCharacters(text);
   const needsAccessibility =
     runtimeInfo?.platform === "macos" && !runtimeInfo.accessibilityGranted;
   const runtimeWarning =
-    runtimeInfo?.shortcutWarning ??
+    (runtimeInfo?.shortcutWarning
+      ? localizeNativeMessage(runtimeInfo.shortcutWarning, preferences.language)
+      : null) ??
     (needsAccessibility
-      ? "Allow access in Privacy & Security → Accessibility. Restart the app after enabling it."
+      ? tr(
+          preferences.language,
+          "Allow access in Privacy & Security → Accessibility. Restart the app after enabling it.",
+          "Permití el acceso en Privacidad y seguridad → Accesibilidad. Reiniciá la app después de activarlo.",
+        )
       : null);
   const operationalState = active
     ? state.status === "paused"
-      ? "PAUSED"
-      : "RUNNING"
+      ? tr(preferences.language, "PAUSED", "EN PAUSA")
+      : tr(preferences.language, "RUNNING", "EN CURSO")
     : state.status === "error"
-      ? "CHECK"
-      : "READY";
+      ? tr(preferences.language, "CHECK", "REVISAR")
+      : tr(preferences.language, "READY", "LISTO");
 
   function beginTyping() {
     void start({
@@ -56,7 +67,14 @@ function App() {
 
   return (
     <div className="app-frame">
-      <aside className="app-rail" aria-label="App identity">
+      <aside
+        className="app-rail"
+        aria-label={tr(
+          preferences.language,
+          "App identity",
+          "Identidad de la aplicación",
+        )}
+      >
         <BrandMark />
       </aside>
 
@@ -66,12 +84,17 @@ function App() {
             Human <span>Typer</span>
           </h1>
           <div className="header-controls">
+            <LanguagePicker
+              value={preferences.language}
+              onChange={(language) => updatePreferences({ language })}
+            />
             <ThemePicker
               value={preferences.theme}
+              language={preferences.language}
               onChange={(theme) => updatePreferences({ theme })}
             />
             <div className="status-plate">
-              <span>Status</span>
+              <span>{tr(preferences.language, "Status", "Estado")}</span>
               <strong>{operationalState}</strong>
             </div>
           </div>
@@ -88,7 +111,11 @@ function App() {
                   type="button"
                   onClick={() => void requestAccessibility()}
                 >
-                  Check permission
+                  {tr(
+                    preferences.language,
+                    "Check permission",
+                    "Comprobar permiso",
+                  )}
                 </button>
               )}
             </div>
@@ -99,6 +126,7 @@ function App() {
           <TextComposer
             text={text}
             disabled={active}
+            language={preferences.language}
             onChange={setText}
             onClear={() => setText("")}
           />
@@ -112,6 +140,7 @@ function App() {
 
         <TypingStatusPanel
           state={state}
+          language={preferences.language}
           textLength={textLength}
           delayMs={preferences.baseDelayMs}
           onStart={beginTyping}

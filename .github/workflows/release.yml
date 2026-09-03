@@ -128,7 +128,7 @@ jobs:
           tagName: v__VERSION__
           releaseName: Human Typer v__VERSION__
           releaseBody: |
-            Human Typer 0.5.1 translates the desktop app, browser extension, background typing controls, notifications, and native error messages into English.
+            Human Typer 0.6.0 adds a persistent English/Spanish language selector to both the desktop app and browser extension, including dynamic typing controls and notifications.
 
             It includes the browser companion for Google Docs, Word Online, and other editors, plus optional target-window protection on macOS and Windows.
 

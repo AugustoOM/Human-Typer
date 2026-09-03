@@ -1,4 +1,5 @@
 export type ThemePreference = "system" | "light" | "dark";
+export type LanguagePreference = "en" | "es";
 export type SpeedPreset =
   "veryFast" | "fast" | "normal" | "slow" | "verySlow" | "custom";
 
@@ -21,6 +22,7 @@ export interface Preferences {
   desktopNotification: boolean;
   speedPreset: SpeedPreset;
   theme: ThemePreference;
+  language: LanguagePreference;
 }
 
 export interface TypingState {

@@ -7,10 +7,12 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { calculateProgress, estimateDuration } from "../lib/typing";
-import type { TypingState } from "../types";
+import { localizeNativeMessage, tr } from "../lib/i18n";
+import type { LanguagePreference, TypingState } from "../types";
 
 interface TypingStatusPanelProps {
   state: TypingState;
+  language: LanguagePreference;
   textLength: number;
   delayMs: number;
   onStart: () => void;
@@ -19,18 +21,9 @@ interface TypingStatusPanelProps {
   onOpenWebCompanion: () => void;
 }
 
-const statusLabels = {
-  idle: "Ready",
-  countdown: "Preparing",
-  typing: "Typing",
-  paused: "Paused",
-  completed: "Completed",
-  cancelled: "Cancelled",
-  error: "Needs attention",
-} as const;
-
 export function TypingStatusPanel({
   state,
+  language,
   textLength,
   delayMs,
   onStart,
@@ -38,6 +31,15 @@ export function TypingStatusPanel({
   onCancel,
   onOpenWebCompanion,
 }: TypingStatusPanelProps) {
+  const statusLabels = {
+    idle: tr(language, "Ready", "Listo"),
+    countdown: tr(language, "Preparing", "Preparando"),
+    typing: tr(language, "Typing", "Escribiendo"),
+    paused: tr(language, "Paused", "En pausa"),
+    completed: tr(language, "Completed", "Completado"),
+    cancelled: tr(language, "Cancelled", "Cancelado"),
+    error: tr(language, "Needs attention", "Necesita atención"),
+  } as const;
   const active =
     state.status === "countdown" ||
     state.status === "typing" ||
@@ -48,7 +50,7 @@ export function TypingStatusPanel({
   return (
     <section
       className={`status-card status-${state.status}`}
-      aria-label="Typing controls"
+      aria-label={tr(language, "Typing controls", "Controles de escritura")}
       aria-live="polite"
     >
       <div className="status-main">
@@ -58,18 +60,25 @@ export function TypingStatusPanel({
             <span className="status-label">{statusLabels[state.status]}</span>
             {state.status === "countdown" ? (
               <strong className="countdown-copy">
-                Starting in {state.countdown ?? "…"}
+                {tr(language, "Starting in", "Comenzando en")}{" "}
+                {state.countdown ?? "…"}
               </strong>
             ) : state.status === "typing" || state.status === "paused" ? (
               <strong>
-                Typing {state.current.toLocaleString("en")} /{" "}
-                {state.total.toLocaleString("en")} characters
+                {tr(language, "Typing", "Escribiendo")}{" "}
+                {state.current.toLocaleString(language)} /{" "}
+                {state.total.toLocaleString(language)}{" "}
+                {tr(language, "characters", "caracteres")}
               </strong>
             ) : (
               <strong>
                 {textLength
-                  ? `${textLength.toLocaleString("en")} characters · ${estimateDuration(textLength, delayMs)}`
-                  : "Paste some text to get started"}
+                  ? `${textLength.toLocaleString(language)} ${tr(language, "characters", "caracteres")} · ${estimateDuration(textLength, delayMs)}`
+                  : tr(
+                      language,
+                      "Paste some text to get started",
+                      "Pegá un texto para empezar",
+                    )}
               </strong>
             )}
           </div>
@@ -77,7 +86,10 @@ export function TypingStatusPanel({
         <span className="progress-percent">{progress}%</span>
       </div>
 
-      <div className="progress-track" aria-label={`Progress ${progress}%`}>
+      <div
+        className="progress-track"
+        aria-label={`${tr(language, "Progress", "Progreso")} ${progress}%`}
+      >
         <span style={{ width: `${progress}%` }} />
       </div>
 
@@ -98,7 +110,7 @@ export function TypingStatusPanel({
           ) : (
             <CheckCircle2 size={16} />
           )}
-          {state.message}
+          {localizeNativeMessage(state.message, language)}
         </div>
       )}
 
@@ -108,7 +120,11 @@ export function TypingStatusPanel({
           type="button"
           onClick={onStart}
           disabled={!textLength || active}
-          title="Type in the active window using native keyboard input"
+          title={tr(
+            language,
+            "Type in the active window using native keyboard input",
+            "Escribir en la ventana activa con teclado nativo",
+          )}
         >
           {state.status === "completed" || state.status === "cancelled" ? (
             <RotateCcw size={18} />
@@ -116,8 +132,8 @@ export function TypingStatusPanel({
             <Play size={18} fill="currentColor" />
           )}
           {state.status === "completed" || state.status === "cancelled"
-            ? "Type again"
-            : "Start (Desktop)"}
+            ? tr(language, "Type again", "Escribir de nuevo")
+            : tr(language, "Start (Desktop)", "Comenzar (Escritorio)")}
         </button>
 
         <button
@@ -125,10 +141,18 @@ export function TypingStatusPanel({
           type="button"
           onClick={onOpenWebCompanion}
           disabled={!textLength}
-          title="Type in the background in Google Docs, Word Online, or any website while you browse or watch videos"
+          title={tr(
+            language,
+            "Type in the background in Google Docs, Word Online, or any website while you browse or watch videos",
+            "Escribir en segundo plano en Google Docs, Word Online o cualquier web mientras navegás o mirás videos",
+          )}
         >
           <span className="spark-icon">⚡</span>
-          Background Mode (Docs / Web)
+          {tr(
+            language,
+            "Background Mode (Docs / Web)",
+            "Segundo plano (Docs / Web)",
+          )}
         </button>
 
         <button
@@ -142,7 +166,9 @@ export function TypingStatusPanel({
           ) : (
             <Pause size={18} fill="currentColor" />
           )}
-          {state.status === "paused" ? "Resume" : "Pause"}
+          {state.status === "paused"
+            ? tr(language, "Resume", "Reanudar")
+            : tr(language, "Pause", "Pausar")}
           <kbd>F8</kbd>
         </button>
         <button
@@ -152,7 +178,7 @@ export function TypingStatusPanel({
           disabled={!active}
         >
           <CircleStop size={18} />
-          Cancel
+          {tr(language, "Cancel", "Cancelar")}
           <kbd>Esc</kbd>
         </button>
       </div>

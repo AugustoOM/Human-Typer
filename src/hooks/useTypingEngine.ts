@@ -6,11 +6,13 @@ import {
   sendDesktopNotification,
 } from "../lib/soundNotification";
 import type {
+  LanguagePreference,
   Preferences,
   RuntimeInfo,
   TypingRequest,
   TypingState,
 } from "../types";
+import { tr } from "../lib/i18n";
 
 const INITIAL_STATE: TypingState = {
   status: "idle",
@@ -20,16 +22,27 @@ const INITIAL_STATE: TypingState = {
   message: null,
 };
 
-function friendlyError(error: unknown): string {
+function friendlyError(
+  error: unknown,
+  language: LanguagePreference = "en",
+): string {
   if (typeof error === "string") return error;
   if (
     typeof window !== "undefined" &&
     !(window as unknown as { __TAURI_INTERNALS__?: unknown })
       .__TAURI_INTERNALS__
   ) {
-    return "You are running Human Typer in a browser. To type in Google Docs or other websites, click the yellow '⚡ Background Mode (Docs / Web)' button. The green button is for the installed desktop app.";
+    return tr(
+      language,
+      "You are running Human Typer in a browser. To type in Google Docs or other websites, click the yellow '⚡ Background Mode (Docs / Web)' button. The green button is for the installed desktop app.",
+      "Estás usando Human Typer en el navegador. Para escribir en Google Docs u otras páginas, hacé clic en el botón amarillo '⚡ Segundo plano (Docs / Web)'. El botón verde es para la aplicación de escritorio instalada.",
+    );
   }
-  return "An unexpected error occurred. Please try again.";
+  return tr(
+    language,
+    "An unexpected error occurred. Please try again.",
+    "Ocurrió un error inesperado. Intentá nuevamente.",
+  );
 }
 
 export function useTypingEngine(preferences?: Preferences) {
@@ -45,7 +58,7 @@ export function useTypingEngine(preferences?: Preferences) {
       setState((current) => ({
         ...current,
         status: "error",
-        message: friendlyError(error),
+        message: friendlyError(error, preferencesRef.current?.language),
       }));
     }
   }, []);
@@ -62,7 +75,11 @@ export function useTypingEngine(preferences?: Preferences) {
         if (preferencesRef.current?.desktopNotification ?? true) {
           void sendDesktopNotification(
             "Human Typer",
-            `Typing completed! ${payload.total.toLocaleString("en")} characters were typed.`,
+            tr(
+              preferencesRef.current?.language ?? "en",
+              `Typing completed! ${payload.total.toLocaleString("en")} characters were typed.`,
+              `¡Escritura completada! Se escribieron ${payload.total.toLocaleString("es")} caracteres.`,
+            ),
           );
         }
       }
@@ -99,7 +116,7 @@ export function useTypingEngine(preferences?: Preferences) {
         ...current,
         status: "error",
         countdown: null,
-        message: friendlyError(error),
+        message: friendlyError(error, preferencesRef.current?.language),
       }));
     }
   }, []);
@@ -108,7 +125,10 @@ export function useTypingEngine(preferences?: Preferences) {
     try {
       await invoke("toggle_pause");
     } catch (error) {
-      setState((current) => ({ ...current, message: friendlyError(error) }));
+      setState((current) => ({
+        ...current,
+        message: friendlyError(error, preferencesRef.current?.language),
+      }));
     }
   }, []);
 
@@ -116,7 +136,10 @@ export function useTypingEngine(preferences?: Preferences) {
     try {
       await invoke("cancel_typing");
     } catch (error) {
-      setState((current) => ({ ...current, message: friendlyError(error) }));
+      setState((current) => ({
+        ...current,
+        message: friendlyError(error, preferencesRef.current?.language),
+      }));
     }
   }, []);
 
@@ -125,7 +148,10 @@ export function useTypingEngine(preferences?: Preferences) {
       await invoke<boolean>("request_accessibility");
       await refreshRuntimeInfo();
     } catch (error) {
-      setState((current) => ({ ...current, message: friendlyError(error) }));
+      setState((current) => ({
+        ...current,
+        message: friendlyError(error, preferencesRef.current?.language),
+      }));
     }
   }, [refreshRuntimeInfo]);
 

@@ -12,6 +12,7 @@ describe("webCompanion", () => {
       variationMs: 20,
       punctuationPauses: true,
       notifyOnComplete: true,
+      language: "en",
     });
 
     expect(script).toContain("Hola mundo!");
@@ -29,6 +30,7 @@ describe("webCompanion", () => {
       variationMs: 15,
       punctuationPauses: false,
       notifyOnComplete: true,
+      language: "es",
     });
 
     expect(href.startsWith("javascript:")).toBe(true);

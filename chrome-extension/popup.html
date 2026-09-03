@@ -13,44 +13,73 @@
           <span class="logo-badge">⚡</span>
           <div>
             <h2>Human <span>Typer</span></h2>
-            <span class="badge">Background</span>
+            <span class="badge" data-i18n="background">Background</span>
           </div>
         </div>
+        <button id="language-btn" class="language-btn" type="button">
+          🌐 ES
+        </button>
       </header>
 
       <main class="main">
         <div class="field-group">
           <label for="text-input">
-            <span>Text to type</span>
+            <span data-i18n="textToType">Text to type</span>
             <span id="char-count" class="char-count">0 characters</span>
           </label>
           <textarea
             id="text-input"
             placeholder="Paste or type the text to enter in the document..."
+            data-i18n-placeholder="placeholder"
             rows="5"
           ></textarea>
         </div>
 
         <div class="settings-block">
           <div class="setting-row">
-            <label>Typing speed</label>
+            <label data-i18n="typingSpeed">Typing speed</label>
             <strong id="speed-val">120 ms (Normal)</strong>
           </div>
 
           <div class="preset-buttons" role="group" aria-label="Speed presets">
-            <button type="button" class="preset-btn" data-speed="35">
+            <button
+              type="button"
+              class="preset-btn"
+              data-speed="35"
+              data-i18n="veryFast"
+            >
               ⚡ Very Fast
             </button>
-            <button type="button" class="preset-btn" data-speed="65">
+            <button
+              type="button"
+              class="preset-btn"
+              data-speed="65"
+              data-i18n="fast"
+            >
               🚀 Fast
             </button>
-            <button type="button" class="preset-btn active" data-speed="120">
+            <button
+              type="button"
+              class="preset-btn active"
+              data-speed="120"
+              data-i18n="normal"
+            >
               ✍️ Normal
             </button>
-            <button type="button" class="preset-btn" data-speed="220">
+            <button
+              type="button"
+              class="preset-btn"
+              data-speed="220"
+              data-i18n="slow"
+            >
               🐢 Slow
             </button>
-            <button type="button" class="preset-btn" data-speed="380">
+            <button
+              type="button"
+              class="preset-btn"
+              data-speed="380"
+              data-i18n="verySlow"
+            >
               🦥 Very Slow
             </button>
           </div>
@@ -64,14 +93,14 @@
             value="120"
           />
           <div class="speed-labels">
-            <span>15 ms (Ultra Fast)</span>
-            <span>800 ms (Paused)</span>
+            <span data-i18n="ultraFastRange">15 ms (Ultra Fast)</span>
+            <span data-i18n="pausedRange">800 ms (Paused)</span>
           </div>
         </div>
 
         <div class="settings-block compact">
           <div class="setting-row">
-            <label>Human variation</label>
+            <label data-i18n="humanVariation">Human variation</label>
             <strong id="variation-val">±35 ms</strong>
           </div>
           <input
@@ -87,17 +116,19 @@
         <div class="options-grid">
           <label class="toggle-label">
             <input type="checkbox" id="pause-punct" checked />
-            <span>Punctuation pauses</span>
+            <span data-i18n="punctuationPauses">Punctuation pauses</span>
           </label>
           <label class="toggle-label">
             <input type="checkbox" id="notify-sound" checked />
-            <span>Completion sound</span>
+            <span data-i18n="completionSound">Completion sound</span>
           </label>
         </div>
 
         <div id="status-card" class="status-card">
           <div class="status-info">
-            <span id="status-text">Ready to start in this tab</span>
+            <span id="status-text" data-i18n="ready"
+              >Ready to start in this tab</span
+            >
             <span id="status-percent">0%</span>
           </div>
           <div class="progress-bg">
@@ -106,14 +137,29 @@
         </div>
 
         <div class="actions">
-          <button type="button" id="start-btn" class="btn btn-primary">
+          <button
+            type="button"
+            id="start-btn"
+            class="btn btn-primary"
+            data-i18n="startTyping"
+          >
             ▶ Start Typing
           </button>
           <div id="control-buttons" class="control-row" style="display: none">
-            <button type="button" id="pause-btn" class="btn btn-secondary">
+            <button
+              type="button"
+              id="pause-btn"
+              class="btn btn-secondary"
+              data-i18n="pauseButton"
+            >
               ⏸ Pause
             </button>
-            <button type="button" id="cancel-btn" class="btn btn-danger">
+            <button
+              type="button"
+              id="cancel-btn"
+              class="btn btn-danger"
+              data-i18n="cancelButton"
+            >
               ✕ Cancel
             </button>
           </div>

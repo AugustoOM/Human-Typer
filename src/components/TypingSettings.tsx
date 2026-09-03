@@ -7,6 +7,7 @@ import {
   Volume2,
 } from "lucide-react";
 import { SPEED_PRESETS } from "../lib/typing";
+import { tr } from "../lib/i18n";
 import type { Preferences, SpeedPreset } from "../types";
 
 interface TypingSettingsProps {
@@ -22,6 +23,15 @@ export function TypingSettings({
   focusGuardSupported,
   onChange,
 }: TypingSettingsProps) {
+  const language = preferences.language;
+  const speedLabels: Record<SpeedPreset, string> = {
+    veryFast: tr(language, "Very fast", "Muy rápida"),
+    fast: tr(language, "Fast", "Rápida"),
+    normal: "Normal",
+    slow: tr(language, "Slow", "Lenta"),
+    verySlow: tr(language, "Very slow", "Muy lenta"),
+    custom: tr(language, "Custom", "Manual"),
+  };
   function selectPreset(preset: SpeedPreset) {
     const selected = SPEED_PRESETS[preset];
     onChange({
@@ -33,15 +43,21 @@ export function TypingSettings({
   return (
     <section className="card settings-card" aria-labelledby="settings-heading">
       <div className="section-heading settings-title">
-        <h2 id="settings-heading">Pace & Options</h2>
+        <h2 id="settings-heading">
+          {tr(language, "Pace & Options", "Ritmo y opciones")}
+        </h2>
       </div>
 
       <div className="setting-block full-width">
         <div className="setting-label-row">
-          <label>Speed</label>
+          <label>{tr(language, "Speed", "Velocidad")}</label>
           <strong>{preferences.baseDelayMs} ms</strong>
         </div>
-        <div className="preset-grid" role="group" aria-label="Speed preset">
+        <div
+          className="preset-grid"
+          role="group"
+          aria-label={tr(language, "Speed preset", "Velocidad predefinida")}
+        >
           {(Object.keys(SPEED_PRESETS) as SpeedPreset[]).map((preset) => (
             <button
               key={preset}
@@ -52,7 +68,7 @@ export function TypingSettings({
               onClick={() => selectPreset(preset)}
               disabled={disabled}
             >
-              {SPEED_PRESETS[preset].label}
+              {speedLabels[preset]}
             </button>
           ))}
         </div>
@@ -64,7 +80,11 @@ export function TypingSettings({
           step="5"
           value={preferences.baseDelayMs}
           disabled={disabled}
-          aria-label="Base speed in milliseconds"
+          aria-label={tr(
+            language,
+            "Base speed in milliseconds",
+            "Velocidad base en milisegundos",
+          )}
           onChange={(event) =>
             onChange({
               baseDelayMs: Number(event.currentTarget.value),
@@ -73,8 +93,8 @@ export function TypingSettings({
           }
         />
         <div className="range-labels">
-          <span>Faster</span>
-          <span>Slower</span>
+          <span>{tr(language, "Faster", "Más rápida")}</span>
+          <span>{tr(language, "Slower", "Más lenta")}</span>
         </div>
       </div>
 
@@ -85,7 +105,9 @@ export function TypingSettings({
           </div>
           <div className="panel-content">
             <div className="setting-label-row">
-              <label htmlFor="variation">Variation</label>
+              <label htmlFor="variation">
+                {tr(language, "Variation", "Variación")}
+              </label>
               <strong>±{preferences.variationMs} ms</strong>
             </div>
             <input
@@ -110,7 +132,9 @@ export function TypingSettings({
           </div>
           <div className="panel-content">
             <div className="setting-label-row">
-              <label htmlFor="countdown">Countdown</label>
+              <label htmlFor="countdown">
+                {tr(language, "Countdown", "Espera")}
+              </label>
               <strong>{preferences.countdownSeconds} s</strong>
             </div>
             <input
@@ -137,8 +161,16 @@ export function TypingSettings({
           <Gauge size={18} />
         </span>
         <span className="toggle-copy">
-          <strong>Punctuation pauses</strong>
-          <small>Natural pauses after periods, commas, and line breaks</small>
+          <strong>
+            {tr(language, "Punctuation pauses", "Pausas de puntuación")}
+          </strong>
+          <small>
+            {tr(
+              language,
+              "Natural pauses after periods, commas, and line breaks",
+              "Pausas naturales en puntos, comas y saltos de línea",
+            )}
+          </small>
         </span>
         <input
           type="checkbox"
@@ -162,11 +194,21 @@ export function TypingSettings({
           <PanelsTopLeft size={18} />
         </span>
         <span className="toggle-copy">
-          <strong>Protect target window</strong>
+          <strong>
+            {tr(language, "Protect target window", "Proteger ventana objetivo")}
+          </strong>
           <small>
             {focusGuardSupported
-              ? "Pauses when another window receives focus"
-              : "Available on macOS and Windows"}
+              ? tr(
+                  language,
+                  "Pauses when another window receives focus",
+                  "Pausa si otra ventana recibe el foco",
+                )
+              : tr(
+                  language,
+                  "Available on macOS and Windows",
+                  "Disponible en macOS y Windows",
+                )}
           </small>
         </span>
         <input
@@ -190,7 +232,9 @@ export function TypingSettings({
             <Volume2 size={18} />
           </span>
           <span className="toggle-copy">
-            <strong>Completion sound</strong>
+            <strong>
+              {tr(language, "Completion sound", "Sonido al finalizar")}
+            </strong>
           </span>
           <input
             type="checkbox"
@@ -212,7 +256,13 @@ export function TypingSettings({
             <Bell size={18} />
           </span>
           <span className="toggle-copy">
-            <strong>Completion notification</strong>
+            <strong>
+              {tr(
+                language,
+                "Completion notification",
+                "Notificación al terminar",
+              )}
+            </strong>
           </span>
           <input
             type="checkbox"

@@ -23,5 +23,6 @@ describe("preferences", () => {
     expect(parsed.soundNotification).toBe(true);
     expect(parsed.desktopNotification).toBe(true);
     expect(parsed.theme).toBe("system");
+    expect(parsed.language).toBe("en");
   });
 });

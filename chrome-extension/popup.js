@@ -1,4 +1,71 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const translations = {
+    en: {
+      background: "Background",
+      textToType: "Text to type",
+      placeholder: "Paste or type the text to enter in the document...",
+      typingSpeed: "Typing speed",
+      veryFast: "⚡ Very Fast",
+      fast: "🚀 Fast",
+      normal: "✍️ Normal",
+      slow: "🐢 Slow",
+      verySlow: "🦥 Very Slow",
+      ultraFastRange: "15 ms (Ultra Fast)",
+      pausedRange: "800 ms (Paused)",
+      humanVariation: "Human variation",
+      punctuationPauses: "Punctuation pauses",
+      completionSound: "Completion sound",
+      ready: "Ready to start in this tab",
+      startTyping: "▶ Start Typing",
+      pauseButton: "⏸ Pause",
+      cancelButton: "✕ Cancel",
+      characters: "characters",
+      ultraFast: "Ultra Fast",
+      fastSpeed: "Fast",
+      normalHuman: "Normal / Human",
+      slowSpeed: "Slow",
+      verySlowPaused: "Very Slow / Paused",
+      noTab: "No active tab detected",
+      started: "⚡ Typing started on the page",
+      running: "Running",
+      sent: "✓ Sent to tab",
+      invalidTab: "Error: make sure you are on a valid tab",
+    },
+    es: {
+      background: "Segundo plano",
+      textToType: "Texto para escribir",
+      placeholder:
+        "Pegá o escribí el texto que debe ingresarse en el documento...",
+      typingSpeed: "Velocidad de escritura",
+      veryFast: "⚡ Muy rápida",
+      fast: "🚀 Rápida",
+      normal: "✍️ Normal",
+      slow: "🐢 Lenta",
+      verySlow: "🦥 Muy lenta",
+      ultraFastRange: "15 ms (Ultrarrápida)",
+      pausedRange: "800 ms (Pausada)",
+      humanVariation: "Variación humana",
+      punctuationPauses: "Pausas de puntuación",
+      completionSound: "Sonido al finalizar",
+      ready: "Listo para comenzar en esta pestaña",
+      startTyping: "▶ Comenzar a escribir",
+      pauseButton: "⏸ Pausar",
+      cancelButton: "✕ Cancelar",
+      characters: "caracteres",
+      ultraFast: "Ultrarrápida",
+      fastSpeed: "Rápida",
+      normalHuman: "Normal / Humana",
+      slowSpeed: "Lenta",
+      verySlowPaused: "Muy lenta / Pausada",
+      noTab: "No se detectó una pestaña activa",
+      started: "⚡ Escritura iniciada en la página",
+      running: "En curso",
+      sent: "✓ Enviado a la pestaña",
+      invalidTab: "Error: asegurate de estar en una pestaña válida",
+    },
+  };
+  let language = "en";
+  const t = (key) => translations[language][key];
   const textInput = document.getElementById("text-input");
   const charCount = document.getElementById("char-count");
   const speedSlider = document.getElementById("speed-slider");
@@ -9,6 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const statusText = document.getElementById("status-text");
   const statusPercent = document.getElementById("status-percent");
   const progressBar = document.getElementById("progress-bar");
+  const languageBtn = document.getElementById("language-btn");
 
   const variationSlider = document.getElementById("variation-slider");
   const variationVal = document.getElementById("variation-val");
@@ -16,8 +84,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Load saved preferences
   chrome.storage.local.get(
-    ["savedText", "speed", "variation", "pausePunct", "notifySound"],
+    [
+      "savedText",
+      "speed",
+      "variation",
+      "pausePunct",
+      "notifySound",
+      "language",
+    ],
     (res) => {
+      language = res.language === "es" ? "es" : "en";
       if (res.savedText) {
         textInput.value = res.savedText;
         updateCharCount();
@@ -32,21 +108,41 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       if (res.pausePunct !== undefined) pausePunct.checked = res.pausePunct;
       if (res.notifySound !== undefined) notifySound.checked = res.notifySound;
+      applyLanguage();
     },
   );
 
+  function applyLanguage() {
+    document.documentElement.lang = language;
+    document.querySelectorAll("[data-i18n]").forEach((element) => {
+      element.textContent = t(element.dataset.i18n);
+    });
+    document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+      element.placeholder = t(element.dataset.i18nPlaceholder);
+    });
+    languageBtn.textContent = language === "en" ? "🌐 ES" : "🌐 EN";
+    updateCharCount();
+    updateSpeedLabel(Number(speedSlider.value));
+  }
+
+  languageBtn.addEventListener("click", () => {
+    language = language === "en" ? "es" : "en";
+    chrome.storage.local.set({ language });
+    applyLanguage();
+  });
+
   function updateCharCount() {
     const len = Array.from(textInput.value).length;
-    charCount.innerText = `${len.toLocaleString("en")} characters`;
+    charCount.innerText = `${len.toLocaleString(language)} ${t("characters")}`;
     startBtn.disabled = len === 0;
   }
 
   function getSpeedDescriptor(ms) {
-    if (ms <= 45) return "Ultra Fast";
-    if (ms <= 85) return "Fast";
-    if (ms <= 160) return "Normal / Human";
-    if (ms <= 280) return "Slow";
-    return "Very Slow / Paused";
+    if (ms <= 45) return t("ultraFast");
+    if (ms <= 85) return t("fastSpeed");
+    if (ms <= 160) return t("normalHuman");
+    if (ms <= 280) return t("slowSpeed");
+    return t("verySlowPaused");
   }
 
   function updateSpeedLabel(ms) {
@@ -102,6 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
       variationMs: variationSlider ? Number(variationSlider.value) : 35,
       punctuationPauses: pausePunct.checked,
       notifySound: notifySound.checked,
+      language,
     };
 
     const [tab] = await chrome.tabs.query({
@@ -109,7 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
       currentWindow: true,
     });
     if (!tab || !tab.id) {
-      statusText.innerText = "No active tab detected";
+      statusText.innerText = t("noTab");
       return;
     }
 
@@ -120,15 +217,15 @@ document.addEventListener("DOMContentLoaded", () => {
         args: [config],
       });
 
-      statusText.innerText = "⚡ Typing started on the page";
-      statusPercent.innerText = "Running";
+      statusText.innerText = t("started");
+      statusPercent.innerText = t("running");
       progressBar.style.width = "100%";
-      startBtn.innerText = "✓ Sent to tab";
+      startBtn.innerText = t("sent");
       setTimeout(() => {
         window.close(); // Close the popup to free up the screen
       }, 700);
     } catch (err) {
-      statusText.innerText = "Error: make sure you are on a valid tab";
+      statusText.innerText = t("invalidTab");
       console.error(err);
     }
   });
@@ -138,6 +235,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // This function runs directly inside Google Docs / the web page
 function injectTypingScript(config) {
+  const labels =
+    config.language === "es"
+      ? {
+          background: "Segundo plano",
+          startingPage: "Iniciando escritura en esta página...",
+          characters: "caracteres",
+          pause: "Pausar",
+          cancel: "Cancelar",
+          starting: "Comenzando en",
+          clickDocument: "Hacé clic en el documento",
+          typing: "⚡ Escribiendo en segundo plano...",
+          typingCancelled: "Escritura cancelada",
+          paused: "En pausa (pulsá Reanudar)",
+          completed: "¡Texto completado con éxito!",
+          resume: "Reanudar",
+        }
+      : {
+          background: "Background",
+          startingPage: "Starting to type on this page...",
+          characters: "characters",
+          pause: "Pause",
+          cancel: "Cancel",
+          starting: "Starting in",
+          clickDocument: "Click in the document",
+          typing: "⚡ Typing in the background...",
+          typingCancelled: "Typing cancelled",
+          paused: "Paused (click Resume)",
+          completed: "Text completed successfully!",
+          resume: "Resume",
+        };
   // Remove any previous instance
   const prev = document.getElementById("ht-floating-controller");
   if (prev) prev.remove();
@@ -168,21 +295,21 @@ function injectTypingScript(config) {
   panel.innerHTML = `
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 8px;">
       <span style="font-weight: 800; color: #facc15; display: flex; align-items: center; gap: 6px;">
-        ⚡ Human Typer <span style="font-size: 11px; background: rgba(234,179,8,0.2); color: #fef08a; padding: 2px 6px; border-radius: 4px;">Background</span>
+        ⚡ Human Typer <span style="font-size: 11px; background: rgba(234,179,8,0.2); color: #fef08a; padding: 2px 6px; border-radius: 4px;">${labels.background}</span>
       </span>
       <button id="ht-close-btn" style="background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 16px;">✕</button>
     </div>
-    <div id="ht-status-text" style="color: #e5e7eb; font-weight: 600;">Starting to type on this page...</div>
+    <div id="ht-status-text" style="color: #e5e7eb; font-weight: 600;">${labels.startingPage}</div>
     <div style="background: rgba(255,255,255,0.1); border-radius: 6px; height: 6px; overflow: hidden;">
       <div id="ht-progress-bar" style="width: 0%; height: 100%; background: #eab308; transition: width 0.1s linear;"></div>
     </div>
     <div style="display: flex; justify-content: space-between; font-size: 11px; color: #9ca3af;">
-      <span id="ht-count-text">0 / ${config.text.length} characters</span>
+      <span id="ht-count-text">0 / ${config.text.length} ${labels.characters}</span>
       <span id="ht-percent-text">0%</span>
     </div>
     <div style="display: flex; gap: 8px; margin-top: 4px;">
-      <button id="ht-pause-btn" style="flex: 1; background: #374151; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Pause</button>
-      <button id="ht-cancel-btn" style="background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancel</button>
+      <button id="ht-pause-btn" style="flex: 1; background: #374151; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">${labels.pause}</button>
+      <button id="ht-cancel-btn" style="background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">${labels.cancel}</button>
     </div>
   `;
 
@@ -457,23 +584,23 @@ function injectTypingScript(config) {
     // Three-second countdown
     for (let c = 3; c > 0; c--) {
       if (isCancelled) return;
-      statusText.innerText = `Starting in ${c}s... (Click in the document)`;
+      statusText.innerText = `${labels.starting} ${c}s... (${labels.clickDocument})`;
       await new Promise((r) => setTimeout(r, 1000));
     }
 
     target = getTarget();
-    statusText.innerText = "⚡ Typing in the background...";
+    statusText.innerText = labels.typing;
 
     const chars = Array.from(config.text);
     const total = chars.length;
 
     while (currentIndex < total) {
       if (isCancelled) {
-        statusText.innerText = "Typing cancelled";
+        statusText.innerText = labels.typingCancelled;
         return;
       }
       if (isPaused) {
-        statusText.innerText = "Paused (click Resume)";
+        statusText.innerText = labels.paused;
         await new Promise((r) => setTimeout(r, 100));
         continue;
       }
@@ -484,7 +611,7 @@ function injectTypingScript(config) {
 
       const pct = Math.round((currentIndex / total) * 100);
       progressBar.style.width = `${pct}%`;
-      countText.innerText = `${currentIndex} / ${total} characters`;
+      countText.innerText = `${currentIndex} / ${total} ${labels.characters}`;
       percentText.innerText = `${pct}%`;
 
       const delay = getDelay(char);
@@ -494,7 +621,7 @@ function injectTypingScript(config) {
       });
     }
 
-    statusText.innerHTML = "✅ <strong>Text completed successfully!</strong>";
+    statusText.innerHTML = `✅ <strong>${labels.completed}</strong>`;
     progressBar.style.background = "#10b981";
     pauseBtn.style.display = "none";
     cancelBtn.style.display = "none";
@@ -506,7 +633,7 @@ function injectTypingScript(config) {
 
   pauseBtn.onclick = () => {
     isPaused = !isPaused;
-    pauseBtn.innerText = isPaused ? "Resume" : "Pause";
+    pauseBtn.innerText = isPaused ? labels.resume : labels.pause;
     pauseBtn.style.background = isPaused ? "#2563eb" : "#374151";
   };
 

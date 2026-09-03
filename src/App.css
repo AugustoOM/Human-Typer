@@ -171,6 +171,24 @@ footer {
   gap: 12px;
 }
 
+.language-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 11px;
+  border: 3px solid var(--line);
+  background: var(--paper-bright);
+  color: var(--ink);
+  cursor: pointer;
+  font: 900 12px/1 var(--mono);
+  box-shadow: var(--shadow-small);
+}
+
+.language-button:hover {
+  background: var(--yellow);
+}
+
 .theme-picker {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

@@ -10,6 +10,7 @@ export interface WebCompanionOptions {
   variationMs: number;
   punctuationPauses: boolean;
   notifyOnComplete: boolean;
+  language: "en" | "es";
 }
 
 export function generateWebCompanionScript(
@@ -21,13 +22,57 @@ export function generateWebCompanionScript(
     variationMs: options.variationMs,
     punctuationPauses: options.punctuationPauses,
     notifyOnComplete: options.notifyOnComplete,
+    labels:
+      options.language === "es"
+        ? {
+            empty: "Human Typer: Ingresá un texto primero.",
+            background: "Segundo plano",
+            ready: "Listo para escribir en este documento",
+            characters: "caracteres",
+            start3: "Comenzar (3s)",
+            pause: "Pausar",
+            cancel: "Cancelar",
+            notification:
+              "¡Escritura finalizada con éxito! Se escribieron todos los caracteres.",
+            starting: "Comenzando en",
+            clickTarget: "Hacé clic donde quieras escribir",
+            typing: "⚡ Escribiendo en segundo plano...",
+            cancelled: "Cancelado",
+            paused: "En pausa",
+            completed: "¡Completado con éxito!",
+            typeAgain: "Escribir de nuevo",
+            resume: "Reanudar",
+            typingCancelled: "Escritura cancelada",
+            start: "Comenzar",
+          }
+        : {
+            empty: "Human Typer: Please enter some text first.",
+            background: "Background",
+            ready: "Ready to type in this document",
+            characters: "characters",
+            start3: "Start (3s)",
+            pause: "Pause",
+            cancel: "Cancel",
+            notification:
+              "Typing completed successfully! All characters were typed.",
+            starting: "Starting in",
+            clickTarget: "Click where you want to type",
+            typing: "⚡ Typing in the background...",
+            cancelled: "Cancelled",
+            paused: "Paused",
+            completed: "Completed successfully!",
+            typeAgain: "Type again",
+            resume: "Resume",
+            typingCancelled: "Typing cancelled",
+            start: "Start",
+          },
   });
 
   return `(() => {
   const config = ${jsonConfig};
   
   if (!config.text) {
-    alert("Human Typer: Please enter some text first.");
+    alert(config.labels.empty);
     return;
   }
 
@@ -61,22 +106,22 @@ export function generateWebCompanionScript(
   panel.innerHTML = \`
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
       <span style="font-weight: 700; color: #60a5fa; display: flex; align-items: center; gap: 6px;">
-        ⚡ Human Typer <span style="font-size: 11px; background: rgba(96,165,250,0.2); padding: 2px 6px; border-radius: 6px;">Background</span>
+        ⚡ Human Typer <span style="font-size: 11px; background: rgba(96,165,250,0.2); padding: 2px 6px; border-radius: 6px;">\${config.labels.background}</span>
       </span>
       <button id="ht-close-btn" style="background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 16px;">✕</button>
     </div>
-    <div id="ht-status-text" style="color: #e5e7eb; font-weight: 500;">Ready to type in this document</div>
+    <div id="ht-status-text" style="color: #e5e7eb; font-weight: 500;">\${config.labels.ready}</div>
     <div style="background: rgba(255,255,255,0.1); border-radius: 6px; height: 6px; overflow: hidden;">
       <div id="ht-progress-bar" style="width: 0%; height: 100%; background: #3b82f6; transition: width 0.1s linear;"></div>
     </div>
     <div style="display: flex; justify-content: space-between; font-size: 11px; color: #9ca3af;">
-      <span id="ht-count-text">0 / \${config.text.length} characters</span>
+      <span id="ht-count-text">0 / \${config.text.length} \${config.labels.characters}</span>
       <span id="ht-percent-text">0%</span>
     </div>
     <div style="display: flex; gap: 8px; margin-top: 4px;">
-      <button id="ht-start-btn" style="flex: 1; background: #2563eb; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer;">Start (3s)</button>
-      <button id="ht-pause-btn" style="display: none; flex: 1; background: #374151; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer;">Pause</button>
-      <button id="ht-cancel-btn" style="display: none; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer;">Cancel</button>
+      <button id="ht-start-btn" style="flex: 1; background: #2563eb; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer;">\${config.labels.start3}</button>
+      <button id="ht-pause-btn" style="display: none; flex: 1; background: #374151; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer;">\${config.labels.pause}</button>
+      <button id="ht-cancel-btn" style="display: none; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer;">\${config.labels.cancel}</button>
     </div>
   \`;
 
@@ -125,7 +170,7 @@ export function generateWebCompanionScript(
   function sendNotify() {
     if ("Notification" in window && Notification.permission === "granted") {
       new Notification("Human Typer", {
-        body: "Typing completed successfully! All characters were typed.",
+        body: config.labels.notification,
         icon: "https://tauri.app/img/favicon.png"
       });
     }
@@ -270,24 +315,24 @@ export function generateWebCompanionScript(
     // Three-second countdown
     for (let c = 3; c > 0; c--) {
       if (isCancelled) return;
-      statusText.innerText = \`Starting in \${c}... (Click where you want to type)\`;
+      statusText.innerText = \`\${config.labels.starting} \${c}... (\${config.labels.clickTarget})\`;
       await new Promise(r => setTimeout(r, 1000));
     }
 
     targetElement = getActiveOrDocsTarget();
-    statusText.innerText = "⚡ Typing in the background...";
+    statusText.innerText = config.labels.typing;
 
     const chars = Array.from(config.text);
     const total = chars.length;
 
     while (currentIndex < total) {
       if (isCancelled) {
-        statusText.innerText = "Cancelled";
+        statusText.innerText = config.labels.cancelled;
         return;
       }
 
       if (isPaused) {
-        statusText.innerText = "Paused";
+        statusText.innerText = config.labels.paused;
         await new Promise(r => setTimeout(r, 100));
         continue;
       }
@@ -298,7 +343,7 @@ export function generateWebCompanionScript(
 
       const pct = Math.round((currentIndex / total) * 100);
       progressBar.style.width = \`\${pct}%\`;
-      countText.innerText = \`\${currentIndex} / \${total} characters\`;
+      countText.innerText = \`\${currentIndex} / \${total} \${config.labels.characters}\`;
       percentText.innerText = \`\${pct}%\`;
 
       const delay = calculateDelay(char);
@@ -308,12 +353,12 @@ export function generateWebCompanionScript(
       });
     }
 
-    statusText.innerHTML = "✅ <strong>Completed successfully!</strong>";
+    statusText.innerHTML = "✅ <strong>" + config.labels.completed + "</strong>";
     progressBar.style.background = "#10b981";
     pauseBtn.style.display = "none";
     cancelBtn.style.display = "none";
     startBtn.style.display = "block";
-    startBtn.innerText = "Type again";
+    startBtn.innerText = config.labels.typeAgain;
     currentIndex = 0;
     isRunning = false;
 
@@ -329,18 +374,18 @@ export function generateWebCompanionScript(
 
   pauseBtn.onclick = () => {
     isPaused = !isPaused;
-    pauseBtn.innerText = isPaused ? "Resume" : "Pause";
+    pauseBtn.innerText = isPaused ? config.labels.resume : config.labels.pause;
     pauseBtn.style.background = isPaused ? "#2563eb" : "#374151";
   };
 
   cancelBtn.onclick = () => {
     isCancelled = true;
     isRunning = false;
-    statusText.innerText = "Typing cancelled";
+    statusText.innerText = config.labels.typingCancelled;
     pauseBtn.style.display = "none";
     cancelBtn.style.display = "none";
     startBtn.style.display = "block";
-    startBtn.innerText = "Start";
+    startBtn.innerText = config.labels.start;
     currentIndex = 0;
   };
 

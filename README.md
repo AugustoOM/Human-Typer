@@ -24,6 +24,7 @@ It is built with Tauri 2, React 19, TypeScript, and Rust. Everything runs locall
 - Pauses or resumes globally with `F8` and cancels immediately with `Esc`.
 - Includes equivalent controls inside the application.
 - Supports light, dark, and system themes.
+- Switches the desktop app and browser extension between English and Spanish.
 - Saves preferences locally without persisting the text.
 - Enforces safety limits of 250,000 characters and eight hours per run.
 

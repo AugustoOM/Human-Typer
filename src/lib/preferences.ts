@@ -1,4 +1,9 @@
-import type { Preferences, SpeedPreset, ThemePreference } from "../types";
+import type {
+  LanguagePreference,
+  Preferences,
+  SpeedPreset,
+  ThemePreference,
+} from "../types";
 
 const STORAGE_KEY = "human-typer.preferences.v1";
 
@@ -12,6 +17,7 @@ export const DEFAULT_PREFERENCES: Preferences = {
   desktopNotification: true,
   speedPreset: "normal",
   theme: "system",
+  language: "en",
 };
 
 const speedPresets: SpeedPreset[] = [
@@ -23,6 +29,7 @@ const speedPresets: SpeedPreset[] = [
   "custom",
 ];
 const themes: ThemePreference[] = ["system", "light", "dark"];
+const languages: LanguagePreference[] = ["en", "es"];
 
 function boundedNumber(
   value: unknown,
@@ -65,6 +72,9 @@ export function parsePreferences(raw: string | null): Preferences {
       theme: themes.includes(value.theme as ThemePreference)
         ? (value.theme as ThemePreference)
         : "system",
+      language: languages.includes(value.language as LanguagePreference)
+        ? (value.language as LanguagePreference)
+        : "en",
     };
   } catch {
     return DEFAULT_PREFERENCES;
