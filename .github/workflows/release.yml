@@ -153,11 +153,13 @@ jobs:
 
       - name: Upload browser extension to release assets
         if: runner.os == 'Windows'
-        uses: softprops/action-gh-release@v2
-        with:
-          files: Human-Typer-Browser-Extension.zip
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: >-
+          gh release upload "${{ github.ref_name }}"
+          Human-Typer-Browser-Extension.zip
+          --repo "${{ github.repository }}"
 
       - name: Verify macOS signature and notarization
         if: runner.os == 'macOS'
