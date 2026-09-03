@@ -2,16 +2,14 @@ import { useState } from "react";
 import {
   Check,
   Copy,
-  Globe,
+  Download,
   Info,
   Sparkles,
   X,
   Zap,
 } from "lucide-react";
-import {
-  generateBookmarkletHref,
-  generateWebCompanionScript,
-} from "../lib/webCompanion";
+import { downloadExtensionZip } from "../lib/extensionPacker";
+import { generateWebCompanionScript } from "../lib/webCompanion";
 import type { Preferences } from "../types";
 
 interface WebCompanionModalProps {
@@ -28,19 +26,12 @@ export function WebCompanionModal({
   preferences,
 }: WebCompanionModalProps) {
   const [copiedCode, setCopiedCode] = useState(false);
-  const [copiedBookmarklet, setCopiedBookmarklet] = useState(false);
+  const [copiedPath, setCopiedPath] = useState(false);
+  const [downloadedZip, setDownloadedZip] = useState(false);
 
   if (!isOpen) return null;
 
   const scriptCode = generateWebCompanionScript({
-    text: text || "Texto de ejemplo para Human Typer...",
-    baseDelayMs: preferences.baseDelayMs,
-    variationMs: preferences.variationMs,
-    punctuationPauses: preferences.punctuationPauses,
-    notifyOnComplete: preferences.desktopNotification,
-  });
-
-  const bookmarkletHref = generateBookmarkletHref({
     text: text || "Texto de ejemplo para Human Typer...",
     baseDelayMs: preferences.baseDelayMs,
     variationMs: preferences.variationMs,
@@ -54,10 +45,10 @@ export function WebCompanionModal({
     setTimeout(() => setCopiedCode(false), 2500);
   }
 
-  function handleCopyBookmarklet() {
-    navigator.clipboard.writeText(bookmarkletHref);
-    setCopiedBookmarklet(true);
-    setTimeout(() => setCopiedBookmarklet(false), 2500);
+  function handleDownloadZip() {
+    downloadExtensionZip();
+    setDownloadedZip(true);
+    setTimeout(() => setDownloadedZip(false), 2500);
   }
 
   return (
@@ -106,28 +97,40 @@ export function WebCompanionModal({
             <div className="method-card">
               <div className="method-header">
                 <div className="step-badge">Recomendado · 1 Solo Clic</div>
-                <h4>Extensión para Chrome y Edge</h4>
+                <h4>Extensión para Chrome, Edge y Firefox</h4>
               </div>
               <p className="method-desc">
-                Te da el botón permanente ⚡ en tu navegador para Google Docs y cualquier web:
+                Te da el botón permanente ⚡ en cualquier navegador para escribir en segundo plano:
               </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px", margin: "10px 0 16px" }}>
+                <button
+                  type="button"
+                  className={`action-btn ${downloadedZip ? "copied" : "primary"}`}
+                  onClick={handleDownloadZip}
+                >
+                  {downloadedZip ? <Check size={18} /> : <Download size={18} />}
+                  {downloadedZip ? "¡Extensión Descargada!" : "Descargar Extensión (.ZIP)"}
+                </button>
+
+                <button
+                  type="button"
+                  className={`action-btn ${copiedPath ? "copied" : "secondary"}`}
+                  onClick={() => {
+                    navigator.clipboard.writeText("C:\\Users\\Rodrigo\\Desktop\\human (1)\\Human-Typer\\chrome-extension");
+                    setCopiedPath(true);
+                    setTimeout(() => setCopiedPath(false), 2500);
+                  }}
+                >
+                  {copiedPath ? <Check size={18} /> : <Copy size={18} />}
+                  {copiedPath ? "¡Ruta Copiada!" : "Copiar Ruta de la Carpeta"}
+                </button>
+              </div>
+
               <ol className="step-list">
-                <li>Abre en tu navegador: <strong>chrome://extensions</strong></li>
-                <li>Activa <strong>"Modo de desarrollador"</strong> (arriba a la derecha).</li>
-                <li>Pulsa <strong>"Cargar descomprimida"</strong> y elige la carpeta de la extensión:</li>
+                <li>Abre <strong>chrome://extensions</strong> (o <strong>about:debugging</strong> en Firefox).</li>
+                <li>Activa <strong>"Modo de desarrollador"</strong>.</li>
+                <li>Pulsa <strong>"Cargar descomprimida"</strong> y selecciona la carpeta.</li>
               </ol>
-              <button
-                type="button"
-                className={`action-btn ${copiedBookmarklet ? "copied" : "primary"}`}
-                onClick={() => {
-                  navigator.clipboard.writeText("C:\\Users\\Rodrigo\\Desktop\\human (1)\\Human-Typer\\chrome-extension");
-                  setCopiedBookmarklet(true);
-                  setTimeout(() => setCopiedBookmarklet(false), 2500);
-                }}
-              >
-                {copiedBookmarklet ? <Check size={18} /> : <Copy size={18} />}
-                {copiedBookmarklet ? "¡Ruta de Carpeta Copiada!" : "Copiar Ruta de la Extensión"}
-              </button>
             </div>
 
             <div className="method-card">
