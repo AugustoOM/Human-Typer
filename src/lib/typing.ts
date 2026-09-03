@@ -2,9 +2,10 @@ import type { TypingStatus } from "../types";
 
 export const SPEED_PRESETS = {
   veryFast: { label: "Muy rápida", delay: 35 },
-  fast: { label: "Rápida", delay: 55 },
-  normal: { label: "Normal", delay: 85 },
-  slow: { label: "Lenta", delay: 140 },
+  fast: { label: "Rápida", delay: 65 },
+  normal: { label: "Normal", delay: 120 },
+  slow: { label: "Lenta", delay: 220 },
+  verySlow: { label: "Muy lenta", delay: 380 },
   custom: { label: "Manual", delay: null },
 } as const;
 

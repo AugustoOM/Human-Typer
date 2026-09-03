@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import type { RuntimeInfo, TypingRequest, TypingState } from "../types";
+import { playCompletionChime, sendDesktopNotification } from "../lib/soundNotification";
+import type { Preferences, RuntimeInfo, TypingRequest, TypingState } from "../types";
 
 const INITIAL_STATE: TypingState = {
   status: "idle",
@@ -13,12 +14,17 @@ const INITIAL_STATE: TypingState = {
 
 function friendlyError(error: unknown): string {
   if (typeof error === "string") return error;
+  if (typeof window !== "undefined" && !(window as unknown as { __TAURI_INTERNALS__?: unknown }).__TAURI_INTERNALS__) {
+    return "Estás en el navegador. Para escribir en Google Docs / páginas web, hacé clic en el botón amarillo '⚡ Segundo Plano (Docs / Web)'. El botón verde es para la aplicación de escritorio instalada de Windows.";
+  }
   return "Ocurrió un error inesperado. Intentá nuevamente.";
 }
 
-export function useTypingEngine() {
+export function useTypingEngine(preferences?: Preferences) {
   const [state, setState] = useState<TypingState>(INITIAL_STATE);
   const [runtimeInfo, setRuntimeInfo] = useState<RuntimeInfo | null>(null);
+  const preferencesRef = useRef(preferences);
+  preferencesRef.current = preferences;
 
   const refreshRuntimeInfo = useCallback(async () => {
     try {
@@ -33,9 +39,22 @@ export function useTypingEngine() {
   }, []);
 
   useEffect(() => {
-    const unlisten = listen<TypingState>("typing-state", (event) =>
-      setState(event.payload),
-    );
+    const unlisten = listen<TypingState>("typing-state", (event) => {
+      const payload = event.payload;
+      setState(payload);
+
+      if (payload.status === "completed") {
+        if (preferencesRef.current?.soundNotification ?? true) {
+          playCompletionChime();
+        }
+        if (preferencesRef.current?.desktopNotification ?? true) {
+          void sendDesktopNotification(
+            "Human Typer",
+            `¡Escritura completada! Se escribieron ${payload.total.toLocaleString("es")} caracteres.`,
+          );
+        }
+      }
+    });
     const refreshWhenVisible = () => {
       if (document.visibilityState === "visible") {
         void refreshRuntimeInfo();

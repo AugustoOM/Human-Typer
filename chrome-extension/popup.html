@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Human Typer</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="popup-container">
+    <header class="header">
+      <div class="brand">
+        <span class="logo-badge">⚡</span>
+        <div>
+          <h2>Human <span>Typer</span></h2>
+          <span class="badge">Segundo Plano</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="field-group">
+        <label for="text-input">
+          <span>Texto para escribir</span>
+          <span id="char-count" class="char-count">0 caracteres</span>
+        </label>
+        <textarea
+          id="text-input"
+          placeholder="Pega o escribe aquí el texto que debe escribirse en el documento..."
+          rows="5"
+        ></textarea>
+      </div>
+
+      <div class="settings-block">
+        <div class="setting-row">
+          <label>Velocidad de escritura</label>
+          <strong id="speed-val">120 ms (Normal)</strong>
+        </div>
+
+        <div class="preset-buttons" role="group" aria-label="Velocidades predefinidas">
+          <button type="button" class="preset-btn" data-speed="35">⚡ Muy Rápido</button>
+          <button type="button" class="preset-btn" data-speed="65">🚀 Rápido</button>
+          <button type="button" class="preset-btn active" data-speed="120">✍️ Normal</button>
+          <button type="button" class="preset-btn" data-speed="220">🐢 Lento</button>
+          <button type="button" class="preset-btn" data-speed="380">🦥 Muy Lento</button>
+        </div>
+
+        <input type="range" id="speed-slider" min="15" max="800" step="5" value="120" />
+        <div class="speed-labels">
+          <span>15 ms (Ultra Rápido)</span>
+          <span>800 ms (Pausado)</span>
+        </div>
+      </div>
+
+      <div class="settings-block compact">
+        <div class="setting-row">
+          <label>Variación humana</label>
+          <strong id="variation-val">±35 ms</strong>
+        </div>
+        <input type="range" id="variation-slider" min="0" max="150" step="5" value="35" />
+      </div>
+
+      <div class="options-grid">
+        <label class="toggle-label">
+          <input type="checkbox" id="pause-punct" checked />
+          <span>Pausas de puntuación</span>
+        </label>
+        <label class="toggle-label">
+          <input type="checkbox" id="notify-sound" checked />
+          <span>Sonido al finalizar</span>
+        </label>
+      </div>
+
+      <div id="status-card" class="status-card">
+        <div class="status-info">
+          <span id="status-text">Listo para iniciar en esta pestaña</span>
+          <span id="status-percent">0%</span>
+        </div>
+        <div class="progress-bg">
+          <div id="progress-bar" class="progress-fill"></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" id="start-btn" class="btn btn-primary">
+          ▶ Comenzar a Escribir
+        </button>
+        <div id="control-buttons" class="control-row" style="display: none;">
+          <button type="button" id="pause-btn" class="btn btn-secondary">
+            ⏸ Pausar
+          </button>
+          <button type="button" id="cancel-btn" class="btn btn-danger">
+            ✕ Cancelar
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
