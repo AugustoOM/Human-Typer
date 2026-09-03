@@ -137,6 +137,7 @@ jobs:
             Descargas:
             - Windows: instalador `.exe` de 64 bits.
             - macOS: imagen `.dmg` para Apple Silicon.
+            - Extensión Navegadores: `Human-Typer-Extension.zip` (para Chrome, Edge y Firefox).
 
             En macOS, habilitá Human Typer en Configuración del Sistema → Privacidad y seguridad → Accesibilidad.
           releaseDraft: false
@@ -144,6 +145,20 @@ jobs:
           generateReleaseNotes: true
           args: ${{ matrix.args }}
           releaseAssetNamePattern: Human-Typer_[version]_[platform]_[arch][_setup].[ext]
+
+      - name: Package browser extension
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          tar -a -c -f Human-Typer-Extension.zip -C chrome-extension .
+
+      - name: Upload browser extension to release assets
+        if: runner.os == 'Windows'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Human-Typer-Extension.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify macOS signature and notarization
         if: runner.os == 'macOS'

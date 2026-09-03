@@ -110,12 +110,36 @@ export function WebCompanionModal({
             <div className="method-card">
               <div className="method-header">
                 <div className="step-badge">Recomendado · 1 Solo Clic</div>
-                <h4>Extensión para Chrome y Edge</h4>
+                <h4>Extensión para Chrome, Edge y Firefox</h4>
               </div>
               <p className="method-desc">
                 Te da el botón permanente ⚡ en tu navegador para Google Docs y
                 cualquier web:
               </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px", margin: "10px 0 16px" }}>
+                <button
+                  type="button"
+                  className={`action-btn ${downloadedZip ? "copied" : "primary"}`}
+                  onClick={handleDownloadZip}
+                >
+                  {downloadedZip ? <Check size={18} /> : <Download size={18} />}
+                  {downloadedZip ? "¡Extensión Descargada!" : "Descargar Extensión (.ZIP)"}
+                </button>
+
+                <button
+                  type="button"
+                  className={`action-btn ${copiedPath ? "copied" : "secondary"}`}
+                  onClick={() => {
+                    navigator.clipboard.writeText("C:\\Users\\Rodrigo\\Desktop\\human (1)\\Human-Typer\\chrome-extension");
+                    setCopiedPath(true);
+                    setTimeout(() => setCopiedPath(false), 2500);
+                  }}
+                >
+                  {copiedPath ? <Check size={18} /> : <Copy size={18} />}
+                  {copiedPath ? "¡Ruta Copiada!" : "Copiar Ruta de la Carpeta"}
+                </button>
+              </div>
+
               <ol className="step-list">
                 <li>
                   Abre en tu navegador: <strong>chrome://extensions</strong>
