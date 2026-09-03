@@ -739,7 +739,7 @@ textarea:disabled {
   font-size: 0.88rem;
 }
 
-/* Modal de Segundo Plano (Google Docs / Web) */
+/* Background Mode modal (Google Docs / Web) */
 .modal-overlay {
   position: fixed;
   inset: 0;

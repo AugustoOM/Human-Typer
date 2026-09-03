@@ -1,12 +1,12 @@
 import type { TypingStatus } from "../types";
 
 export const SPEED_PRESETS = {
-  veryFast: { label: "Muy rápida", delay: 35 },
-  fast: { label: "Rápida", delay: 65 },
+  veryFast: { label: "Very fast", delay: 35 },
+  fast: { label: "Fast", delay: 65 },
   normal: { label: "Normal", delay: 120 },
-  slow: { label: "Lenta", delay: 220 },
-  verySlow: { label: "Muy lenta", delay: 380 },
-  custom: { label: "Manual", delay: null },
+  slow: { label: "Slow", delay: 220 },
+  verySlow: { label: "Very slow", delay: 380 },
+  custom: { label: "Custom", delay: null },
 } as const;
 
 export function countCharacters(text: string): number {

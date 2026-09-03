@@ -7,21 +7,21 @@ interface ThemePickerProps {
 }
 
 const themes = [
-  { value: "system", label: "Sistema", icon: Monitor },
-  { value: "light", label: "Claro", icon: Sun },
-  { value: "dark", label: "Oscuro", icon: Moon },
+  { value: "system", label: "System", icon: Monitor },
+  { value: "light", label: "Light", icon: Sun },
+  { value: "dark", label: "Dark", icon: Moon },
 ] as const;
 
 export function ThemePicker({ value, onChange }: ThemePickerProps) {
   return (
-    <div className="theme-picker" aria-label="Tema de la aplicación">
+    <div className="theme-picker" aria-label="App theme">
       {themes.map(({ value: option, label, icon: Icon }) => (
         <button
           className={value === option ? "theme-button active" : "theme-button"}
           key={option}
           type="button"
           onClick={() => onChange(option)}
-          aria-label={`Tema ${label.toLowerCase()}`}
+          aria-label={`${label} theme`}
           title={label}
         >
           <Icon size={16} />

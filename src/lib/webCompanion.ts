@@ -1,7 +1,7 @@
 /**
- * Generador de script / bookmarklet para Google Docs, Word Online y cualquier web.
- * Permite escribir carácter por carácter en segundo plano sin importar que el usuario
- * cambie de pestaña o vea videos en otra ventana.
+ * Script / bookmarklet generator for Google Docs, Word Online, and any website.
+ * Types character by character in the background even when the user switches tabs
+ * or watches videos in another window.
  */
 
 export interface WebCompanionOptions {
@@ -27,15 +27,15 @@ export function generateWebCompanionScript(
   const config = ${jsonConfig};
   
   if (!config.text) {
-    alert("Human Typer: Por favor ingresa un texto primero.");
+    alert("Human Typer: Please enter some text first.");
     return;
   }
 
-  // Eliminar instancia previa si existe
+  // Remove any previous instance
   const prev = document.getElementById("human-typer-companion-panel");
   if (prev) prev.remove();
 
-  // Crear panel flotante de control
+  // Create the floating control panel
   const panel = document.createElement("div");
   panel.id = "human-typer-companion-panel";
   Object.assign(panel.style, {
@@ -61,22 +61,22 @@ export function generateWebCompanionScript(
   panel.innerHTML = \`
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
       <span style="font-weight: 700; color: #60a5fa; display: flex; align-items: center; gap: 6px;">
-        ⚡ Human Typer <span style="font-size: 11px; background: rgba(96,165,250,0.2); padding: 2px 6px; border-radius: 6px;">Segundo Plano</span>
+        ⚡ Human Typer <span style="font-size: 11px; background: rgba(96,165,250,0.2); padding: 2px 6px; border-radius: 6px;">Background</span>
       </span>
       <button id="ht-close-btn" style="background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 16px;">✕</button>
     </div>
-    <div id="ht-status-text" style="color: #e5e7eb; font-weight: 500;">Listo para escribir en este documento</div>
+    <div id="ht-status-text" style="color: #e5e7eb; font-weight: 500;">Ready to type in this document</div>
     <div style="background: rgba(255,255,255,0.1); border-radius: 6px; height: 6px; overflow: hidden;">
       <div id="ht-progress-bar" style="width: 0%; height: 100%; background: #3b82f6; transition: width 0.1s linear;"></div>
     </div>
     <div style="display: flex; justify-content: space-between; font-size: 11px; color: #9ca3af;">
-      <span id="ht-count-text">0 / \${config.text.length} caracteres</span>
+      <span id="ht-count-text">0 / \${config.text.length} characters</span>
       <span id="ht-percent-text">0%</span>
     </div>
     <div style="display: flex; gap: 8px; margin-top: 4px;">
-      <button id="ht-start-btn" style="flex: 1; background: #2563eb; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer;">Comenzar (3s)</button>
-      <button id="ht-pause-btn" style="display: none; flex: 1; background: #374151; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer;">Pausar</button>
-      <button id="ht-cancel-btn" style="display: none; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer;">Cancelar</button>
+      <button id="ht-start-btn" style="flex: 1; background: #2563eb; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer;">Start (3s)</button>
+      <button id="ht-pause-btn" style="display: none; flex: 1; background: #374151; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer;">Pause</button>
+      <button id="ht-cancel-btn" style="display: none; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer;">Cancel</button>
     </div>
   \`;
 
@@ -102,7 +102,7 @@ export function generateWebCompanionScript(
     panel.remove();
   };
 
-  // Sonido de aviso con Web Audio API
+  // Completion sound using the Web Audio API
   function playBeep() {
     try {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -121,11 +121,11 @@ export function generateWebCompanionScript(
     } catch (e) {}
   }
 
-  // Notificación del sistema
+  // System notification
   function sendNotify() {
     if ("Notification" in window && Notification.permission === "granted") {
       new Notification("Human Typer", {
-        body: "¡Escritura finalizada con éxito! Todos los caracteres fueron escritos.",
+        body: "Typing completed successfully! All characters were typed.",
         icon: "https://tauri.app/img/favicon.png"
       });
     }
@@ -135,7 +135,7 @@ export function generateWebCompanionScript(
   }
 
   function getActiveOrDocsTarget() {
-    // 1. Google Docs (iframe específico de captura de eventos de teclado)
+    // 1. Google Docs keyboard-event iframe
     try {
       const docsIframe = document.querySelector(".docs-texteventtarget-iframe");
       if (docsIframe && docsIframe.contentDocument) {
@@ -147,13 +147,13 @@ export function generateWebCompanionScript(
       }
     } catch(e) {}
 
-    // 2. Elemento activo en la página
+    // 2. Active element on the page
     const active = document.activeElement;
     if (active && active !== document.body && active !== panel && !panel.contains(active)) {
       return { element: active, document: document, isDocs: false };
     }
 
-    // 3. Primer campo de texto o editor editable
+    // 3. First text field or editable element
     const fallback = document.querySelector("[contenteditable='true'], textarea, input[type='text']") || document.body;
     return { element: fallback, document: document, isDocs: false };
   }
@@ -163,7 +163,7 @@ export function generateWebCompanionScript(
     const target = targetInfo.element || targetInfo;
     const doc = targetInfo.document || document;
 
-    // Caso Especial Google Docs
+    // Special handling for Google Docs
     if (targetInfo.isDocs) {
       try {
         if (char === '\\n') {
@@ -183,7 +183,7 @@ export function generateWebCompanionScript(
       } catch(e) {}
     }
 
-    // 1. execCommand estándar
+    // 1. Standard execCommand
     try {
       if (char === '\\n') {
         target.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true }));
@@ -195,7 +195,7 @@ export function generateWebCompanionScript(
       if (success) return;
     } catch(e) {}
 
-    // 2. Textarea o input HTML
+    // 2. Textarea or HTML input
     if (target instanceof HTMLTextAreaElement || target instanceof HTMLInputElement) {
       const start = target.selectionStart ?? target.value.length;
       const end = target.selectionEnd ?? target.value.length;
@@ -205,7 +205,7 @@ export function generateWebCompanionScript(
       return;
     }
 
-    // 3. Contenteditable directo
+    // 3. Direct contenteditable insertion
     if (target.isContentEditable) {
       const sel = window.getSelection();
       if (sel && sel.rangeCount > 0) {
@@ -222,7 +222,7 @@ export function generateWebCompanionScript(
       }
     }
 
-    // 4. Dispatching sintético
+    // 4. Synthetic events
     const code = char.charCodeAt(0);
     target.dispatchEvent(new KeyboardEvent('keydown', { key: char, keyCode: code, which: code, bubbles: true }));
     target.dispatchEvent(new InputEvent('beforeinput', { inputType: 'insertText', data: char, bubbles: true }));
@@ -247,7 +247,7 @@ export function generateWebCompanionScript(
     return Math.max(10, Math.round(base + jitter + pause));
   }
 
-  // Web Worker in-memory para evitar throttling de pestañas en segundo plano de Chrome/Edge
+  // In-memory Web Worker to avoid Chrome/Edge background-tab throttling
   const workerBlob = new Blob([\`
     self.onmessage = function(e) {
       setTimeout(() => { self.postMessage('tick'); }, e.data);
@@ -261,33 +261,33 @@ export function generateWebCompanionScript(
     pauseBtn.style.display = "block";
     cancelBtn.style.display = "block";
 
-    // Capturar elemento destino
+    // Capture the target element
     targetElement = getActiveOrDocsTarget();
     if (targetElement && targetElement.element) {
       targetElement.element.focus();
     }
 
-    // Cuenta regresiva de 3 segundos
+    // Three-second countdown
     for (let c = 3; c > 0; c--) {
       if (isCancelled) return;
-      statusText.innerText = \`Comenzando en \${c}... (Haz clic donde quieras escribir)\`;
+      statusText.innerText = \`Starting in \${c}... (Click where you want to type)\`;
       await new Promise(r => setTimeout(r, 1000));
     }
 
     targetElement = getActiveOrDocsTarget();
-    statusText.innerText = "⚡ Escribiendo en segundo plano...";
+    statusText.innerText = "⚡ Typing in the background...";
 
     const chars = Array.from(config.text);
     const total = chars.length;
 
     while (currentIndex < total) {
       if (isCancelled) {
-        statusText.innerText = "Cancelado";
+        statusText.innerText = "Cancelled";
         return;
       }
 
       if (isPaused) {
-        statusText.innerText = "En pausa";
+        statusText.innerText = "Paused";
         await new Promise(r => setTimeout(r, 100));
         continue;
       }
@@ -298,7 +298,7 @@ export function generateWebCompanionScript(
 
       const pct = Math.round((currentIndex / total) * 100);
       progressBar.style.width = \`\${pct}%\`;
-      countText.innerText = \`\${currentIndex} / \${total} caracteres\`;
+      countText.innerText = \`\${currentIndex} / \${total} characters\`;
       percentText.innerText = \`\${pct}%\`;
 
       const delay = calculateDelay(char);
@@ -308,12 +308,12 @@ export function generateWebCompanionScript(
       });
     }
 
-    statusText.innerHTML = "✅ <strong>¡Completado con éxito!</strong>";
+    statusText.innerHTML = "✅ <strong>Completed successfully!</strong>";
     progressBar.style.background = "#10b981";
     pauseBtn.style.display = "none";
     cancelBtn.style.display = "none";
     startBtn.style.display = "block";
-    startBtn.innerText = "Escribir de nuevo";
+    startBtn.innerText = "Type again";
     currentIndex = 0;
     isRunning = false;
 
@@ -329,28 +329,28 @@ export function generateWebCompanionScript(
 
   pauseBtn.onclick = () => {
     isPaused = !isPaused;
-    pauseBtn.innerText = isPaused ? "Reanudar" : "Pausar";
+    pauseBtn.innerText = isPaused ? "Resume" : "Pause";
     pauseBtn.style.background = isPaused ? "#2563eb" : "#374151";
   };
 
   cancelBtn.onclick = () => {
     isCancelled = true;
     isRunning = false;
-    statusText.innerText = "Escritura cancelada";
+    statusText.innerText = "Typing cancelled";
     pauseBtn.style.display = "none";
     cancelBtn.style.display = "none";
     startBtn.style.display = "block";
-    startBtn.innerText = "Comenzar";
+    startBtn.innerText = "Start";
     currentIndex = 0;
   };
 
-  // Auto-iniciar
+  // Start automatically
   startTypingLoop();
 })();`;
 }
 
 /**
- * Retorna el bookmarklet executable como URL javascript:
+ * Returns the executable bookmarklet as a JavaScript URL.
  */
 export function generateBookmarkletHref(options: WebCompanionOptions): string {
   const code = generateWebCompanionScript(options);

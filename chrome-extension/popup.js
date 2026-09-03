@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const variationVal = document.getElementById("variation-val");
   const presetBtns = document.querySelectorAll(".preset-btn");
 
-  // Cargar preferencias guardadas
+  // Load saved preferences
   chrome.storage.local.get(
     ["savedText", "speed", "variation", "pausePunct", "notifySound"],
     (res) => {
@@ -37,16 +37,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateCharCount() {
     const len = Array.from(textInput.value).length;
-    charCount.innerText = `${len.toLocaleString("es")} caracteres`;
+    charCount.innerText = `${len.toLocaleString("en")} characters`;
     startBtn.disabled = len === 0;
   }
 
   function getSpeedDescriptor(ms) {
-    if (ms <= 45) return "Ultra Rápido";
-    if (ms <= 85) return "Rápido";
-    if (ms <= 160) return "Normal / Humano";
-    if (ms <= 280) return "Lento";
-    return "Muy Lento / Pausado";
+    if (ms <= 45) return "Ultra Fast";
+    if (ms <= 85) return "Fast";
+    if (ms <= 160) return "Normal / Human";
+    if (ms <= 280) return "Slow";
+    return "Very Slow / Paused";
   }
 
   function updateSpeedLabel(ms) {
@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
       currentWindow: true,
     });
     if (!tab || !tab.id) {
-      statusText.innerText = "No se detectó pestaña activa";
+      statusText.innerText = "No active tab detected";
       return;
     }
 
@@ -120,15 +120,15 @@ document.addEventListener("DOMContentLoaded", () => {
         args: [config],
       });
 
-      statusText.innerText = "⚡ Escritura iniciada en la página";
-      statusPercent.innerText = "En curso";
+      statusText.innerText = "⚡ Typing started on the page";
+      statusPercent.innerText = "Running";
       progressBar.style.width = "100%";
-      startBtn.innerText = "✓ Enviado a la pestaña";
+      startBtn.innerText = "✓ Sent to tab";
       setTimeout(() => {
-        window.close(); // Cerrar el popup para dejar libre la pantalla
+        window.close(); // Close the popup to free up the screen
       }, 700);
     } catch (err) {
-      statusText.innerText = "Error: asegurate de estar en una pestaña válida";
+      statusText.innerText = "Error: make sure you are on a valid tab";
       console.error(err);
     }
   });
@@ -136,13 +136,13 @@ document.addEventListener("DOMContentLoaded", () => {
   updateCharCount();
 });
 
-// Esta función se ejecuta directamente dentro de Google Docs / la página web
+// This function runs directly inside Google Docs / the web page
 function injectTypingScript(config) {
-  // Eliminar instancia previa si existe
+  // Remove any previous instance
   const prev = document.getElementById("ht-floating-controller");
   if (prev) prev.remove();
 
-  // Crear panel flotante de control
+  // Create the floating control panel
   const panel = document.createElement("div");
   panel.id = "ht-floating-controller";
   Object.assign(panel.style, {
@@ -168,21 +168,21 @@ function injectTypingScript(config) {
   panel.innerHTML = `
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 8px;">
       <span style="font-weight: 800; color: #facc15; display: flex; align-items: center; gap: 6px;">
-        ⚡ Human Typer <span style="font-size: 11px; background: rgba(234,179,8,0.2); color: #fef08a; padding: 2px 6px; border-radius: 4px;">Segundo Plano</span>
+        ⚡ Human Typer <span style="font-size: 11px; background: rgba(234,179,8,0.2); color: #fef08a; padding: 2px 6px; border-radius: 4px;">Background</span>
       </span>
       <button id="ht-close-btn" style="background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 16px;">✕</button>
     </div>
-    <div id="ht-status-text" style="color: #e5e7eb; font-weight: 600;">Iniciando escritura en esta página...</div>
+    <div id="ht-status-text" style="color: #e5e7eb; font-weight: 600;">Starting to type on this page...</div>
     <div style="background: rgba(255,255,255,0.1); border-radius: 6px; height: 6px; overflow: hidden;">
       <div id="ht-progress-bar" style="width: 0%; height: 100%; background: #eab308; transition: width 0.1s linear;"></div>
     </div>
     <div style="display: flex; justify-content: space-between; font-size: 11px; color: #9ca3af;">
-      <span id="ht-count-text">0 / ${config.text.length} caracteres</span>
+      <span id="ht-count-text">0 / ${config.text.length} characters</span>
       <span id="ht-percent-text">0%</span>
     </div>
     <div style="display: flex; gap: 8px; margin-top: 4px;">
-      <button id="ht-pause-btn" style="flex: 1; background: #374151; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Pausar</button>
-      <button id="ht-cancel-btn" style="background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancelar</button>
+      <button id="ht-pause-btn" style="flex: 1; background: #374151; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Pause</button>
+      <button id="ht-cancel-btn" style="background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancel</button>
     </div>
   `;
 
@@ -221,7 +221,7 @@ function injectTypingScript(config) {
         o.stop(now + i * 0.1 + 0.9);
       });
     } catch {
-      // El audio puede estar bloqueado hasta que exista interacción del usuario.
+      // Audio may be blocked until the user interacts with the page.
     }
   }
 
@@ -235,10 +235,10 @@ function injectTypingScript(config) {
         if (el) return { element: el, document: doc, isDocs: true };
       }
     } catch {
-      // Algunos editores aíslan su iframe y no permiten inspeccionarlo.
+      // Some editors isolate their iframe and prevent inspection.
     }
 
-    // 2. Elemento activo
+    // 2. Active element
     const active = document.activeElement;
     if (
       active &&
@@ -249,7 +249,7 @@ function injectTypingScript(config) {
       return { element: active, document: document, isDocs: false };
     }
 
-    // 3. Fallback editable
+    // 3. Editable fallback
     const el =
       document.querySelector(
         "[contenteditable='true'], textarea, input[type='text']",
@@ -262,7 +262,7 @@ function injectTypingScript(config) {
     const target = targetInfo.element || targetInfo;
     const doc = targetInfo.document || document;
 
-    // Caso Especial Google Docs
+    // Special handling for Google Docs
     if (targetInfo.isDocs) {
       try {
         if (char === "\n") {
@@ -330,11 +330,11 @@ function injectTypingScript(config) {
         );
         return;
       } catch {
-        // Si Google Docs rechaza los eventos, se prueban los métodos genéricos.
+        // If Google Docs rejects the events, try the generic methods.
       }
     }
 
-    // execCommand estándar
+    // Standard execCommand
     try {
       if (char === "\n") {
         target.dispatchEvent(
@@ -352,7 +352,7 @@ function injectTypingScript(config) {
       }
       if (doc.execCommand("insertText", false, char)) return;
     } catch {
-      // Se continúa con la inserción directa para campos y contenteditable.
+      // Continue with direct insertion for fields and contenteditable elements.
     }
 
     // Textarea / Input
@@ -386,7 +386,7 @@ function injectTypingScript(config) {
       }
     }
 
-    // Eventos genéricos
+    // Generic events
     const code = char.charCodeAt(0);
     target.dispatchEvent(
       new KeyboardEvent("keydown", {
@@ -437,7 +437,7 @@ function injectTypingScript(config) {
     return Math.max(10, Math.round(base + jitter + pause));
   }
 
-  // Web Worker para temporización perfecta en pestañas inactivas
+  // Web Worker for reliable timing in inactive tabs
   const blob = new Blob(
     [
       `self.onmessage = function(e) {
@@ -454,26 +454,26 @@ function injectTypingScript(config) {
       target.element.focus();
     }
 
-    // 3 segundos de preparación
+    // Three-second countdown
     for (let c = 3; c > 0; c--) {
       if (isCancelled) return;
-      statusText.innerText = `Comenzando en ${c}s... (Haz clic en el documento)`;
+      statusText.innerText = `Starting in ${c}s... (Click in the document)`;
       await new Promise((r) => setTimeout(r, 1000));
     }
 
     target = getTarget();
-    statusText.innerText = "⚡ Escribiendo en segundo plano...";
+    statusText.innerText = "⚡ Typing in the background...";
 
     const chars = Array.from(config.text);
     const total = chars.length;
 
     while (currentIndex < total) {
       if (isCancelled) {
-        statusText.innerText = "Escritura cancelada";
+        statusText.innerText = "Typing cancelled";
         return;
       }
       if (isPaused) {
-        statusText.innerText = "En pausa (pulsa Reanudar)";
+        statusText.innerText = "Paused (click Resume)";
         await new Promise((r) => setTimeout(r, 100));
         continue;
       }
@@ -484,7 +484,7 @@ function injectTypingScript(config) {
 
       const pct = Math.round((currentIndex / total) * 100);
       progressBar.style.width = `${pct}%`;
-      countText.innerText = `${currentIndex} / ${total} caracteres`;
+      countText.innerText = `${currentIndex} / ${total} characters`;
       percentText.innerText = `${pct}%`;
 
       const delay = getDelay(char);
@@ -494,7 +494,7 @@ function injectTypingScript(config) {
       });
     }
 
-    statusText.innerHTML = "✅ <strong>¡Texto completado con éxito!</strong>";
+    statusText.innerHTML = "✅ <strong>Text completed successfully!</strong>";
     progressBar.style.background = "#10b981";
     pauseBtn.style.display = "none";
     cancelBtn.style.display = "none";
@@ -506,7 +506,7 @@ function injectTypingScript(config) {
 
   pauseBtn.onclick = () => {
     isPaused = !isPaused;
-    pauseBtn.innerText = isPaused ? "Reanudar" : "Pausar";
+    pauseBtn.innerText = isPaused ? "Resume" : "Pause";
     pauseBtn.style.background = isPaused ? "#2563eb" : "#374151";
   };
 

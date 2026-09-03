@@ -1,5 +1,5 @@
 !macro customInstall
-  ; Registrar la extensión de Human Typer en Google Chrome, Microsoft Edge y Mozilla Firefox
+  ; Register the Human Typer extension in Google Chrome, Microsoft Edge, and Mozilla Firefox
   WriteRegStr HKCU "Software\Google\Chrome\Extensions\humantyper" "path" "$INSTDIR\resources\chrome-extension"
   WriteRegStr HKCU "Software\Microsoft\Edge\Extensions\humantyper" "path" "$INSTDIR\resources\chrome-extension"
   WriteRegStr HKCU "Software\Mozilla\Firefox\Extensions" "humantyper@desktop.app" "$INSTDIR\resources\chrome-extension"

@@ -17,20 +17,20 @@ export function TextComposer({
   return (
     <section className="card composer-card" aria-labelledby="text-heading">
       <div className="section-heading">
-        <h2 id="text-heading">Texto</h2>
+        <h2 id="text-heading">Text</h2>
         <div className="composer-actions">
           <span className="character-count">
-            {countCharacters(text).toLocaleString("es")} caracteres
+            {countCharacters(text).toLocaleString("en")} characters
           </span>
           <button
             className="icon-text-button"
             type="button"
             onClick={onClear}
             disabled={!text || disabled}
-            title="Limpiar texto"
+            title="Clear text"
           >
             <Eraser size={15} />
-            Limpiar
+            Clear
           </button>
         </div>
       </div>
@@ -38,7 +38,7 @@ export function TextComposer({
         value={text}
         onChange={(event) => onChange(event.currentTarget.value)}
         disabled={disabled}
-        placeholder="Pegá o escribí el texto…"
+        placeholder="Paste or type your text…"
         spellCheck="true"
         autoFocus
       />

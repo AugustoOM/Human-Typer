@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { join, resourceDir } from "@tauri-apps/api/path";
-import { Check, Copy, Info, Sparkles, X, Zap } from "lucide-react";
+import { Check, Copy, Download, Info, Sparkles, X, Zap } from "lucide-react";
+import { downloadExtensionZip } from "../lib/extensionPacker";
 import { generateWebCompanionScript } from "../lib/webCompanion";
 import type { Preferences } from "../types";
 
@@ -19,6 +20,7 @@ export function WebCompanionModal({
 }: WebCompanionModalProps) {
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedExtensionPath, setCopiedExtensionPath] = useState(false);
+  const [downloadedZip, setDownloadedZip] = useState(false);
   const [extensionPath, setExtensionPath] = useState("chrome-extension");
 
   useEffect(() => {
@@ -36,7 +38,7 @@ export function WebCompanionModal({
   if (!isOpen) return null;
 
   const scriptCode = generateWebCompanionScript({
-    text: text || "Texto de ejemplo para Human Typer...",
+    text: text || "Sample text for Human Typer...",
     baseDelayMs: preferences.baseDelayMs,
     variationMs: preferences.variationMs,
     punctuationPauses: preferences.punctuationPauses,
@@ -53,6 +55,12 @@ export function WebCompanionModal({
     void navigator.clipboard.writeText(extensionPath);
     setCopiedExtensionPath(true);
     setTimeout(() => setCopiedExtensionPath(false), 2500);
+  }
+
+  function handleDownloadZip() {
+    downloadExtensionZip();
+    setDownloadedZip(true);
+    setTimeout(() => setDownloadedZip(false), 2500);
   }
 
   return (
@@ -74,11 +82,11 @@ export function WebCompanionModal({
             </div>
             <div>
               <h3 id="web-modal-title">
-                Escritura en Segundo Plano (Google Docs / Web / Word Online)
+                Background Typing (Google Docs / Web / Word Online)
               </h3>
               <p className="modal-subtitle">
-                Escribe fijamente en tu documento web mientras miras videos o
-                navegas en otras pestañas.
+                Keep typing in your web document while watching videos or
+                browsing other tabs.
               </p>
             </div>
           </div>
@@ -86,7 +94,7 @@ export function WebCompanionModal({
             type="button"
             className="modal-close-btn"
             onClick={onClose}
-            aria-label="Cerrar ventana"
+            aria-label="Close dialog"
           >
             <X size={20} />
           </button>
@@ -96,12 +104,12 @@ export function WebCompanionModal({
           <div className="feature-banner">
             <Sparkles size={20} className="feature-icon" />
             <div>
-              <strong>100% Independiente del Foco</strong>
+              <strong>100% Focus Independent</strong>
               <p>
-                Este método inyecta la escritura con ritmo humano directamente
-                en el documento. Puedes cambiar de ventana, ver YouTube a
-                pantalla completa o jugar sin que se interrumpa ni interfiera
-                con tu teclado.
+                This method injects human-paced typing directly into the
+                document. You can switch windows, watch YouTube in full screen,
+                or play without interruptions or interference with your
+                keyboard.
               </p>
             </div>
           </div>
@@ -109,48 +117,44 @@ export function WebCompanionModal({
           <div className="methods-grid">
             <div className="method-card">
               <div className="method-header">
-                <div className="step-badge">Recomendado · 1 Solo Clic</div>
-                <h4>Extensión para Chrome, Edge y Firefox</h4>
+                <div className="step-badge">Recommended · One Click</div>
+                <h4>Extension for Chrome, Edge, and Firefox</h4>
               </div>
               <p className="method-desc">
-                Te da el botón permanente ⚡ en tu navegador para Google Docs y
-                cualquier web:
+                Adds a permanent ⚡ button to your browser for Google Docs and
+                any website:
               </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px", margin: "10px 0 16px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "8px",
+                  margin: "10px 0 16px",
+                }}
+              >
                 <button
                   type="button"
                   className={`action-btn ${downloadedZip ? "copied" : "primary"}`}
                   onClick={handleDownloadZip}
                 >
                   {downloadedZip ? <Check size={18} /> : <Download size={18} />}
-                  {downloadedZip ? "¡Extensión Descargada!" : "Descargar Extensión (.ZIP)"}
-                </button>
-
-                <button
-                  type="button"
-                  className={`action-btn ${copiedPath ? "copied" : "secondary"}`}
-                  onClick={() => {
-                    navigator.clipboard.writeText("C:\\Users\\Rodrigo\\Desktop\\human (1)\\Human-Typer\\chrome-extension");
-                    setCopiedPath(true);
-                    setTimeout(() => setCopiedPath(false), 2500);
-                  }}
-                >
-                  {copiedPath ? <Check size={18} /> : <Copy size={18} />}
-                  {copiedPath ? "¡Ruta Copiada!" : "Copiar Ruta de la Carpeta"}
+                  {downloadedZip
+                    ? "Extension Downloaded!"
+                    : "Download Extension (.ZIP)"}
                 </button>
               </div>
 
               <ol className="step-list">
                 <li>
-                  Abre en tu navegador: <strong>chrome://extensions</strong>
+                  Open <strong>chrome://extensions</strong>, or Firefox's{" "}
+                  <strong>about:debugging</strong> page.
                 </li>
                 <li>
-                  Activa <strong>"Modo de desarrollador"</strong> (arriba a la
-                  derecha).
+                  Enable <strong>"Developer mode"</strong> (top right).
                 </li>
                 <li>
-                  Pulsa <strong>"Cargar descomprimida"</strong> y elige la
-                  carpeta de la extensión:
+                  Click <strong>"Load unpacked"</strong> and select the
+                  extracted extension folder.
                 </li>
               </ol>
               <button
@@ -160,32 +164,31 @@ export function WebCompanionModal({
               >
                 {copiedExtensionPath ? <Check size={18} /> : <Copy size={18} />}
                 {copiedExtensionPath
-                  ? "¡Ruta de Carpeta Copiada!"
-                  : "Copiar Ruta de la Extensión"}
+                  ? "Folder Path Copied!"
+                  : "Copy Extension Folder Path"}
               </button>
             </div>
 
             <div className="method-card">
               <div className="method-header">
-                <div className="step-badge">Alternativa · Sin Instalar</div>
+                <div className="step-badge">Alternative · No Installation</div>
                 <h4>
-                  Pegar en Consola (<kbd>F12</kbd>)
+                  Paste into Console (<kbd>F12</kbd>)
                 </h4>
               </div>
               <p className="method-desc">
-                Escribe al instante en cualquier pestaña activa sin instalar
-                nada:
+                Type instantly in any active tab without installing anything:
               </p>
               <ol className="step-list">
                 <li>
-                  Ve a tu documento de <strong>Google Docs</strong>.
+                  Open your <strong>Google Docs</strong> document.
                 </li>
                 <li>
-                  Presiona <kbd>F12</kbd> (o clic derecho →{" "}
-                  <em>Inspeccionar</em> → <strong>Consola</strong>).
+                  Press <kbd>F12</kbd> (or right-click → <em>Inspect</em> →{" "}
+                  <strong>Console</strong>).
                 </li>
                 <li>
-                  Pega el código generado y presiona <kbd>Enter</kbd>.
+                  Paste the generated code and press <kbd>Enter</kbd>.
                 </li>
               </ol>
               <button
@@ -194,7 +197,7 @@ export function WebCompanionModal({
                 onClick={handleCopyScript}
               >
                 {copiedCode ? <Check size={18} /> : <Copy size={18} />}
-                {copiedCode ? "¡Código Copiado!" : "Copiar Código para Consola"}
+                {copiedCode ? "Code Copied!" : "Copy Code for Console"}
               </button>
             </div>
           </div>
@@ -202,17 +205,16 @@ export function WebCompanionModal({
           <div className="modal-tip-box">
             <Info size={16} />
             <span>
-              Incluye tus ajustes actuales de velocidad (
-              {preferences.baseDelayMs} ms), variación (±
-              {preferences.variationMs} ms), pausas de puntuación y aviso con
-              sonido y notificación al finalizar.
+              Includes your current speed ({preferences.baseDelayMs} ms),
+              variation (±{preferences.variationMs} ms), punctuation pauses, and
+              sound and desktop notifications on completion.
             </span>
           </div>
         </div>
 
         <footer className="modal-footer">
           <button type="button" className="button secondary" onClick={onClose}>
-            Entendido
+            Got it
           </button>
         </footer>
       </div>

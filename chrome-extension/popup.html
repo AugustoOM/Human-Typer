@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,7 +13,7 @@
           <span class="logo-badge">⚡</span>
           <div>
             <h2>Human <span>Typer</span></h2>
-            <span class="badge">Segundo Plano</span>
+            <span class="badge">Background</span>
           </div>
         </div>
       </header>
@@ -21,41 +21,37 @@
       <main class="main">
         <div class="field-group">
           <label for="text-input">
-            <span>Texto para escribir</span>
-            <span id="char-count" class="char-count">0 caracteres</span>
+            <span>Text to type</span>
+            <span id="char-count" class="char-count">0 characters</span>
           </label>
           <textarea
             id="text-input"
-            placeholder="Pega o escribe aquí el texto que debe escribirse en el documento..."
+            placeholder="Paste or type the text to enter in the document..."
             rows="5"
           ></textarea>
         </div>
 
         <div class="settings-block">
           <div class="setting-row">
-            <label>Velocidad de escritura</label>
+            <label>Typing speed</label>
             <strong id="speed-val">120 ms (Normal)</strong>
           </div>
 
-          <div
-            class="preset-buttons"
-            role="group"
-            aria-label="Velocidades predefinidas"
-          >
+          <div class="preset-buttons" role="group" aria-label="Speed presets">
             <button type="button" class="preset-btn" data-speed="35">
-              ⚡ Muy Rápido
+              ⚡ Very Fast
             </button>
             <button type="button" class="preset-btn" data-speed="65">
-              🚀 Rápido
+              🚀 Fast
             </button>
             <button type="button" class="preset-btn active" data-speed="120">
               ✍️ Normal
             </button>
             <button type="button" class="preset-btn" data-speed="220">
-              🐢 Lento
+              🐢 Slow
             </button>
             <button type="button" class="preset-btn" data-speed="380">
-              🦥 Muy Lento
+              🦥 Very Slow
             </button>
           </div>
 
@@ -68,14 +64,14 @@
             value="120"
           />
           <div class="speed-labels">
-            <span>15 ms (Ultra Rápido)</span>
-            <span>800 ms (Pausado)</span>
+            <span>15 ms (Ultra Fast)</span>
+            <span>800 ms (Paused)</span>
           </div>
         </div>
 
         <div class="settings-block compact">
           <div class="setting-row">
-            <label>Variación humana</label>
+            <label>Human variation</label>
             <strong id="variation-val">±35 ms</strong>
           </div>
           <input
@@ -91,17 +87,17 @@
         <div class="options-grid">
           <label class="toggle-label">
             <input type="checkbox" id="pause-punct" checked />
-            <span>Pausas de puntuación</span>
+            <span>Punctuation pauses</span>
           </label>
           <label class="toggle-label">
             <input type="checkbox" id="notify-sound" checked />
-            <span>Sonido al finalizar</span>
+            <span>Completion sound</span>
           </label>
         </div>
 
         <div id="status-card" class="status-card">
           <div class="status-info">
-            <span id="status-text">Listo para iniciar en esta pestaña</span>
+            <span id="status-text">Ready to start in this tab</span>
             <span id="status-percent">0%</span>
           </div>
           <div class="progress-bg">
@@ -111,14 +107,14 @@
 
         <div class="actions">
           <button type="button" id="start-btn" class="btn btn-primary">
-            ▶ Comenzar a Escribir
+            ▶ Start Typing
           </button>
           <div id="control-buttons" class="control-row" style="display: none">
             <button type="button" id="pause-btn" class="btn btn-secondary">
-              ⏸ Pausar
+              ⏸ Pause
             </button>
             <button type="button" id="cancel-btn" class="btn btn-danger">
-              ✕ Cancelar
+              ✕ Cancel
             </button>
           </div>
         </div>

@@ -93,7 +93,7 @@ pub fn run() {
             }
             if !unavailable.is_empty() {
                 app.state::<TypingController>().set_shortcut_warning(format!(
-                    "No se pudieron registrar los atajos globales: {}. Los botones de la app siguen disponibles.",
+                    "Could not register the global shortcuts: {}. The app buttons remain available.",
                     unavailable.join(", ")
                 ));
             }
@@ -110,5 +110,5 @@ pub fn run() {
             request_accessibility
         ])
         .run(tauri::generate_context!())
-        .expect("Human Typer no pudo iniciar");
+        .expect("Human Typer failed to start");
 }

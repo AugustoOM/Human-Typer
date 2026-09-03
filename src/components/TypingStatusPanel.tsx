@@ -20,13 +20,13 @@ interface TypingStatusPanelProps {
 }
 
 const statusLabels = {
-  idle: "Listo",
-  countdown: "Preparando",
-  typing: "Escribiendo",
-  paused: "En pausa",
-  completed: "Completado",
-  cancelled: "Cancelado",
-  error: "Necesita atención",
+  idle: "Ready",
+  countdown: "Preparing",
+  typing: "Typing",
+  paused: "Paused",
+  completed: "Completed",
+  cancelled: "Cancelled",
+  error: "Needs attention",
 } as const;
 
 export function TypingStatusPanel({
@@ -48,7 +48,7 @@ export function TypingStatusPanel({
   return (
     <section
       className={`status-card status-${state.status}`}
-      aria-label="Control de escritura"
+      aria-label="Typing controls"
       aria-live="polite"
     >
       <div className="status-main">
@@ -58,18 +58,18 @@ export function TypingStatusPanel({
             <span className="status-label">{statusLabels[state.status]}</span>
             {state.status === "countdown" ? (
               <strong className="countdown-copy">
-                Comenzando en {state.countdown ?? "…"}
+                Starting in {state.countdown ?? "…"}
               </strong>
             ) : state.status === "typing" || state.status === "paused" ? (
               <strong>
-                Escribiendo {state.current.toLocaleString("es")} /{" "}
-                {state.total.toLocaleString("es")} caracteres
+                Typing {state.current.toLocaleString("en")} /{" "}
+                {state.total.toLocaleString("en")} characters
               </strong>
             ) : (
               <strong>
                 {textLength
-                  ? `${textLength.toLocaleString("es")} caracteres · ${estimateDuration(textLength, delayMs)}`
-                  : "Pegá un texto para empezar"}
+                  ? `${textLength.toLocaleString("en")} characters · ${estimateDuration(textLength, delayMs)}`
+                  : "Paste some text to get started"}
               </strong>
             )}
           </div>
@@ -77,7 +77,7 @@ export function TypingStatusPanel({
         <span className="progress-percent">{progress}%</span>
       </div>
 
-      <div className="progress-track" aria-label={`Progreso ${progress}%`}>
+      <div className="progress-track" aria-label={`Progress ${progress}%`}>
         <span style={{ width: `${progress}%` }} />
       </div>
 
@@ -108,7 +108,7 @@ export function TypingStatusPanel({
           type="button"
           onClick={onStart}
           disabled={!textLength || active}
-          title="Escribir en la ventana activa con teclado nativo"
+          title="Type in the active window using native keyboard input"
         >
           {state.status === "completed" || state.status === "cancelled" ? (
             <RotateCcw size={18} />
@@ -116,8 +116,8 @@ export function TypingStatusPanel({
             <Play size={18} fill="currentColor" />
           )}
           {state.status === "completed" || state.status === "cancelled"
-            ? "Escribir de nuevo"
-            : "Comenzar (Escritorio)"}
+            ? "Type again"
+            : "Start (Desktop)"}
         </button>
 
         <button
@@ -125,10 +125,10 @@ export function TypingStatusPanel({
           type="button"
           onClick={onOpenWebCompanion}
           disabled={!textLength}
-          title="Escribir en segundo plano en Google Docs, Word Online o cualquier web mientras navegas o miras videos"
+          title="Type in the background in Google Docs, Word Online, or any website while you browse or watch videos"
         >
           <span className="spark-icon">⚡</span>
-          Segundo Plano (Docs / Web)
+          Background Mode (Docs / Web)
         </button>
 
         <button
@@ -142,7 +142,7 @@ export function TypingStatusPanel({
           ) : (
             <Pause size={18} fill="currentColor" />
           )}
-          {state.status === "paused" ? "Reanudar" : "Pausar"}
+          {state.status === "paused" ? "Resume" : "Pause"}
           <kbd>F8</kbd>
         </button>
         <button
@@ -152,7 +152,7 @@ export function TypingStatusPanel({
           disabled={!active}
         >
           <CircleStop size={18} />
-          Cancelar
+          Cancel
           <kbd>Esc</kbd>
         </button>
       </div>

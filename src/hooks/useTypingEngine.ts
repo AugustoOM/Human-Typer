@@ -27,9 +27,9 @@ function friendlyError(error: unknown): string {
     !(window as unknown as { __TAURI_INTERNALS__?: unknown })
       .__TAURI_INTERNALS__
   ) {
-    return "Estás en el navegador. Para escribir en Google Docs / páginas web, hacé clic en el botón amarillo '⚡ Segundo Plano (Docs / Web)'. El botón verde es para la aplicación de escritorio instalada de Windows.";
+    return "You are running Human Typer in a browser. To type in Google Docs or other websites, click the yellow '⚡ Background Mode (Docs / Web)' button. The green button is for the installed desktop app.";
   }
-  return "Ocurrió un error inesperado. Intentá nuevamente.";
+  return "An unexpected error occurred. Please try again.";
 }
 
 export function useTypingEngine(preferences?: Preferences) {
@@ -62,7 +62,7 @@ export function useTypingEngine(preferences?: Preferences) {
         if (preferencesRef.current?.desktopNotification ?? true) {
           void sendDesktopNotification(
             "Human Typer",
-            `¡Escritura completada! Se escribieron ${payload.total.toLocaleString("es")} caracteres.`,
+            `Typing completed! ${payload.total.toLocaleString("en")} characters were typed.`,
           );
         }
       }

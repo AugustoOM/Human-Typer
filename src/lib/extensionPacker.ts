@@ -1,6 +1,6 @@
 /**
- * Generador liviano de archivo ZIP cliente sin dependencias pesadas
- * para descargar la extensión de Chrome / Edge / Firefox con 1 clic.
+ * Lightweight client-side ZIP generator with no heavy dependencies.
+ * Downloads the Chrome / Edge / Firefox extension with one click.
  */
 
 interface ZipFile {
@@ -12,10 +12,10 @@ export function downloadExtensionZip(): void {
   const manifest = JSON.stringify(
     {
       manifest_version: 3,
-      name: "Human Typer - Segundo Plano",
-      version: "1.0.0",
+      name: "Human Typer - Background Mode",
+      version: "0.5.1",
       description:
-        "Escribe automáticamente con ritmo humano en Google Docs, Word Online y cualquier web en segundo plano.",
+        "Automatically type at a human pace in Google Docs, Word Online, and any website in the background.",
       permissions: ["activeTab", "scripting", "storage", "notifications"],
       host_permissions: ["http://*/*", "https://*/*"],
       action: {
@@ -30,11 +30,11 @@ export function downloadExtensionZip(): void {
       },
     },
     null,
-    2
+    2,
   );
 
   const popupHtml = `<!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -48,39 +48,39 @@ export function downloadExtensionZip(): void {
         <span class="logo-badge">⚡</span>
         <div>
           <h2>Human <span>Typer</span></h2>
-          <span class="badge">Segundo Plano</span>
+          <span class="badge">Background</span>
         </div>
       </div>
     </header>
     <main class="main">
       <div class="field-group">
         <label for="text-input">
-          <span>Texto para escribir</span>
-          <span id="char-count" class="char-count">0 caracteres</span>
+          <span>Text to type</span>
+          <span id="char-count" class="char-count">0 characters</span>
         </label>
-        <textarea id="text-input" placeholder="Pega o escribe aquí el texto que debe escribirse en el documento..." rows="5"></textarea>
+        <textarea id="text-input" placeholder="Paste or type the text to enter in the document..." rows="5"></textarea>
       </div>
       <div class="settings-block">
         <div class="setting-row">
-          <label>Velocidad de escritura</label>
+          <label>Typing speed</label>
           <strong id="speed-val">120 ms (Normal)</strong>
         </div>
         <div class="preset-buttons">
-          <button type="button" class="preset-btn" data-speed="35">⚡ Muy Rápido</button>
-          <button type="button" class="preset-btn" data-speed="65">🚀 Rápido</button>
+          <button type="button" class="preset-btn" data-speed="35">⚡ Very Fast</button>
+          <button type="button" class="preset-btn" data-speed="65">🚀 Fast</button>
           <button type="button" class="preset-btn active" data-speed="120">✍️ Normal</button>
-          <button type="button" class="preset-btn" data-speed="220">🐢 Lento</button>
-          <button type="button" class="preset-btn" data-speed="380">🦥 Muy Lento</button>
+          <button type="button" class="preset-btn" data-speed="220">🐢 Slow</button>
+          <button type="button" class="preset-btn" data-speed="380">🦥 Very Slow</button>
         </div>
         <input type="range" id="speed-slider" min="15" max="800" step="5" value="120" />
         <div class="speed-labels">
-          <span>15 ms (Ultra Rápido)</span>
-          <span>800 ms (Pausado)</span>
+          <span>15 ms (Ultra Fast)</span>
+          <span>800 ms (Paused)</span>
         </div>
       </div>
       <div class="settings-block compact">
         <div class="setting-row">
-          <label>Variación humana</label>
+          <label>Human variation</label>
           <strong id="variation-val">±35 ms</strong>
         </div>
         <input type="range" id="variation-slider" min="0" max="150" step="5" value="35" />
@@ -88,16 +88,16 @@ export function downloadExtensionZip(): void {
       <div class="options-grid">
         <label class="toggle-label">
           <input type="checkbox" id="pause-punct" checked />
-          <span>Pausas de puntuación</span>
+          <span>Punctuation pauses</span>
         </label>
         <label class="toggle-label">
           <input type="checkbox" id="notify-sound" checked />
-          <span>Sonido al finalizar</span>
+          <span>Completion sound</span>
         </label>
       </div>
       <div id="status-card" class="status-card">
         <div class="status-info">
-          <span id="status-text">Listo para iniciar en esta pestaña</span>
+          <span id="status-text">Ready to start in this tab</span>
           <span id="status-percent">0%</span>
         </div>
         <div class="progress-bg">
@@ -105,7 +105,7 @@ export function downloadExtensionZip(): void {
         </div>
       </div>
       <div class="actions">
-        <button type="button" id="start-btn" class="btn btn-primary">▶ Comenzar a Escribir</button>
+        <button type="button" id="start-btn" class="btn btn-primary">▶ Start Typing</button>
       </div>
     </main>
   </div>
@@ -175,16 +175,16 @@ input[type="range"] { width: 100%; accent-color: #eab308; cursor: pointer; margi
 
   function updateCharCount() {
     const len = Array.from(textInput.value).length;
-    charCount.innerText = len.toLocaleString("es") + " caracteres";
+    charCount.innerText = len.toLocaleString("en") + " characters";
     startBtn.disabled = len === 0;
   }
 
   function getSpeedDescriptor(ms) {
-    if (ms <= 45) return "Ultra Rápido";
-    if (ms <= 85) return "Rápido";
-    if (ms <= 160) return "Normal / Humano";
-    if (ms <= 280) return "Lento";
-    return "Muy Lento / Pausado";
+    if (ms <= 45) return "Ultra Fast";
+    if (ms <= 85) return "Fast";
+    if (ms <= 160) return "Normal / Human";
+    if (ms <= 280) return "Slow";
+    return "Very Slow / Paused";
   }
 
   function updateSpeedLabel(ms) {
@@ -223,10 +223,10 @@ input[type="range"] { width: 100%; accent-color: #eab308; cursor: pointer; margi
     if (!tab || !tab.id) return;
     try {
       await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: injectScript, args: [config] });
-      statusText.innerText = "⚡ Escritura iniciada en la página";
+      statusText.innerText = "⚡ Typing started on the page";
       progressBar.style.width = "100%";
       setTimeout(() => window.close(), 700);
-    } catch(e) { statusText.innerText = "Error: asegurate de estar en una pestaña válida"; }
+    } catch(e) { statusText.innerText = "Error: make sure you are on a valid tab"; }
   });
   updateCharCount();
 });
@@ -244,20 +244,20 @@ function injectScript(config) {
     fontSize: "13px", minWidth: "300px", display: "flex", flexDirection: "column", gap: "10px", userSelect: "none"
   });
   panel.innerHTML = \`<div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 8px;">
-    <span style="font-weight: 800; color: #facc15; display: flex; align-items: center; gap: 6px;">⚡ Human Typer <span style="font-size: 11px; background: rgba(234,179,8,0.2); color: #fef08a; padding: 2px 6px; border-radius: 4px;">Segundo Plano</span></span>
+    <span style="font-weight: 800; color: #facc15; display: flex; align-items: center; gap: 6px;">⚡ Human Typer <span style="font-size: 11px; background: rgba(234,179,8,0.2); color: #fef08a; padding: 2px 6px; border-radius: 4px;">Background</span></span>
     <button id="ht-close-btn" style="background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 16px;">✕</button>
   </div>
-  <div id="ht-status-text" style="color: #e5e7eb; font-weight: 600;">Iniciando escritura en esta página...</div>
+  <div id="ht-status-text" style="color: #e5e7eb; font-weight: 600;">Starting to type on this page...</div>
   <div style="background: rgba(255,255,255,0.1); border-radius: 6px; height: 6px; overflow: hidden;">
     <div id="ht-progress-bar" style="width: 0%; height: 100%; background: #eab308; transition: width 0.1s linear;"></div>
   </div>
   <div style="display: flex; justify-content: space-between; font-size: 11px; color: #9ca3af;">
-    <span id="ht-count-text">0 / \${config.text.length} caracteres</span>
+    <span id="ht-count-text">0 / \${config.text.length} characters</span>
     <span id="ht-percent-text">0%</span>
   </div>
   <div style="display: flex; gap: 8px; margin-top: 4px;">
-    <button id="ht-pause-btn" style="flex: 1; background: #374151; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Pausar</button>
-    <button id="ht-cancel-btn" style="background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancelar</button>
+    <button id="ht-pause-btn" style="flex: 1; background: #374151; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Pause</button>
+    <button id="ht-cancel-btn" style="background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">Cancel</button>
   </div>\`;
   document.body.appendChild(panel);
   const pauseBtn = panel.querySelector("#ht-pause-btn");
@@ -368,32 +368,32 @@ function injectScript(config) {
     if (target && target.element) target.element.focus();
     for (let c = 3; c > 0; c--) {
       if (isCancelled) return;
-      statusText.innerText = 'Comenzando en ' + c + 's... (Haz clic en el documento)';
+      statusText.innerText = 'Starting in ' + c + 's... (Click in the document)';
       await new Promise(r => setTimeout(r, 1000));
     }
     target = getTarget();
-    statusText.innerText = "⚡ Escribiendo en segundo plano...";
+    statusText.innerText = "⚡ Typing in the background...";
     const chars = Array.from(config.text);
     const total = chars.length;
     while (currentIndex < total) {
-      if (isCancelled) { statusText.innerText = "Escritura cancelada"; return; }
-      if (isPaused) { statusText.innerText = "En pausa (pulsa Reanudar)"; await new Promise(r => setTimeout(r, 100)); continue; }
+      if (isCancelled) { statusText.innerText = "Typing cancelled"; return; }
+      if (isPaused) { statusText.innerText = "Paused (click Resume)"; await new Promise(r => setTimeout(r, 100)); continue; }
       const char = chars[currentIndex];
       insertChar(char, target);
       currentIndex++;
       const pct = Math.round((currentIndex / total) * 100);
       progressBar.style.width = pct + "%";
-      countText.innerText = currentIndex + " / " + total + " caracteres";
+      countText.innerText = currentIndex + " / " + total + " characters";
       percentText.innerText = pct + "%";
       const delay = getDelay(char);
       await new Promise(resolve => { worker.onmessage = () => resolve(); worker.postMessage(delay); });
     }
-    statusText.innerHTML = "✅ <strong>¡Texto completado con éxito!</strong>";
+    statusText.innerHTML = "✅ <strong>Text completed successfully!</strong>";
     progressBar.style.background = "#10b981";
     pauseBtn.style.display = "none"; cancelBtn.style.display = "none";
     if (config.notifySound) playChime();
   }
-  pauseBtn.onclick = () => { isPaused = !isPaused; pauseBtn.innerText = isPaused ? "Reanudar" : "Pausar"; pauseBtn.style.background = isPaused ? "#2563eb" : "#374151"; };
+  pauseBtn.onclick = () => { isPaused = !isPaused; pauseBtn.innerText = isPaused ? "Resume" : "Pause"; pauseBtn.style.background = isPaused ? "#2563eb" : "#374151"; };
   cancelBtn.onclick = () => { isCancelled = true; panel.remove(); };
   loop();
 }`;

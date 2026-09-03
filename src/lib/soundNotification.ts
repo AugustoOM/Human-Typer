@@ -1,6 +1,6 @@
 /**
- * Genera un sonido de aviso agradable mediante la Web Audio API nativa
- * sin requerir archivos de audio externos.
+ * Generates a pleasant completion sound using the native Web Audio API
+ * without requiring external audio files.
  */
 export function playCompletionChime() {
   try {
@@ -13,7 +13,7 @@ export function playCompletionChime() {
     const ctx = new AudioContextClass();
     const now = ctx.currentTime;
 
-    // Acorde suave de 3 notas armoniosas (Do - Mi - Sol / C5 - E5 - G5)
+    // Soft three-note chord (C5 - E5 - G5)
     const freqs = [523.25, 659.25, 783.99];
 
     freqs.forEach((freq, i) => {
@@ -34,12 +34,12 @@ export function playCompletionChime() {
       osc.stop(now + i * 0.1 + 0.95);
     });
   } catch {
-    // Si el navegador bloquea el audio hasta interacción, se ignora silenciosamente
+    // If the browser blocks audio until user interaction, fail silently.
   }
 }
 
 /**
- * Solicita permisos y envía una notificación del sistema
+ * Requests permission and sends a system notification.
  */
 export async function sendDesktopNotification(title: string, body: string) {
   if (!("Notification" in window)) return;
@@ -60,6 +60,6 @@ export async function sendDesktopNotification(title: string, body: string) {
       }
     }
   } catch {
-    // Manejo seguro si las notificaciones están bloqueadas
+    // Fail safely if notifications are blocked.
   }
 }

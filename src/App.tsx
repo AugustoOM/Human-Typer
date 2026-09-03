@@ -33,15 +33,15 @@ function App() {
   const runtimeWarning =
     runtimeInfo?.shortcutWarning ??
     (needsAccessibility
-      ? "Permití el acceso en Privacidad y seguridad → Accesibilidad. Reiniciá la app después de activarlo."
+      ? "Allow access in Privacy & Security → Accessibility. Restart the app after enabling it."
       : null);
   const operationalState = active
     ? state.status === "paused"
-      ? "EN PAUSA"
-      : "EN CURSO"
+      ? "PAUSED"
+      : "RUNNING"
     : state.status === "error"
-      ? "REVISAR"
-      : "OPERATIVO";
+      ? "CHECK"
+      : "READY";
 
   function beginTyping() {
     void start({
@@ -56,7 +56,7 @@ function App() {
 
   return (
     <div className="app-frame">
-      <aside className="app-rail" aria-label="Identificación de la estación">
+      <aside className="app-rail" aria-label="App identity">
         <BrandMark />
       </aside>
 
@@ -71,7 +71,7 @@ function App() {
               onChange={(theme) => updatePreferences({ theme })}
             />
             <div className="status-plate">
-              <span>Estado</span>
+              <span>Status</span>
               <strong>{operationalState}</strong>
             </div>
           </div>
@@ -88,7 +88,7 @@ function App() {
                   type="button"
                   onClick={() => void requestAccessibility()}
                 >
-                  Comprobar permiso
+                  Check permission
                 </button>
               )}
             </div>

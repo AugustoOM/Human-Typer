@@ -33,19 +33,15 @@ export function TypingSettings({
   return (
     <section className="card settings-card" aria-labelledby="settings-heading">
       <div className="section-heading settings-title">
-        <h2 id="settings-heading">Ritmo y Opciones</h2>
+        <h2 id="settings-heading">Pace & Options</h2>
       </div>
 
       <div className="setting-block full-width">
         <div className="setting-label-row">
-          <label>Velocidad</label>
+          <label>Speed</label>
           <strong>{preferences.baseDelayMs} ms</strong>
         </div>
-        <div
-          className="preset-grid"
-          role="group"
-          aria-label="Velocidad predefinida"
-        >
+        <div className="preset-grid" role="group" aria-label="Speed preset">
           {(Object.keys(SPEED_PRESETS) as SpeedPreset[]).map((preset) => (
             <button
               key={preset}
@@ -68,7 +64,7 @@ export function TypingSettings({
           step="5"
           value={preferences.baseDelayMs}
           disabled={disabled}
-          aria-label="Velocidad base en milisegundos"
+          aria-label="Base speed in milliseconds"
           onChange={(event) =>
             onChange({
               baseDelayMs: Number(event.currentTarget.value),
@@ -77,8 +73,8 @@ export function TypingSettings({
           }
         />
         <div className="range-labels">
-          <span>Más rápida</span>
-          <span>Más lenta</span>
+          <span>Faster</span>
+          <span>Slower</span>
         </div>
       </div>
 
@@ -89,7 +85,7 @@ export function TypingSettings({
           </div>
           <div className="panel-content">
             <div className="setting-label-row">
-              <label htmlFor="variation">Variación</label>
+              <label htmlFor="variation">Variation</label>
               <strong>±{preferences.variationMs} ms</strong>
             </div>
             <input
@@ -114,7 +110,7 @@ export function TypingSettings({
           </div>
           <div className="panel-content">
             <div className="setting-label-row">
-              <label htmlFor="countdown">Espera</label>
+              <label htmlFor="countdown">Countdown</label>
               <strong>{preferences.countdownSeconds} s</strong>
             </div>
             <input
@@ -141,8 +137,8 @@ export function TypingSettings({
           <Gauge size={18} />
         </span>
         <span className="toggle-copy">
-          <strong>Pausas de puntuación</strong>
-          <small>Pausas naturales en puntos, comas y saltos de línea</small>
+          <strong>Punctuation pauses</strong>
+          <small>Natural pauses after periods, commas, and line breaks</small>
         </span>
         <input
           type="checkbox"
@@ -166,11 +162,11 @@ export function TypingSettings({
           <PanelsTopLeft size={18} />
         </span>
         <span className="toggle-copy">
-          <strong>Proteger ventana objetivo</strong>
+          <strong>Protect target window</strong>
           <small>
             {focusGuardSupported
-              ? "Pausa si otra ventana recibe el foco"
-              : "Disponible en macOS y Windows"}
+              ? "Pauses when another window receives focus"
+              : "Available on macOS and Windows"}
           </small>
         </span>
         <input
@@ -194,7 +190,7 @@ export function TypingSettings({
             <Volume2 size={18} />
           </span>
           <span className="toggle-copy">
-            <strong>Sonido al finalizar</strong>
+            <strong>Completion sound</strong>
           </span>
           <input
             type="checkbox"
@@ -216,7 +212,7 @@ export function TypingSettings({
             <Bell size={18} />
           </span>
           <span className="toggle-copy">
-            <strong>Notificación al terminar</strong>
+            <strong>Completion notification</strong>
           </span>
           <input
             type="checkbox"

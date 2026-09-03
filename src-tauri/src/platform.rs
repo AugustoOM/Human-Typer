@@ -61,7 +61,7 @@ impl FocusedWindow {
     pub fn capture() -> Result<Self, String> {
         let system = unsafe { AXUIElementCreateSystemWide() };
         if system.is_null() {
-            return Err("No se pudo identificar la ventana objetivo de macOS.".into());
+            return Err("Could not identify the target macOS window.".into());
         }
 
         let focused_application_attribute = CFString::new("AXFocusedApplication");
@@ -71,7 +71,7 @@ impl FocusedWindow {
         unsafe { CFRelease(system.cast()) };
         let Some(application) = application else {
             return Err(
-                "No se pudo identificar la aplicación objetivo. Enfocá un campo de texto antes de que termine la cuenta regresiva."
+                "Could not identify the target application. Focus a text field before the countdown ends."
                     .into(),
             );
         };
@@ -86,7 +86,7 @@ impl FocusedWindow {
         unsafe { CFRelease(application) };
         let Some(window) = window else {
             return Err(
-                "No se pudo identificar la ventana objetivo. Enfocá una ventana con un campo de texto antes de que termine la cuenta regresiva."
+                "Could not identify the target window. Focus a window containing a text field before the countdown ends."
                     .into(),
             );
         };
@@ -136,7 +136,7 @@ impl FocusedWindow {
         let handle = unsafe { GetForegroundWindow() };
         if handle.is_null() {
             return Err(
-                "No se pudo identificar la ventana objetivo. Enfocá una ventana antes de que termine la cuenta regresiva."
+                "Could not identify the target window. Focus a window before the countdown ends."
                     .into(),
             );
         }
@@ -155,7 +155,7 @@ pub struct FocusedWindow;
 #[cfg(not(any(target_os = "macos", target_os = "windows")))]
 impl FocusedWindow {
     pub fn capture() -> Result<Self, String> {
-        Err("La protección de ventana sólo está disponible en macOS y Windows.".into())
+        Err("Target window protection is only available on macOS and Windows.".into())
     }
 
     pub fn is_active(&self) -> bool {

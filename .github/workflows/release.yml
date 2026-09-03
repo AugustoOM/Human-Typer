@@ -128,18 +128,18 @@ jobs:
           tagName: v__VERSION__
           releaseName: Human Typer v__VERSION__
           releaseBody: |
-            Human Typer 0.5.0 incorpora un compañero web para escribir en Google Docs, Word Online y otros editores sin mantener el foco en la ventana, con extensión compatible con Chrome, Edge y Firefox incluida dentro de la aplicación.
+            Human Typer 0.5.1 translates the desktop app, browser extension, background typing controls, notifications, and native error messages into English.
 
-            También suma nuevos presets de velocidad lenta y pausada, control de variación en la extensión y avisos sonoros y de escritorio al finalizar.
+            It includes the browser companion for Google Docs, Word Online, and other editors, plus optional target-window protection on macOS and Windows.
 
-            En macOS, el paquete conserva la firma ad hoc válida y admite firma Developer ID con notarización cuando están configuradas las credenciales de Apple.
+            On macOS, the package retains valid ad-hoc signing and supports Developer ID signing with notarization when Apple credentials are configured.
 
-            Descargas:
-            - Windows: instalador `.exe` de 64 bits.
-            - macOS: imagen `.dmg` para Apple Silicon.
-            - Extensión Navegadores: `Human-Typer-Extension.zip` (para Chrome, Edge y Firefox).
+            Downloads:
+            - Windows: 64-bit `.exe` installer.
+            - macOS: Apple Silicon `.dmg` image.
+            - Browser extension: `Human-Typer-Extension.zip` for Chrome, Edge, and Firefox.
 
-            En macOS, habilitá Human Typer en Configuración del Sistema → Privacidad y seguridad → Accesibilidad.
+            On macOS, enable Human Typer in System Settings → Privacy & Security → Accessibility.
           releaseDraft: false
           prerelease: false
           generateReleaseNotes: true

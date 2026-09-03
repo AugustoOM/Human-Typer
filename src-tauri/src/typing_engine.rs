@@ -117,7 +117,7 @@ impl TypingController {
             }
             runtime.status = TypingStatus::Cancelled;
             runtime.generation = runtime.generation.wrapping_add(1);
-            event_from_runtime(&runtime, Some("Escritura cancelada".into()))
+            event_from_runtime(&runtime, Some("Typing cancelled".into()))
         };
         emit_event(app, event);
     }
@@ -125,7 +125,7 @@ impl TypingController {
     fn begin(&self, total: usize) -> Result<u64, String> {
         let mut runtime = self.lock();
         if runtime.status.is_active() {
-            return Err("Ya hay una escritura en curso. Cancelala antes de iniciar otra.".into());
+            return Err("Typing is already in progress. Cancel it before starting another run.".into());
         }
         runtime.generation = runtime.generation.wrapping_add(1);
         runtime.status = TypingStatus::Countdown;
@@ -152,21 +152,21 @@ fn emit_event(app: &AppHandle, event: TypingEvent) {
 fn validate_request(request: &TypingRequest) -> Result<usize, String> {
     let total = request.text.chars().count();
     if total == 0 {
-        return Err("Agregá algún texto antes de comenzar.".into());
+        return Err("Add some text before starting.".into());
     }
     if total > MAX_CHARACTERS {
         return Err(format!(
-            "El texto supera el límite de {MAX_CHARACTERS} caracteres. Dividilo en partes más pequeñas."
+            "The text exceeds the {MAX_CHARACTERS}-character limit. Split it into smaller sections."
         ));
     }
     if !(15..=2_000).contains(&request.base_delay_ms) {
-        return Err("La velocidad base debe estar entre 15 y 2000 ms.".into());
+        return Err("The base speed must be between 15 and 2000 ms.".into());
     }
     if request.variation_ms > 1_000 {
-        return Err("La variación no puede superar 1000 ms.".into());
+        return Err("Variation cannot exceed 1000 ms.".into());
     }
     if !(1..=30).contains(&request.countdown_seconds) {
-        return Err("La cuenta regresiva debe estar entre 1 y 30 segundos.".into());
+        return Err("The countdown must be between 1 and 30 seconds.".into());
     }
     Ok(total)
 }
@@ -177,12 +177,12 @@ pub fn start_typing(
     request: TypingRequest,
 ) -> Result<(), String> {
     if request.pause_on_focus_loss && !platform::focus_guard_supported() {
-        return Err("La protección de ventana sólo está disponible en macOS y Windows.".into());
+        return Err("Target window protection is only available on macOS and Windows.".into());
     }
     if !platform::accessibility_granted() {
         platform::request_accessibility();
         return Err(
-            "Human Typer necesita permiso de Accesibilidad. Habilitalo en Configuración del Sistema → Privacidad y seguridad → Accesibilidad. Si ya aparece habilitado, quitá y volvé a abrir Human Typer; una compilación nueva puede necesitar que retires y agregues nuevamente la app."
+            "Human Typer needs Accessibility permission. Enable it in System Settings → Privacy & Security → Accessibility. If it is already enabled, quit and reopen Human Typer; a new build may require you to remove and add the app again."
                 .into(),
         );
     }
@@ -267,7 +267,7 @@ fn run_typing(
                 &app,
                 controller,
                 generation,
-                format!("No se pudo iniciar el teclado simulado: {error}"),
+                format!("Could not start the simulated keyboard: {error}"),
             );
             return;
         }
@@ -281,7 +281,7 @@ fn run_typing(
                 &app,
                 controller,
                 generation,
-                "Se alcanzó el límite de seguridad de 8 horas y la escritura se detuvo.".into(),
+                "The 8-hour safety limit was reached and typing was stopped.".into(),
             );
             return;
         }
@@ -296,7 +296,7 @@ fn run_typing(
                 controller,
                 generation,
                 format!(
-                    "No se pudo escribir un carácter. Revisá los permisos del sistema: {error}"
+                    "Could not type a character. Check the system permissions: {error}"
                 ),
             );
             return;
@@ -336,7 +336,7 @@ fn run_typing(
             return;
         }
         runtime.status = TypingStatus::Completed;
-        event_from_runtime(&runtime, Some("Texto escrito correctamente".into()))
+        event_from_runtime(&runtime, Some("Text typed successfully".into()))
     };
     emit_event(&app, event);
 }
@@ -426,7 +426,7 @@ fn focus_loss_event(controller: &TypingController, generation: u64) -> Option<Ty
     Some(event_from_runtime(
         &runtime,
         Some(
-            "Pausa automática: la ventana objetivo perdió el foco. Volvé a ella y presioná F8 para continuar."
+            "Automatically paused: the target window lost focus. Return to it and press F8 to continue."
                 .into(),
         ),
     ))
@@ -547,7 +547,7 @@ mod tests {
 
         let event = focus_loss_event(&controller, generation).unwrap();
         assert_eq!(event.status, TypingStatus::Paused);
-        assert!(event.message.unwrap().contains("ventana objetivo"));
+        assert!(event.message.unwrap().contains("target window"));
         assert!(focus_loss_event(&controller, generation).is_none());
         assert!(focus_loss_event(&controller, generation.wrapping_add(1)).is_none());
     }
