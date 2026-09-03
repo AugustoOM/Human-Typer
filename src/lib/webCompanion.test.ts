@@ -15,10 +15,11 @@ describe("webCompanion", () => {
     });
 
     expect(script).toContain("Hola mundo!");
-    expect(script).toContain("baseDelayMs\":70");
-    expect(script).toContain("variationMs\":20");
-    expect(script).toContain("punctuationPauses\":true");
+    expect(script).toContain('baseDelayMs":70');
+    expect(script).toContain('variationMs":20');
+    expect(script).toContain('punctuationPauses":true');
     expect(script).toContain("human-typer-companion-panel");
+    expect(() => new Function(script)).not.toThrow();
   });
 
   it("generates valid javascript: URL for bookmarklet", () => {

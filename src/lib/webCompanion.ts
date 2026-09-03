@@ -12,7 +12,9 @@ export interface WebCompanionOptions {
   notifyOnComplete: boolean;
 }
 
-export function generateWebCompanionScript(options: WebCompanionOptions): string {
+export function generateWebCompanionScript(
+  options: WebCompanionOptions,
+): string {
   const jsonConfig = JSON.stringify({
     text: options.text,
     baseDelayMs: options.baseDelayMs,
@@ -136,8 +138,8 @@ export function generateWebCompanionScript(options: WebCompanionOptions): string
     // 1. Google Docs (iframe específico de captura de eventos de teclado)
     try {
       const docsIframe = document.querySelector(".docs-texteventtarget-iframe");
-      if (docsIframe && (docsIframe as HTMLIFrameElement).contentDocument) {
-        const doc = (docsIframe as HTMLIFrameElement).contentDocument;
+      if (docsIframe && docsIframe.contentDocument) {
+        const doc = docsIframe.contentDocument;
         if (doc) {
           const el = doc.activeElement || doc.body;
           if (el) return { element: el, document: doc, isDocs: true };
@@ -261,8 +263,8 @@ export function generateWebCompanionScript(options: WebCompanionOptions): string
 
     // Capturar elemento destino
     targetElement = getActiveOrDocsTarget();
-    if (targetElement) {
-      targetElement.focus();
+    if (targetElement && targetElement.element) {
+      targetElement.element.focus();
     }
 
     // Cuenta regresiva de 3 segundos

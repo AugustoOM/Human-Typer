@@ -1,4 +1,11 @@
-import { Bell, Clock3, Gauge, PanelsTopLeft, Sparkles, Volume2 } from "lucide-react";
+import {
+  Bell,
+  Clock3,
+  Gauge,
+  PanelsTopLeft,
+  Sparkles,
+  Volume2,
+} from "lucide-react";
 import { SPEED_PRESETS } from "../lib/typing";
 import type { Preferences, SpeedPreset } from "../types";
 
@@ -178,7 +185,11 @@ export function TypingSettings({
       </label>
 
       <div className="settings-subgrid">
-        <label className={disabled ? "toggle-row compact disabled" : "toggle-row compact"}>
+        <label
+          className={
+            disabled ? "toggle-row compact disabled" : "toggle-row compact"
+          }
+        >
           <span className="panel-icon">
             <Volume2 size={18} />
           </span>
@@ -196,7 +207,11 @@ export function TypingSettings({
           <span className="switch" aria-hidden="true" />
         </label>
 
-        <label className={disabled ? "toggle-row compact disabled" : "toggle-row compact"}>
+        <label
+          className={
+            disabled ? "toggle-row compact disabled" : "toggle-row compact"
+          }
+        >
           <span className="panel-icon">
             <Bell size={18} />
           </span>

@@ -128,7 +128,9 @@ jobs:
           tagName: v__VERSION__
           releaseName: Human Typer v__VERSION__
           releaseBody: |
-            Human Typer 0.4.0 incorpora la protección opcional de ventana objetivo en macOS y Windows. Al activarla, la escritura se pausa automáticamente si otra ventana recibe el foco y sólo continúa cuando el usuario vuelve al objetivo y presiona F8.
+            Human Typer 0.5.0 incorpora un compañero web para escribir en Google Docs, Word Online y otros editores sin mantener el foco en la ventana, con extensión compatible con Chrome, Edge y Firefox incluida dentro de la aplicación.
+
+            También suma nuevos presets de velocidad lenta y pausada, control de variación en la extensión y avisos sonoros y de escritorio al finalizar.
 
             En macOS, el paquete conserva la firma ad hoc válida y admite firma Developer ID con notarización cuando están configuradas las credenciales de Apple.
 
