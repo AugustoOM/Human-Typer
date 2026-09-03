@@ -1,11 +1,12 @@
 import {
-  AlertTriangle,
-  CheckCircle2,
-  CircleStop,
-  Pause,
-  Play,
-  RotateCcw,
-} from "lucide-react";
+  IconAlertTriangle,
+  IconCircleCheck,
+  IconPlayerPause,
+  IconPlayerPlay,
+  IconRefresh,
+  IconSquareRoundedX,
+  IconWorld,
+} from "@tabler/icons-react";
 import { calculateProgress, estimateDuration } from "../lib/typing";
 import { localizeNativeMessage, tr } from "../lib/i18n";
 import type { LanguagePreference, TypingState } from "../types";
@@ -104,11 +105,11 @@ export function TypingStatusPanel({
           }
         >
           {state.status === "error" ? (
-            <AlertTriangle size={16} />
+            <IconAlertTriangle size={16} />
           ) : state.status === "paused" ? (
-            <Pause size={16} />
+            <IconPlayerPause size={16} />
           ) : (
-            <CheckCircle2 size={16} />
+            <IconCircleCheck size={16} />
           )}
           {localizeNativeMessage(state.message, language)}
         </div>
@@ -127,9 +128,9 @@ export function TypingStatusPanel({
           )}
         >
           {state.status === "completed" || state.status === "cancelled" ? (
-            <RotateCcw size={18} />
+            <IconRefresh size={18} />
           ) : (
-            <Play size={18} fill="currentColor" />
+            <IconPlayerPlay size={18} fill="currentColor" />
           )}
           {state.status === "completed" || state.status === "cancelled"
             ? tr(language, "Type again", "Escribir de nuevo")
@@ -147,7 +148,7 @@ export function TypingStatusPanel({
             "Escribir en segundo plano en Google Docs, Word Online o cualquier web mientras navegás o mirás videos",
           )}
         >
-          <span className="spark-icon">⚡</span>
+          <IconWorld size={18} />
           {tr(
             language,
             "Background Mode (Docs / Web)",
@@ -162,9 +163,9 @@ export function TypingStatusPanel({
           disabled={!canPause}
         >
           {state.status === "paused" ? (
-            <Play size={18} />
+            <IconPlayerPlay size={18} />
           ) : (
-            <Pause size={18} fill="currentColor" />
+            <IconPlayerPause size={18} fill="currentColor" />
           )}
           {state.status === "paused"
             ? tr(language, "Resume", "Reanudar")
@@ -177,7 +178,7 @@ export function TypingStatusPanel({
           onClick={onCancel}
           disabled={!active}
         >
-          <CircleStop size={18} />
+          <IconSquareRoundedX size={18} />
           {tr(language, "Cancel", "Cancelar")}
           <kbd>Esc</kbd>
         </button>

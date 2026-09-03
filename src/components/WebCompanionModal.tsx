@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { join, resourceDir } from "@tauri-apps/api/path";
-import { Check, Copy, Download, Info, Sparkles, X, Zap } from "lucide-react";
+import {
+  IconBolt,
+  IconCheck,
+  IconCopy,
+  IconDownload,
+  IconInfoCircle,
+  IconSparkles,
+  IconX,
+} from "@tabler/icons-react";
 import { downloadExtensionZip } from "../lib/extensionPacker";
 import { generateWebCompanionScript } from "../lib/webCompanion";
 import { tr } from "../lib/i18n";
@@ -88,7 +96,7 @@ export function WebCompanionModal({
         <header className="modal-header">
           <div className="modal-title-wrap">
             <div className="modal-icon-badge">
-              <Zap size={20} />
+              <IconBolt size={20} />
             </div>
             <div>
               <h3 id="web-modal-title">
@@ -113,13 +121,13 @@ export function WebCompanionModal({
             onClick={onClose}
             aria-label={tr(language, "Close dialog", "Cerrar ventana")}
           >
-            <X size={20} />
+            <IconX size={20} />
           </button>
         </header>
 
         <div className="modal-body">
           <div className="feature-banner">
-            <Sparkles size={20} className="feature-icon" />
+            <IconSparkles size={20} className="feature-icon" />
             <div>
               <strong>
                 {tr(
@@ -159,8 +167,8 @@ export function WebCompanionModal({
               <p className="method-desc">
                 {tr(
                   language,
-                  "Adds a permanent ⚡ button to your browser for Google Docs and any website:",
-                  "Agrega un botón ⚡ permanente al navegador para Google Docs y cualquier web:",
+                  "Adds a permanent Human Typer button to your browser for Google Docs and any website:",
+                  "Agrega un botón permanente de Human Typer al navegador para Google Docs y cualquier web:",
                 )}
               </p>
               <div
@@ -176,7 +184,11 @@ export function WebCompanionModal({
                   className={`action-btn ${downloadedZip ? "copied" : "primary"}`}
                   onClick={handleDownloadZip}
                 >
-                  {downloadedZip ? <Check size={18} /> : <Download size={18} />}
+                  {downloadedZip ? (
+                    <IconCheck size={18} />
+                  ) : (
+                    <IconDownload size={18} />
+                  )}
                   {downloadedZip
                     ? tr(
                         language,
@@ -226,7 +238,11 @@ export function WebCompanionModal({
                 className={`action-btn ${copiedExtensionPath ? "copied" : "primary"}`}
                 onClick={handleCopyExtensionPath}
               >
-                {copiedExtensionPath ? <Check size={18} /> : <Copy size={18} />}
+                {copiedExtensionPath ? (
+                  <IconCheck size={18} />
+                ) : (
+                  <IconCopy size={18} />
+                )}
                 {copiedExtensionPath
                   ? tr(language, "Folder Path Copied!", "¡Ruta copiada!")
                   : tr(
@@ -283,7 +299,7 @@ export function WebCompanionModal({
                 className={`action-btn ${copiedCode ? "copied" : "secondary"}`}
                 onClick={handleCopyScript}
               >
-                {copiedCode ? <Check size={18} /> : <Copy size={18} />}
+                {copiedCode ? <IconCheck size={18} /> : <IconCopy size={18} />}
                 {copiedCode
                   ? tr(language, "Code Copied!", "¡Código copiado!")
                   : tr(
@@ -296,7 +312,7 @@ export function WebCompanionModal({
           </div>
 
           <div className="modal-tip-box">
-            <Info size={16} />
+            <IconInfoCircle size={16} />
             <span>
               {tr(
                 language,

@@ -4,20 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Human Typer</title>
+    <link rel="stylesheet" href="tabler-icons.min.css" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="popup-container">
       <header class="header">
         <div class="brand">
-          <span class="logo-badge">⚡</span>
+          <span class="logo-badge" aria-hidden="true">
+            <i class="ti ti-keyboard"></i>
+          </span>
           <div>
             <h2>Human <span>Typer</span></h2>
             <span class="badge" data-i18n="background">Background</span>
           </div>
         </div>
         <button id="language-btn" class="language-btn" type="button">
-          🌐 ES
+          <i class="ti ti-language" aria-hidden="true"></i>
+          <span id="language-label">ES</span>
         </button>
       </header>
 
@@ -42,45 +46,25 @@
           </div>
 
           <div class="preset-buttons" role="group" aria-label="Speed presets">
-            <button
-              type="button"
-              class="preset-btn"
-              data-speed="35"
-              data-i18n="veryFast"
-            >
-              ⚡ Very Fast
+            <button type="button" class="preset-btn" data-speed="35">
+              <i class="ti ti-bolt" aria-hidden="true"></i>
+              <span data-i18n="veryFast">Very Fast</span>
             </button>
-            <button
-              type="button"
-              class="preset-btn"
-              data-speed="65"
-              data-i18n="fast"
-            >
-              🚀 Fast
+            <button type="button" class="preset-btn" data-speed="65">
+              <i class="ti ti-run-sprint" aria-hidden="true"></i>
+              <span data-i18n="fast">Fast</span>
             </button>
-            <button
-              type="button"
-              class="preset-btn active"
-              data-speed="120"
-              data-i18n="normal"
-            >
-              ✍️ Normal
+            <button type="button" class="preset-btn active" data-speed="120">
+              <i class="ti ti-keyboard" aria-hidden="true"></i>
+              <span data-i18n="normal">Normal</span>
             </button>
-            <button
-              type="button"
-              class="preset-btn"
-              data-speed="220"
-              data-i18n="slow"
-            >
-              🐢 Slow
+            <button type="button" class="preset-btn" data-speed="220">
+              <i class="ti ti-feather" aria-hidden="true"></i>
+              <span data-i18n="slow">Slow</span>
             </button>
-            <button
-              type="button"
-              class="preset-btn"
-              data-speed="380"
-              data-i18n="verySlow"
-            >
-              🦥 Very Slow
+            <button type="button" class="preset-btn" data-speed="380">
+              <i class="ti ti-clock" aria-hidden="true"></i>
+              <span data-i18n="verySlow">Very Slow</span>
             </button>
           </div>
 
@@ -137,30 +121,18 @@
         </div>
 
         <div class="actions">
-          <button
-            type="button"
-            id="start-btn"
-            class="btn btn-primary"
-            data-i18n="startTyping"
-          >
-            ▶ Start Typing
+          <button type="button" id="start-btn" class="btn btn-primary">
+            <i class="ti ti-player-play" aria-hidden="true"></i>
+            <span data-i18n="startTyping">Start Typing</span>
           </button>
           <div id="control-buttons" class="control-row" style="display: none">
-            <button
-              type="button"
-              id="pause-btn"
-              class="btn btn-secondary"
-              data-i18n="pauseButton"
-            >
-              ⏸ Pause
+            <button type="button" id="pause-btn" class="btn btn-secondary">
+              <i class="ti ti-player-pause" aria-hidden="true"></i>
+              <span data-i18n="pauseButton">Pause</span>
             </button>
-            <button
-              type="button"
-              id="cancel-btn"
-              class="btn btn-danger"
-              data-i18n="cancelButton"
-            >
-              ✕ Cancel
+            <button type="button" id="cancel-btn" class="btn btn-danger">
+              <i class="ti ti-x" aria-hidden="true"></i>
+              <span data-i18n="cancelButton">Cancel</span>
             </button>
           </div>
         </div>

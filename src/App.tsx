@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AlertTriangle } from "lucide-react";
+import { IconAlertTriangle } from "@tabler/icons-react";
 import { BrandMark } from "./components/BrandMark";
 import { LanguagePicker } from "./components/LanguagePicker";
 import { TextComposer } from "./components/TextComposer";
@@ -102,7 +102,7 @@ function App() {
 
         {runtimeWarning && (
           <div className="warning-banner" role="alert">
-            <AlertTriangle size={18} />
+            <IconAlertTriangle size={18} />
             <div className="warning-content">
               <span>{runtimeWarning}</span>
               {needsAccessibility && (

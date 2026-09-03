@@ -1,11 +1,14 @@
 import {
-  Bell,
-  Clock3,
-  Gauge,
-  PanelsTopLeft,
-  Sparkles,
-  Volume2,
-} from "lucide-react";
+  IconBell,
+  IconClock,
+  IconFeather,
+  IconGauge,
+  IconKeyboard,
+  IconLayoutNavbar,
+  IconRunSprint,
+  IconSparkles,
+  IconVolume,
+} from "@tabler/icons-react";
 import { SPEED_PRESETS } from "../lib/typing";
 import { tr } from "../lib/i18n";
 import type { Preferences, SpeedPreset } from "../types";
@@ -31,6 +34,11 @@ export function TypingSettings({
     slow: tr(language, "Slow", "Lenta"),
     verySlow: tr(language, "Very slow", "Muy lenta"),
     custom: tr(language, "Custom", "Manual"),
+  };
+  const speedIcons: Partial<Record<SpeedPreset, typeof IconKeyboard>> = {
+    fast: IconRunSprint,
+    normal: IconKeyboard,
+    slow: IconFeather,
   };
   function selectPreset(preset: SpeedPreset) {
     const selected = SPEED_PRESETS[preset];
@@ -58,19 +66,25 @@ export function TypingSettings({
           role="group"
           aria-label={tr(language, "Speed preset", "Velocidad predefinida")}
         >
-          {(Object.keys(SPEED_PRESETS) as SpeedPreset[]).map((preset) => (
-            <button
-              key={preset}
-              className={
-                preferences.speedPreset === preset ? "preset active" : "preset"
-              }
-              type="button"
-              onClick={() => selectPreset(preset)}
-              disabled={disabled}
-            >
-              {speedLabels[preset]}
-            </button>
-          ))}
+          {(Object.keys(SPEED_PRESETS) as SpeedPreset[]).map((preset) => {
+            const SpeedIcon = speedIcons[preset];
+            return (
+              <button
+                key={preset}
+                className={
+                  preferences.speedPreset === preset
+                    ? "preset active"
+                    : "preset"
+                }
+                type="button"
+                onClick={() => selectPreset(preset)}
+                disabled={disabled}
+              >
+                {SpeedIcon && <SpeedIcon size={15} aria-hidden="true" />}
+                {speedLabels[preset]}
+              </button>
+            );
+          })}
         </div>
         <input
           className="range"
@@ -101,7 +115,7 @@ export function TypingSettings({
       <div className="settings-grid">
         <div className="setting-panel">
           <div className="panel-icon">
-            <Sparkles size={18} />
+            <IconSparkles size={18} />
           </div>
           <div className="panel-content">
             <div className="setting-label-row">
@@ -128,7 +142,7 @@ export function TypingSettings({
 
         <div className="setting-panel">
           <div className="panel-icon">
-            <Clock3 size={18} />
+            <IconClock size={18} />
           </div>
           <div className="panel-content">
             <div className="setting-label-row">
@@ -158,7 +172,7 @@ export function TypingSettings({
 
       <label className={disabled ? "toggle-row disabled" : "toggle-row"}>
         <span className="panel-icon">
-          <Gauge size={18} />
+          <IconGauge size={18} />
         </span>
         <span className="toggle-copy">
           <strong>
@@ -191,7 +205,7 @@ export function TypingSettings({
         }
       >
         <span className="panel-icon">
-          <PanelsTopLeft size={18} />
+          <IconLayoutNavbar size={18} />
         </span>
         <span className="toggle-copy">
           <strong>
@@ -229,7 +243,7 @@ export function TypingSettings({
           }
         >
           <span className="panel-icon">
-            <Volume2 size={18} />
+            <IconVolume size={18} />
           </span>
           <span className="toggle-copy">
             <strong>
@@ -253,7 +267,7 @@ export function TypingSettings({
           }
         >
           <span className="panel-icon">
-            <Bell size={18} />
+            <IconBell size={18} />
           </span>
           <span className="toggle-copy">
             <strong>

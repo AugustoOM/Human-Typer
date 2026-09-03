@@ -1,4 +1,4 @@
-import { Eraser } from "lucide-react";
+import { IconEraser } from "@tabler/icons-react";
 import { countCharacters } from "../lib/typing";
 import { tr } from "../lib/i18n";
 import type { LanguagePreference } from "../types";
@@ -34,7 +34,7 @@ export function TextComposer({
             disabled={!text || disabled}
             title={tr(language, "Clear text", "Limpiar texto")}
           >
-            <Eraser size={15} />
+            <IconEraser size={15} />
             {tr(language, "Clear", "Limpiar")}
           </button>
         </div>

@@ -1,4 +1,4 @@
-import { Monitor, Moon, Sun } from "lucide-react";
+import { IconDeviceDesktop, IconMoon, IconSun } from "@tabler/icons-react";
 import { tr } from "../lib/i18n";
 import type { LanguagePreference, ThemePreference } from "../types";
 
@@ -9,9 +9,9 @@ interface ThemePickerProps {
 }
 
 const themes = [
-  { value: "system", label: "System", icon: Monitor },
-  { value: "light", label: "Light", icon: Sun },
-  { value: "dark", label: "Dark", icon: Moon },
+  { value: "system", label: "System", icon: IconDeviceDesktop },
+  { value: "light", label: "Light", icon: IconSun },
+  { value: "dark", label: "Dark", icon: IconMoon },
 ] as const;
 
 export function ThemePicker({ value, language, onChange }: ThemePickerProps) {

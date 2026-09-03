@@ -1,9 +1,9 @@
-import { Keyboard } from "lucide-react";
+import { IconKeyboard } from "@tabler/icons-react";
 
 export function BrandMark() {
   return (
     <div className="brand-mark" aria-hidden="true">
-      <Keyboard size={22} strokeWidth={2.1} />
+      <IconKeyboard size={22} stroke={1.8} />
     </div>
   );
 }
