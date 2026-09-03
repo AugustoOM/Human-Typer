@@ -148,9 +148,8 @@ jobs:
 
       - name: Package browser extension
         if: runner.os == 'Windows'
-        shell: bash
-        run: |
-          tar -a -c -f Human-Typer-Extension.zip -C chrome-extension .
+        shell: pwsh
+        run: Compress-Archive -Path chrome-extension\* -DestinationPath Human-Typer-Extension.zip
 
       - name: Upload browser extension to release assets
         if: runner.os == 'Windows'
