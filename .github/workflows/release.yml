@@ -1,4 +1,4 @@
-name: Publish desktop installers
+name: Publish release
 
 on:
   push:
@@ -9,8 +9,63 @@ permissions:
   contents: write
 
 jobs:
+  sign-firefox:
+    name: Sign Firefox extension
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: Validate Mozilla signing credentials
+        env:
+          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+          AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: |
+          if [[ -z "$AMO_JWT_ISSUER" || -z "$AMO_JWT_SECRET" ]]; then
+            echo "Mozilla signing credentials are missing." >&2
+            echo "Set AMO_JWT_ISSUER and AMO_JWT_SECRET as repository Actions secrets." >&2
+            exit 1
+          fi
+
+      - name: Validate Firefox extension
+        run: npx --yes web-ext@10.3.0 lint --source-dir chrome-extension
+
+      - name: Sign Firefox extension with Mozilla
+        env:
+          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+          AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: |
+          npx --yes web-ext@10.3.0 sign \
+            --source-dir chrome-extension \
+            --artifacts-dir web-ext-artifacts \
+            --channel unlisted \
+            --approval-timeout 900000 \
+            --api-key "$AMO_JWT_ISSUER" \
+            --api-secret "$AMO_JWT_SECRET"
+
+          signed_xpi="$(find web-ext-artifacts -maxdepth 1 -name '*.xpi' -print -quit)"
+          if [[ -z "$signed_xpi" ]]; then
+            echo "Mozilla did not return a signed XPI." >&2
+            exit 1
+          fi
+          mv "$signed_xpi" Human-Typer-Firefox-Extension.xpi
+
+      - name: Preserve signed Firefox extension
+        uses: actions/upload-artifact@v7
+        with:
+          name: signed-firefox-extension
+          path: Human-Typer-Firefox-Extension.xpi
+          if-no-files-found: error
+
   publish:
     name: ${{ matrix.name }}
+    needs: sign-firefox
     strategy:
       fail-fast: false
       matrix:
@@ -128,7 +183,7 @@ jobs:
           tagName: v__VERSION__
           releaseName: Human Typer v__VERSION__
           releaseBody: |
-            Human Typer 0.7.0 adds optional self-correcting typing mistakes using nearby keyboard keys, followed by a natural pause, Backspace, and the intended character.
+            Human Typer 0.7.1 adds a Mozilla-signed Firefox package, while retaining the optional self-correcting typing mistakes introduced in 0.7.0.
 
             The desktop app, browser extension, and web companion share this behavior. The extension also adopts the same cream color palette and Tabler icon system as the desktop app.
 
@@ -139,7 +194,8 @@ jobs:
             Downloads:
             - Windows: 64-bit `.exe` installer.
             - macOS: Apple Silicon `.dmg` image.
-            - Browser extension: `Human-Typer-Browser-Extension.zip` for Chrome, Edge, and Firefox.
+            - Chrome and Edge: `Human-Typer-Chrome-Extension.zip`.
+            - Firefox 140 or newer: Mozilla-signed `Human-Typer-Firefox-Extension.xpi`.
 
             On macOS, enable Human Typer in System Settings → Privacy & Security → Accessibility.
           releaseDraft: false
@@ -147,21 +203,6 @@ jobs:
           generateReleaseNotes: true
           args: ${{ matrix.args }}
           releaseAssetNamePattern: Human-Typer_[version]_[platform]_[arch][_setup].[ext]
-
-      - name: Package browser extension
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: Compress-Archive -Path chrome-extension\* -DestinationPath Human-Typer-Browser-Extension.zip
-
-      - name: Upload browser extension to release assets
-        if: runner.os == 'Windows'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: pwsh
-        run: >-
-          gh release upload "${{ github.ref_name }}"
-          Human-Typer-Browser-Extension.zip
-          --repo "${{ github.repository }}"
 
       - name: Verify macOS signature and notarization
         if: runner.os == 'macOS'
@@ -187,3 +228,35 @@ jobs:
             spctl --assess --type execute --verbose=2 "$app_path"
             xcrun stapler validate "$app_path"
           fi
+
+  browser-extensions:
+    name: Browser extensions
+    needs:
+      - sign-firefox
+      - publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Package Chrome and Edge extension
+        run: |
+          mkdir -p browser-artifacts
+          cd chrome-extension
+          zip -r ../browser-artifacts/Human-Typer-Chrome-Extension.zip .
+
+      - name: Download signed Firefox extension
+        uses: actions/download-artifact@v8
+        with:
+          name: signed-firefox-extension
+          path: browser-artifacts
+
+      - name: Upload browser extensions to release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ github.ref_name }}" \
+            browser-artifacts/Human-Typer-Chrome-Extension.zip \
+            browser-artifacts/Human-Typer-Firefox-Extension.xpi \
+            --repo "${{ github.repository }}"

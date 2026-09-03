@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Human Typer - Background Mode",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Automatically type at a human pace in Google Docs, Word Online, and any website in the background.",
   "permissions": ["activeTab", "scripting", "storage", "notifications"],
   "host_permissions": ["http://*/*", "https://*/*"],
@@ -12,7 +12,10 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "humantyper@desktop.app",
-      "strict_min_version": "109.0"
+      "strict_min_version": "140.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
     }
   }
 }
