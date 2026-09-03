@@ -61,6 +61,7 @@ function App() {
       variationMs: preferences.variationMs,
       countdownSeconds: preferences.countdownSeconds,
       punctuationPauses: preferences.punctuationPauses,
+      typingMistakes: preferences.typingMistakes,
       pauseOnFocusLoss: preferences.pauseOnFocusLoss,
     });
   }

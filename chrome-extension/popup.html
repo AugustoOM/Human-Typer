@@ -100,11 +100,18 @@
         <div class="options-grid">
           <label class="toggle-label">
             <input type="checkbox" id="pause-punct" checked />
+            <i class="ti ti-gauge" aria-hidden="true"></i>
             <span data-i18n="punctuationPauses">Punctuation pauses</span>
           </label>
           <label class="toggle-label">
             <input type="checkbox" id="notify-sound" checked />
+            <i class="ti ti-volume" aria-hidden="true"></i>
             <span data-i18n="completionSound">Completion sound</span>
+          </label>
+          <label class="toggle-label typing-mistakes-option">
+            <input type="checkbox" id="typing-mistakes" />
+            <i class="ti ti-keyboard" aria-hidden="true"></i>
+            <span data-i18n="typingMistakes">Typing mistakes</span>
           </label>
         </div>
 
@@ -123,7 +130,9 @@
         <div class="actions">
           <button type="button" id="start-btn" class="btn btn-primary">
             <i class="ti ti-player-play" aria-hidden="true"></i>
-            <span data-i18n="startTyping">Start Typing</span>
+            <span id="start-btn-label" data-i18n="startTyping"
+              >Start Typing</span
+            >
           </button>
           <div id="control-buttons" class="control-row" style="display: none">
             <button type="button" id="pause-btn" class="btn btn-secondary">

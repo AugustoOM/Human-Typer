@@ -197,6 +197,31 @@ export function TypingSettings({
         <span className="switch" aria-hidden="true" />
       </label>
 
+      <label className={disabled ? "toggle-row disabled" : "toggle-row"}>
+        <span className="panel-icon">
+          <IconKeyboard size={18} />
+        </span>
+        <span className="toggle-copy">
+          <strong>{tr(language, "Typing mistakes", "Errores de tipeo")}</strong>
+          <small>
+            {tr(
+              language,
+              "Occasionally presses a nearby key, deletes it, and types the correct letter",
+              "A veces pulsa una tecla cercana, la borra y escribe la letra correcta",
+            )}
+          </small>
+        </span>
+        <input
+          type="checkbox"
+          checked={preferences.typingMistakes}
+          disabled={disabled}
+          onChange={(event) =>
+            onChange({ typingMistakes: event.currentTarget.checked })
+          }
+        />
+        <span className="switch" aria-hidden="true" />
+      </label>
+
       <label
         className={
           disabled || !focusGuardSupported

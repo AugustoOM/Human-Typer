@@ -3,7 +3,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![Latest release](https://img.shields.io/github/v/release/AugustoOM/Human-Typer)](https://github.com/AugustoOM/Human-Typer/releases/latest)
 
-Human Typer is a lightweight desktop utility that types text character by character into the active field of another application. Its base speed, random timing variation, and punctuation pauses are configurable, producing a natural cadence without deliberately introducing mistakes.
+Human Typer is a lightweight desktop utility that types text character by character into the active field of another application. Its base speed, random timing variation, punctuation pauses, and optional self-corrected typing mistakes are configurable, producing a natural cadence.
 
 It is built with Tauri 2, React 19, TypeScript, and Rust. Everything runs locally on your device: there is no server, account, telemetry, or permanent storage of your text.
 
@@ -16,6 +16,7 @@ It is built with Tauri 2, React 19, TypeScript, and Rust. Everything runs locall
 - Includes predefined speeds and fine-grained adjustment from 15 to 350 ms.
 - Adds random timing variation and subtle natural fluctuations.
 - Supports optional pauses after `. , ; : ? !` and line breaks.
+- Can occasionally press a nearby letter, erase it, and immediately type the intended letter.
 - Can lock onto the target window and pause automatically if focus moves elsewhere on macOS or Windows.
 - Includes a bundled Chrome, Edge, and Firefox web companion for background typing in browser-based editors.
 - Can play a completion chime and show a desktop notification when a run finishes.
@@ -94,7 +95,7 @@ In CI or a macOS session that cannot automate Finder, run `CI=true npm run tauri
 
 1. Paste or enter content in **Your text**.
 2. Select a speed preset or adjust the delay slider in milliseconds.
-3. Configure timing variation, the countdown, and punctuation pauses.
+3. Configure timing variation, the countdown, punctuation pauses, and optional typing mistakes.
 4. Optionally enable **Protect target window** to prevent typing into another window if focus changes.
 5. Select **Start**.
 6. Focus the target text field during the countdown. With target protection enabled, the foreground window at the end of the countdown becomes the target.
@@ -161,7 +162,7 @@ React invokes Tauri commands and listens for state events. A native worker owns 
 
 ## Persistence and privacy
 
-Only the speed, variation, countdown, theme, punctuation, and target-window protection preferences are stored in `localStorage`. Text exists only in memory and is discarded when the application closes or reloads.
+Only the speed, variation, countdown, theme, punctuation, typing-mistake, and target-window protection preferences are stored in `localStorage`. Text exists only in memory and is discarded when the application closes or reloads.
 
 - Text is never sent over the network.
 - There are no analytics, crash reporting services, or user accounts.

@@ -17,6 +17,7 @@ export interface Preferences {
   variationMs: number;
   countdownSeconds: number;
   punctuationPauses: boolean;
+  typingMistakes: boolean;
   pauseOnFocusLoss: boolean;
   soundNotification: boolean;
   desktopNotification: boolean;
@@ -39,6 +40,7 @@ export interface TypingRequest {
   variationMs: number;
   countdownSeconds: number;
   punctuationPauses: boolean;
+  typingMistakes: boolean;
   pauseOnFocusLoss: boolean;
 }
 

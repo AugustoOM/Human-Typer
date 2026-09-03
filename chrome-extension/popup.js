@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
       pausedRange: "800 ms (Paused)",
       humanVariation: "Human variation",
       punctuationPauses: "Punctuation pauses",
+      typingMistakes: "Typing mistakes",
       completionSound: "Completion sound",
       ready: "Ready to start in this tab",
       startTyping: "Start Typing",
@@ -46,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
       pausedRange: "800 ms (Pausada)",
       humanVariation: "Variación humana",
       punctuationPauses: "Pausas de puntuación",
+      typingMistakes: "Errores de tipeo",
       completionSound: "Sonido al finalizar",
       ready: "Listo para comenzar en esta pestaña",
       startTyping: "Comenzar a escribir",
@@ -71,6 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const speedSlider = document.getElementById("speed-slider");
   const speedVal = document.getElementById("speed-val");
   const pausePunct = document.getElementById("pause-punct");
+  const typingMistakes = document.getElementById("typing-mistakes");
   const notifySound = document.getElementById("notify-sound");
   const startBtn = document.getElementById("start-btn");
   const statusText = document.getElementById("status-text");
@@ -78,6 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const progressBar = document.getElementById("progress-bar");
   const languageBtn = document.getElementById("language-btn");
   const languageLabel = document.getElementById("language-label");
+  const startBtnLabel = document.getElementById("start-btn-label");
 
   const variationSlider = document.getElementById("variation-slider");
   const variationVal = document.getElementById("variation-val");
@@ -120,6 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "speed",
       "variation",
       "pausePunct",
+      "typingMistakes",
       "notifySound",
       "language",
     ],
@@ -138,6 +143,8 @@ document.addEventListener("DOMContentLoaded", () => {
         variationVal.innerText = `±${res.variation} ms`;
       }
       if (res.pausePunct !== undefined) pausePunct.checked = res.pausePunct;
+      if (res.typingMistakes !== undefined)
+        typingMistakes.checked = res.typingMistakes;
       if (res.notifySound !== undefined) notifySound.checked = res.notifySound;
       applyLanguage();
     },
@@ -152,6 +159,10 @@ document.addEventListener("DOMContentLoaded", () => {
       element.placeholder = t(element.dataset.i18nPlaceholder);
     });
     languageLabel.textContent = language === "en" ? "ES" : "EN";
+    languageBtn.setAttribute(
+      "aria-label",
+      language === "en" ? "Cambiar a español" : "Switch to English",
+    );
     updateCharCount();
     updateSpeedLabel(Number(speedSlider.value));
   }
@@ -215,6 +226,10 @@ document.addEventListener("DOMContentLoaded", () => {
     savePreferences({ pausePunct: pausePunct.checked });
   });
 
+  typingMistakes.addEventListener("change", () => {
+    savePreferences({ typingMistakes: typingMistakes.checked });
+  });
+
   notifySound.addEventListener("change", () => {
     savePreferences({ notifySound: notifySound.checked });
   });
@@ -228,6 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
       baseDelayMs: Number(speedSlider.value),
       variationMs: variationSlider ? Number(variationSlider.value) : 35,
       punctuationPauses: pausePunct.checked,
+      typingMistakes: typingMistakes.checked,
       notifySound: notifySound.checked,
       language,
     };
@@ -251,7 +267,7 @@ document.addEventListener("DOMContentLoaded", () => {
       statusText.innerText = t("started");
       statusPercent.innerText = t("running");
       progressBar.style.width = "100%";
-      startBtn.innerText = t("sent");
+      startBtnLabel.innerText = t("sent");
       setTimeout(() => {
         window.close(); // Close the popup to free up the screen
       }, 700);
@@ -580,6 +596,140 @@ function injectTypingScript(config) {
     );
   }
 
+  function deletePreviousChar(targetInfo) {
+    if (!targetInfo) targetInfo = getTarget();
+    const target = targetInfo.element || targetInfo;
+    const doc = targetInfo.document || document;
+
+    if (targetInfo.isDocs) {
+      try {
+        target.dispatchEvent(
+          new KeyboardEvent("keydown", {
+            key: "Backspace",
+            code: "Backspace",
+            keyCode: 8,
+            which: 8,
+            bubbles: true,
+          }),
+        );
+        doc.execCommand("delete", false, null);
+        target.dispatchEvent(
+          new KeyboardEvent("keyup", {
+            key: "Backspace",
+            code: "Backspace",
+            keyCode: 8,
+            which: 8,
+            bubbles: true,
+          }),
+        );
+        return;
+      } catch {
+        // Fall through to the generic deletion methods.
+      }
+    }
+
+    if (
+      target &&
+      (target.tagName === "TEXTAREA" || target.tagName === "INPUT")
+    ) {
+      const start = target.selectionStart ?? target.value.length;
+      const end = target.selectionEnd ?? target.value.length;
+      if (start !== end) {
+        target.value =
+          target.value.substring(0, start) + target.value.substring(end);
+        target.selectionStart = target.selectionEnd = start;
+      } else if (start > 0) {
+        target.value =
+          target.value.substring(0, start - 1) + target.value.substring(end);
+        target.selectionStart = target.selectionEnd = start - 1;
+      }
+      target.dispatchEvent(
+        new InputEvent("input", {
+          inputType: "deleteContentBackward",
+          data: null,
+          bubbles: true,
+        }),
+      );
+      return;
+    }
+
+    try {
+      if (doc.execCommand("delete", false, null)) return;
+    } catch {
+      // Some editors only react to keyboard/input events.
+    }
+
+    target.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "Backspace",
+        code: "Backspace",
+        keyCode: 8,
+        which: 8,
+        bubbles: true,
+      }),
+    );
+    target.dispatchEvent(
+      new InputEvent("beforeinput", {
+        inputType: "deleteContentBackward",
+        data: null,
+        bubbles: true,
+      }),
+    );
+    target.dispatchEvent(
+      new InputEvent("input", {
+        inputType: "deleteContentBackward",
+        data: null,
+        bubbles: true,
+      }),
+    );
+    target.dispatchEvent(
+      new KeyboardEvent("keyup", {
+        key: "Backspace",
+        code: "Backspace",
+        keyCode: 8,
+        which: 8,
+        bubbles: true,
+      }),
+    );
+  }
+
+  const nearbyKeys = {
+    a: "qwsz",
+    b: "vghn",
+    c: "xdfv",
+    d: "serfvxc",
+    e: "wsdr",
+    f: "drtgvc",
+    g: "ftyhbv",
+    h: "gyujnb",
+    i: "ujko",
+    j: "huikmn",
+    k: "jiolm",
+    l: "kop",
+    m: "njk",
+    n: "bhjm",
+    o: "iklp",
+    p: "ol",
+    q: "wa",
+    r: "edft",
+    s: "awedxz",
+    t: "rfgy",
+    u: "yhji",
+    v: "cfgb",
+    w: "qase",
+    x: "zsdc",
+    y: "tghu",
+    z: "asx",
+  };
+
+  function nearbyTypo(char) {
+    if (!config.typingMistakes || Math.random() >= 0.05) return null;
+    const choices = nearbyKeys[char.toLowerCase()];
+    if (!choices) return null;
+    const typo = choices[Math.floor(Math.random() * choices.length)];
+    return char === char.toUpperCase() ? typo.toUpperCase() : typo;
+  }
+
   function isPunct(c) {
     return [".", ",", ";", ":", "?", "!", "\n"].includes(c);
   }
@@ -607,6 +757,13 @@ function injectTypingScript(config) {
     { type: "application/javascript" },
   );
   const worker = new Worker(URL.createObjectURL(blob));
+
+  function waitFor(ms) {
+    return new Promise((resolve) => {
+      worker.onmessage = () => resolve();
+      worker.postMessage(ms);
+    });
+  }
 
   async function loop() {
     let target = getTarget();
@@ -639,6 +796,14 @@ function injectTypingScript(config) {
       }
 
       const char = chars[currentIndex];
+      const typo = nearbyTypo(char);
+      if (typo) {
+        insertChar(typo, target);
+        await waitFor(90 + Math.random() * 160);
+        deletePreviousChar(target);
+        await waitFor(45 + Math.random() * 75);
+        if (isCancelled) return;
+      }
       insertChar(char, target);
       currentIndex++;
 
@@ -648,10 +813,7 @@ function injectTypingScript(config) {
       percentText.innerText = `${pct}%`;
 
       const delay = getDelay(char);
-      await new Promise((resolve) => {
-        worker.onmessage = () => resolve();
-        worker.postMessage(delay);
-      });
+      await waitFor(delay);
     }
 
     statusText.innerHTML = `<strong>${labels.completed}</strong>`;

@@ -9,6 +9,7 @@ export interface WebCompanionOptions {
   baseDelayMs: number;
   variationMs: number;
   punctuationPauses: boolean;
+  typingMistakes: boolean;
   notifyOnComplete: boolean;
   language: "en" | "es";
 }
@@ -21,6 +22,7 @@ export function generateWebCompanionScript(
     baseDelayMs: options.baseDelayMs,
     variationMs: options.variationMs,
     punctuationPauses: options.punctuationPauses,
+    typingMistakes: options.typingMistakes,
     notifyOnComplete: options.notifyOnComplete,
     labels:
       options.language === "es"
@@ -276,6 +278,60 @@ export function generateWebCompanionScript(
     target.dispatchEvent(new KeyboardEvent('keyup', { key: char, keyCode: code, which: code, bubbles: true }));
   }
 
+  function deletePreviousChar(targetInfo) {
+    if (!targetInfo) targetInfo = getActiveOrDocsTarget();
+    const target = targetInfo.element || targetInfo;
+    const doc = targetInfo.document || document;
+
+    if (targetInfo.isDocs) {
+      try {
+        target.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', code: 'Backspace', keyCode: 8, which: 8, bubbles: true }));
+        doc.execCommand('delete', false, null);
+        target.dispatchEvent(new KeyboardEvent('keyup', { key: 'Backspace', code: 'Backspace', keyCode: 8, which: 8, bubbles: true }));
+        return;
+      } catch(e) {}
+    }
+
+    if (target && (target.tagName === 'TEXTAREA' || target.tagName === 'INPUT')) {
+      const start = target.selectionStart ?? target.value.length;
+      const end = target.selectionEnd ?? target.value.length;
+      if (start !== end) {
+        target.value = target.value.substring(0, start) + target.value.substring(end);
+        target.selectionStart = target.selectionEnd = start;
+      } else if (start > 0) {
+        target.value = target.value.substring(0, start - 1) + target.value.substring(end);
+        target.selectionStart = target.selectionEnd = start - 1;
+      }
+      target.dispatchEvent(new InputEvent('input', { inputType: 'deleteContentBackward', data: null, bubbles: true }));
+      return;
+    }
+
+    try {
+      if (doc.execCommand('delete', false, null)) return;
+    } catch(e) {}
+
+    target.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', code: 'Backspace', keyCode: 8, which: 8, bubbles: true }));
+    target.dispatchEvent(new InputEvent('beforeinput', { inputType: 'deleteContentBackward', data: null, bubbles: true }));
+    target.dispatchEvent(new InputEvent('input', { inputType: 'deleteContentBackward', data: null, bubbles: true }));
+    target.dispatchEvent(new KeyboardEvent('keyup', { key: 'Backspace', code: 'Backspace', keyCode: 8, which: 8, bubbles: true }));
+  }
+
+  const nearbyKeys = {
+    a: 'qwsz', b: 'vghn', c: 'xdfv', d: 'serfvxc', e: 'wsdr',
+    f: 'drtgvc', g: 'ftyhbv', h: 'gyujnb', i: 'ujko', j: 'huikmn',
+    k: 'jiolm', l: 'kop', m: 'njk', n: 'bhjm', o: 'iklp', p: 'ol',
+    q: 'wa', r: 'edft', s: 'awedxz', t: 'rfgy', u: 'yhji',
+    v: 'cfgb', w: 'qase', x: 'zsdc', y: 'tghu', z: 'asx'
+  };
+
+  function nearbyTypo(char) {
+    if (!config.typingMistakes || Math.random() >= 0.05) return null;
+    const choices = nearbyKeys[char.toLowerCase()];
+    if (!choices) return null;
+    const typo = choices[Math.floor(Math.random() * choices.length)];
+    return char === char.toUpperCase() ? typo.toUpperCase() : typo;
+  }
+
   function isPunctuation(ch) {
     return ['.', ',', ';', ':', '?', '!', '\\n'].includes(ch);
   }
@@ -300,6 +356,13 @@ export function generateWebCompanionScript(
     };
   \`], { type: 'application/javascript' });
   const worker = new Worker(URL.createObjectURL(workerBlob));
+
+  function waitFor(ms) {
+    return new Promise(resolve => {
+      worker.onmessage = () => resolve();
+      worker.postMessage(ms);
+    });
+  }
 
   async function startTypingLoop() {
     isRunning = true;
@@ -339,6 +402,14 @@ export function generateWebCompanionScript(
       }
 
       const char = chars[currentIndex];
+      const typo = nearbyTypo(char);
+      if (typo) {
+        insertChar(typo, targetElement);
+        await waitFor(90 + Math.random() * 160);
+        deletePreviousChar(targetElement);
+        await waitFor(45 + Math.random() * 75);
+        if (isCancelled) return;
+      }
       insertChar(char, targetElement);
       currentIndex++;
 
@@ -348,10 +419,7 @@ export function generateWebCompanionScript(
       percentText.innerText = \`\${pct}%\`;
 
       const delay = calculateDelay(char);
-      await new Promise(resolve => {
-        worker.onmessage = () => resolve();
-        worker.postMessage(delay);
-      });
+      await waitFor(delay);
     }
 
     statusText.innerHTML = "<strong>" + config.labels.completed + "</strong>";

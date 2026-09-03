@@ -128,7 +128,9 @@ jobs:
           tagName: v__VERSION__
           releaseName: Human Typer v__VERSION__
           releaseBody: |
-            Human Typer 0.6.0 adds a persistent English/Spanish language selector to both the desktop app and browser extension, including dynamic typing controls and notifications.
+            Human Typer 0.7.0 adds optional self-correcting typing mistakes using nearby keyboard keys, followed by a natural pause, Backspace, and the intended character.
+
+            The desktop app, browser extension, and web companion share this behavior. The extension also adopts the same cream color palette and Tabler icon system as the desktop app.
 
             It includes the browser companion for Google Docs, Word Online, and other editors, plus optional target-window protection on macOS and Windows.
 

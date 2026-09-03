@@ -35,6 +35,7 @@ textarea,
 input {
   font: inherit;
 }
+
 button:focus-visible,
 textarea:focus-visible,
 input:focus-visible {
@@ -48,6 +49,7 @@ input:focus-visible {
   gap: 16px;
   padding: 18px;
 }
+
 .header,
 .brand,
 .setting-row,
@@ -58,14 +60,17 @@ input:focus-visible {
   display: flex;
   align-items: center;
 }
+
 .header {
   justify-content: space-between;
   padding-bottom: 14px;
   border-bottom: 1px solid var(--line);
 }
+
 .brand {
   gap: 10px;
 }
+
 .logo-badge {
   display: grid;
   place-items: center;
@@ -78,21 +83,25 @@ input:focus-visible {
   font-size: 19px;
   box-shadow: 0 4px 14px rgba(66, 57, 44, 0.06);
 }
+
 .brand h2 {
   color: var(--ink);
   font-size: 16px;
   font-weight: 700;
   letter-spacing: -0.03em;
 }
+
 .brand h2 span {
   color: var(--muted);
   font-weight: 450;
 }
+
 .badge {
   color: var(--muted);
   font-size: 10px;
   font-weight: 600;
 }
+
 .language-btn {
   gap: 5px;
   min-height: 34px;
@@ -105,6 +114,7 @@ input:focus-visible {
   font-size: 11px;
   font-weight: 700;
 }
+
 .language-btn:hover {
   border-color: var(--accent);
   background: var(--accent-soft);
@@ -117,12 +127,15 @@ input:focus-visible {
   display: flex;
   flex-direction: column;
 }
+
 .main {
   gap: 12px;
 }
+
 .field-group {
   gap: 7px;
 }
+
 .field-group label {
   display: flex;
   justify-content: space-between;
@@ -130,11 +143,13 @@ input:focus-visible {
   font-size: 11px;
   font-weight: 650;
 }
+
 .char-count {
   color: var(--faint);
   font-variant-numeric: tabular-nums;
   font-weight: 500;
 }
+
 textarea {
   width: 100%;
   min-height: 100px;
@@ -147,9 +162,11 @@ textarea {
   font-size: 13px;
   line-height: 1.55;
 }
+
 textarea::placeholder {
   color: var(--faint);
 }
+
 textarea:focus {
   border-color: var(--accent);
   outline: none;
@@ -162,30 +179,36 @@ textarea:focus {
   border-radius: 12px;
   background: var(--surface);
 }
+
 .settings-block {
   gap: 9px;
   padding: 12px;
 }
+
 .settings-block.compact {
   gap: 7px;
   padding: 10px 12px;
 }
+
 .setting-row {
   justify-content: space-between;
   color: var(--muted);
   font-size: 12px;
   font-weight: 600;
 }
+
 .setting-row strong {
   color: var(--ink);
   font-size: 11px;
   font-variant-numeric: tabular-nums;
 }
+
 .preset-buttons {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 5px;
 }
+
 .preset-btn {
   display: flex;
   min-width: 0;
@@ -204,32 +227,38 @@ textarea:focus {
   font-weight: 650;
   line-height: 1.1;
 }
+
 .preset-btn i {
   font-size: 15px;
 }
+
 .preset-btn:hover,
 .preset-btn.active {
   border-color: var(--accent);
   background: var(--accent-soft);
   color: var(--ink);
 }
+
 input[type="range"] {
   width: 100%;
   margin-top: 2px;
   accent-color: var(--accent);
   cursor: pointer;
 }
+
 .speed-labels {
   display: flex;
   justify-content: space-between;
   color: var(--faint);
   font-size: 9px;
 }
+
 .options-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 7px;
 }
+
 .toggle-label {
   gap: 7px;
   min-height: 38px;
@@ -241,13 +270,24 @@ input[type="range"] {
   cursor: pointer;
   font-size: 10px;
 }
+
+.toggle-label i {
+  flex: 0 0 auto;
+  font-size: 15px;
+}
+
 .toggle-label input {
   accent-color: var(--success);
+}
+
+.typing-mistakes-option {
+  grid-column: 1 / -1;
 }
 
 .status-card {
   padding: 11px 12px;
 }
+
 .status-info {
   justify-content: space-between;
   margin-bottom: 7px;
@@ -255,12 +295,14 @@ input[type="range"] {
   font-size: 10px;
   font-weight: 600;
 }
+
 .progress-bg {
   height: 5px;
   overflow: hidden;
   border-radius: 99px;
   background: var(--line);
 }
+
 .progress-fill {
   width: 0;
   height: 100%;
@@ -272,6 +314,7 @@ input[type="range"] {
 .actions {
   gap: 8px;
 }
+
 .btn {
   justify-content: center;
   gap: 7px;
@@ -284,35 +327,43 @@ input[type="range"] {
   font-size: 12px;
   font-weight: 700;
 }
+
 .btn-primary {
   border-color: var(--ink);
   background: var(--ink);
   color: var(--surface-raised);
 }
+
 .btn-primary:hover:not(:disabled) {
   background: #47423a;
 }
+
 .btn:disabled {
   cursor: not-allowed;
   opacity: 0.35;
 }
+
 .control-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
+
 .btn-secondary {
   background: var(--surface-raised);
   color: var(--ink);
 }
+
 .btn-secondary:hover {
   background: var(--accent-soft);
 }
+
 .btn-danger {
   border-color: #e5c9c1;
   background: var(--danger-soft);
   color: var(--danger);
 }
+
 .btn-danger:hover {
   background: #efd4cc;
 }

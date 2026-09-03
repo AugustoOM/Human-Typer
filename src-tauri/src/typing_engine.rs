@@ -14,6 +14,7 @@ use crate::platform;
 const MAX_CHARACTERS: usize = 250_000;
 const MAX_RUN_TIME: Duration = Duration::from_secs(8 * 60 * 60);
 const POLL_INTERVAL: Duration = Duration::from_millis(25);
+const TYPING_MISTAKE_CHANCE_PERCENT: u8 = 5;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -41,6 +42,7 @@ pub struct TypingRequest {
     pub variation_ms: u64,
     pub countdown_seconds: u64,
     pub punctuation_pauses: bool,
+    pub typing_mistakes: bool,
     pub pause_on_focus_loss: bool,
 }
 
@@ -125,7 +127,9 @@ impl TypingController {
     fn begin(&self, total: usize) -> Result<u64, String> {
         let mut runtime = self.lock();
         if runtime.status.is_active() {
-            return Err("Typing is already in progress. Cancel it before starting another run.".into());
+            return Err(
+                "Typing is already in progress. Cancel it before starting another run.".into(),
+            );
         }
         runtime.generation = runtime.generation.wrapping_add(1);
         runtime.status = TypingStatus::Countdown;
@@ -290,14 +294,60 @@ fn run_typing(
             return;
         }
 
+        if request.typing_mistakes
+            && let Some(typo) = random_nearby_key(character, &mut rng)
+        {
+            if let Err(error) = type_character(&mut enigo, typo) {
+                finish_with_error(
+                    &app,
+                    controller,
+                    generation,
+                    format!("Could not type a character. Check the system permissions: {error}"),
+                );
+                return;
+            }
+
+            let recognition_delay = Duration::from_millis(rng.random_range(90_u64..=250));
+            if !interruptible_sleep(
+                &app,
+                controller,
+                generation,
+                recognition_delay,
+                true,
+                focus_target.as_ref(),
+            ) {
+                return;
+            }
+
+            if let Err(error) = enigo.key(Key::Backspace, Direction::Click) {
+                finish_with_error(
+                    &app,
+                    controller,
+                    generation,
+                    format!("Could not type a character. Check the system permissions: {error}"),
+                );
+                return;
+            }
+
+            let correction_delay = Duration::from_millis(rng.random_range(45_u64..=120));
+            if !interruptible_sleep(
+                &app,
+                controller,
+                generation,
+                correction_delay,
+                true,
+                focus_target.as_ref(),
+            ) {
+                return;
+            }
+        }
+
         if let Err(error) = type_character(&mut enigo, character) {
             finish_with_error(
                 &app,
                 controller,
                 generation,
-                format!(
-                    "Could not type a character. Check the system permissions: {error}"
-                ),
+                format!("Could not type a character. Check the system permissions: {error}"),
             );
             return;
         }
@@ -354,6 +404,52 @@ fn type_character(enigo: &mut Enigo, character: char) -> Result<(), String> {
             .text(&character.to_string())
             .map_err(|error| error.to_string()),
     }
+}
+
+fn nearby_keys(character: char) -> Option<&'static [u8]> {
+    match character.to_ascii_lowercase() {
+        'a' => Some(b"qwsz"),
+        'b' => Some(b"vghn"),
+        'c' => Some(b"xdfv"),
+        'd' => Some(b"serfvxc"),
+        'e' => Some(b"wsdr"),
+        'f' => Some(b"drtgvc"),
+        'g' => Some(b"ftyhbv"),
+        'h' => Some(b"gyujnb"),
+        'i' => Some(b"ujko"),
+        'j' => Some(b"huikmn"),
+        'k' => Some(b"jiolm"),
+        'l' => Some(b"kop"),
+        'm' => Some(b"njk"),
+        'n' => Some(b"bhjm"),
+        'o' => Some(b"iklp"),
+        'p' => Some(b"ol"),
+        'q' => Some(b"wa"),
+        'r' => Some(b"edft"),
+        's' => Some(b"awedxz"),
+        't' => Some(b"rfgy"),
+        'u' => Some(b"yhji"),
+        'v' => Some(b"cfgb"),
+        'w' => Some(b"qase"),
+        'x' => Some(b"zsdc"),
+        'y' => Some(b"tghu"),
+        'z' => Some(b"asx"),
+        _ => None,
+    }
+}
+
+fn random_nearby_key(character: char, rng: &mut impl Rng) -> Option<char> {
+    if rng.random_range(0_u8..100) >= TYPING_MISTAKE_CHANCE_PERCENT {
+        return None;
+    }
+
+    let choices = nearby_keys(character)?;
+    let choice = choices[rng.random_range(0..choices.len())] as char;
+    Some(if character.is_ascii_uppercase() {
+        choice.to_ascii_uppercase()
+    } else {
+        choice
+    })
 }
 
 fn is_generation_active(controller: &TypingController, generation: u64) -> bool {
@@ -506,6 +602,17 @@ mod tests {
         }
         assert!(!is_punctuation('a'));
         assert!(!is_punctuation(' '));
+    }
+
+    #[test]
+    fn nearby_keys_match_the_physical_keyboard() {
+        let d_neighbors = nearby_keys('d').unwrap();
+        for neighbor in b"erfvxc" {
+            assert!(d_neighbors.contains(neighbor));
+        }
+        assert_eq!(nearby_keys('D'), nearby_keys('d'));
+        assert!(nearby_keys('ñ').is_none());
+        assert!(nearby_keys(' ').is_none());
     }
 
     #[test]

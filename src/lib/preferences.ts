@@ -12,6 +12,7 @@ export const DEFAULT_PREFERENCES: Preferences = {
   variationMs: 35,
   countdownSeconds: 5,
   punctuationPauses: true,
+  typingMistakes: false,
   pauseOnFocusLoss: false,
   soundNotification: true,
   desktopNotification: true,
@@ -54,6 +55,10 @@ export function parsePreferences(raw: string | null): Preferences {
         typeof value.punctuationPauses === "boolean"
           ? value.punctuationPauses
           : true,
+      typingMistakes:
+        typeof value.typingMistakes === "boolean"
+          ? value.typingMistakes
+          : false,
       pauseOnFocusLoss:
         typeof value.pauseOnFocusLoss === "boolean"
           ? value.pauseOnFocusLoss

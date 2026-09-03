@@ -59,6 +59,7 @@ export function WebCompanionModal({
     baseDelayMs: preferences.baseDelayMs,
     variationMs: preferences.variationMs,
     punctuationPauses: preferences.punctuationPauses,
+    typingMistakes: preferences.typingMistakes,
     notifyOnComplete: preferences.desktopNotification,
     language,
   });
@@ -316,8 +317,8 @@ export function WebCompanionModal({
             <span>
               {tr(
                 language,
-                `Includes your current speed (${preferences.baseDelayMs} ms), variation (±${preferences.variationMs} ms), punctuation pauses, and sound and desktop notifications on completion.`,
-                `Incluye tus ajustes actuales de velocidad (${preferences.baseDelayMs} ms), variación (±${preferences.variationMs} ms), pausas de puntuación y avisos con sonido y notificación al finalizar.`,
+                `Includes your current speed (${preferences.baseDelayMs} ms), variation (±${preferences.variationMs} ms), punctuation pauses, typing mistakes, and sound and desktop notifications on completion.`,
+                `Incluye tus ajustes actuales de velocidad (${preferences.baseDelayMs} ms), variación (±${preferences.variationMs} ms), pausas de puntuación, errores de tipeo y avisos con sonido y notificación al finalizar.`,
               )}
             </span>
           </div>

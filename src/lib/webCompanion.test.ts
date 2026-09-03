@@ -11,6 +11,7 @@ describe("webCompanion", () => {
       baseDelayMs: 70,
       variationMs: 20,
       punctuationPauses: true,
+      typingMistakes: true,
       notifyOnComplete: true,
       language: "en",
     });
@@ -19,6 +20,8 @@ describe("webCompanion", () => {
     expect(script).toContain('baseDelayMs":70');
     expect(script).toContain('variationMs":20');
     expect(script).toContain('punctuationPauses":true');
+    expect(script).toContain('typingMistakes":true');
+    expect(script).toContain("deletePreviousChar");
     expect(script).toContain("human-typer-companion-panel");
     expect(() => new Function(script)).not.toThrow();
   });
@@ -29,6 +32,7 @@ describe("webCompanion", () => {
       baseDelayMs: 60,
       variationMs: 15,
       punctuationPauses: false,
+      typingMistakes: false,
       notifyOnComplete: true,
       language: "es",
     });

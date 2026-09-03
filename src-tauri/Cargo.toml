@@ -1,6 +1,6 @@
 [package]
 name = "human-typer"
-version = "0.6.0"
+version = "0.7.0"
 description = "Natural, local, and controllable automatic typing"
 authors = ["Human Typer contributors"]
 license = "GPL-3.0-only"
