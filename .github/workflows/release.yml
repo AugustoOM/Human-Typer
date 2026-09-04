@@ -12,6 +12,8 @@ jobs:
   sign-firefox:
     name: Sign Firefox extension
     runs-on: ubuntu-latest
+    outputs:
+      signing_available: ${{ steps.credentials.outputs.available }}
 
     steps:
       - name: Checkout repository
@@ -23,20 +25,23 @@ jobs:
           node-version-file: .nvmrc
 
       - name: Validate Mozilla signing credentials
+        id: credentials
         env:
           AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
           AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
         run: |
           if [[ -z "$AMO_JWT_ISSUER" || -z "$AMO_JWT_SECRET" ]]; then
-            echo "Mozilla signing credentials are missing." >&2
-            echo "Set AMO_JWT_ISSUER and AMO_JWT_SECRET as repository Actions secrets." >&2
-            exit 1
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Mozilla signing credentials are unavailable; the Firefox XPI will be omitted."
+          else
+            echo "available=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Validate Firefox extension
         run: npx --yes web-ext@10.3.0 lint --source-dir chrome-extension
 
       - name: Sign Firefox extension with Mozilla
+        if: steps.credentials.outputs.available == 'true'
         env:
           AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
           AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
@@ -57,6 +62,7 @@ jobs:
           mv "$signed_xpi" Human-Typer-Firefox-Extension.xpi
 
       - name: Preserve signed Firefox extension
+        if: steps.credentials.outputs.available == 'true'
         uses: actions/upload-artifact@v7
         with:
           name: signed-firefox-extension
@@ -195,7 +201,7 @@ jobs:
             - Windows: 64-bit `.exe` installer.
             - macOS: Apple Silicon `.dmg` image.
             - Chrome and Edge: `Human-Typer-Chrome-Extension.zip`.
-            - Firefox 142 or newer: Mozilla-signed `Human-Typer-Firefox-Extension.xpi`.
+            - Firefox 142 or newer: Mozilla-signed `Human-Typer-Firefox-Extension.xpi` when Mozilla signing is configured.
 
             On macOS, enable Human Typer in System Settings → Privacy & Security → Accessibility.
           releaseDraft: false
@@ -247,16 +253,25 @@ jobs:
           zip -r ../browser-artifacts/Human-Typer-Chrome-Extension.zip .
 
       - name: Download signed Firefox extension
+        if: needs['sign-firefox'].outputs.signing_available == 'true'
         uses: actions/download-artifact@v8
         with:
           name: signed-firefox-extension
           path: browser-artifacts
 
-      - name: Upload browser extensions to release assets
+      - name: Upload Chrome and Edge extension to release assets
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release upload "${{ github.ref_name }}" \
             browser-artifacts/Human-Typer-Chrome-Extension.zip \
+            --repo "${{ github.repository }}"
+
+      - name: Upload Firefox extension to release assets
+        if: needs['sign-firefox'].outputs.signing_available == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ github.ref_name }}" \
             browser-artifacts/Human-Typer-Firefox-Extension.xpi \
             --repo "${{ github.repository }}"
