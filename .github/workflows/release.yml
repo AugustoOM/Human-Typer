@@ -195,7 +195,7 @@ jobs:
             - Windows: 64-bit `.exe` installer.
             - macOS: Apple Silicon `.dmg` image.
             - Chrome and Edge: `Human-Typer-Chrome-Extension.zip`.
-            - Firefox 140 or newer: Mozilla-signed `Human-Typer-Firefox-Extension.xpi`.
+            - Firefox 142 or newer: Mozilla-signed `Human-Typer-Firefox-Extension.xpi`.
 
             On macOS, enable Human Typer in System Settings → Privacy & Security → Accessibility.
           releaseDraft: false

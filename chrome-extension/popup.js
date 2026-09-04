@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const MAX_CHARACTERS = 250_000;
   const translations = {
     en: {
       background: "Background",
@@ -31,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
       running: "Running",
       sent: "Sent to tab",
       invalidTab: "Error: make sure you are on a valid tab",
+      tooLong: "Text cannot exceed 250,000 characters",
     },
     es: {
       background: "Segundo plano",
@@ -64,6 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
       running: "En curso",
       sent: "Enviado a la pestaña",
       invalidTab: "Error: asegurate de estar en una pestaña válida",
+      tooLong: "El texto no puede superar los 250.000 caracteres",
     },
   };
   let language = "en";
@@ -117,10 +120,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Load saved preferences
+  // Versions before 0.7.1 persisted the composed text. Remove that legacy
+  // value so text remains memory-only as promised by the privacy policy.
+  if (extensionStorage) {
+    extensionStorage.remove("savedText");
+  } else {
+    localStorage.removeItem("human-typer:savedText");
+  }
+
+  // Load non-sensitive preferences only.
   getStoredPreferences(
     [
-      "savedText",
       "speed",
       "variation",
       "pausePunct",
@@ -130,10 +140,6 @@ document.addEventListener("DOMContentLoaded", () => {
     ],
     (res) => {
       language = res.language === "es" ? "es" : "en";
-      if (res.savedText) {
-        textInput.value = res.savedText;
-        updateCharCount();
-      }
       if (res.speed) {
         speedSlider.value = res.speed;
         updateSpeedLabel(res.speed);
@@ -205,7 +211,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   textInput.addEventListener("input", () => {
     updateCharCount();
-    savePreferences({ savedText: textInput.value });
   });
 
   speedSlider.addEventListener("input", () => {
@@ -237,6 +242,10 @@ document.addEventListener("DOMContentLoaded", () => {
   startBtn.addEventListener("click", async () => {
     const text = textInput.value;
     if (!text.trim()) return;
+    if (Array.from(text).length > MAX_CHARACTERS) {
+      statusText.innerText = t("tooLong");
+      return;
+    }
 
     const config = {
       text,
@@ -340,30 +349,35 @@ function injectTypingScript(config) {
     userSelect: "none",
   });
 
-  panel.innerHTML = `
+  const panelDocument = new DOMParser().parseFromString(
+    `
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #d8d0c2; padding-bottom: 10px;">
       <span style="font-weight: 700; color: #2d2a25; display: flex; align-items: center; gap: 7px;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6a2 2 0 0 1 2 -2h16a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-16a2 2 0 0 1 -2 -2z"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M7 16h10"/></svg>
-        Human Typer <span style="font-size: 10px; background: #f4e7c9; color: #6f572c; padding: 3px 7px; border-radius: 999px;">${labels.background}</span>
+        Human Typer <span id="ht-background-label" style="font-size: 10px; background: #f4e7c9; color: #6f572c; padding: 3px 7px; border-radius: 999px;"></span>
       </span>
       <button id="ht-close-btn" aria-label="Close" style="display:grid;place-items:center;background: none; border: none; color: #6f6a60; cursor: pointer; padding:4px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 6l-12 12M6 6l12 12"/></svg></button>
     </div>
-    <div id="ht-status-text" style="color: #2d2a25; font-weight: 600;">${labels.startingPage}</div>
+    <div id="ht-status-text" style="color: #2d2a25; font-weight: 600;"></div>
     <div style="background: #d8d0c2; border-radius: 999px; height: 5px; overflow: hidden;">
       <div id="ht-progress-bar" style="width: 0%; height: 100%; background: #c99535; transition: width 0.1s linear;"></div>
     </div>
     <div style="display: flex; justify-content: space-between; font-size: 11px; color: #6f6a60;">
-      <span id="ht-count-text">0 / ${config.text.length} ${labels.characters}</span>
+      <span id="ht-count-text"></span>
       <span id="ht-percent-text">0%</span>
     </div>
     <div style="display: flex; gap: 8px; margin-top: 4px;">
-      <button id="ht-pause-btn" style="flex: 1; background: #2d2a25; color: #fffdf8; border: 1px solid #2d2a25; padding: 8px 12px; border-radius: 9px; font-weight: 600; cursor: pointer;">${labels.pause}</button>
-      <button id="ht-cancel-btn" style="background: #f5e4de; color: #a65345; border: 1px solid #e5c9c1; padding: 8px 12px; border-radius: 9px; font-weight: 600; cursor: pointer;">${labels.cancel}</button>
+      <button id="ht-pause-btn" style="flex: 1; background: #2d2a25; color: #fffdf8; border: 1px solid #2d2a25; padding: 8px 12px; border-radius: 9px; font-weight: 600; cursor: pointer;"></button>
+      <button id="ht-cancel-btn" style="background: #f5e4de; color: #a65345; border: 1px solid #e5c9c1; padding: 8px 12px; border-radius: 9px; font-weight: 600; cursor: pointer;"></button>
     </div>
-  `;
+  `,
+    "text/html",
+  );
+  panel.append(...panelDocument.body.children);
 
   document.body.appendChild(panel);
 
+  const backgroundLabel = panel.querySelector("#ht-background-label");
   const pauseBtn = panel.querySelector("#ht-pause-btn");
   const cancelBtn = panel.querySelector("#ht-cancel-btn");
   const closeBtn = panel.querySelector("#ht-close-btn");
@@ -371,6 +385,12 @@ function injectTypingScript(config) {
   const progressBar = panel.querySelector("#ht-progress-bar");
   const countText = panel.querySelector("#ht-count-text");
   const percentText = panel.querySelector("#ht-percent-text");
+
+  backgroundLabel.textContent = labels.background;
+  statusText.textContent = labels.startingPage;
+  countText.textContent = `0 / ${Array.from(config.text).length} ${labels.characters}`;
+  pauseBtn.textContent = labels.pause;
+  cancelBtn.textContent = labels.cancel;
 
   let isPaused = false;
   let isCancelled = false;
@@ -816,7 +836,8 @@ function injectTypingScript(config) {
       await waitFor(delay);
     }
 
-    statusText.innerHTML = `<strong>${labels.completed}</strong>`;
+    statusText.textContent = labels.completed;
+    statusText.style.fontWeight = "700";
     progressBar.style.background = "#55765c";
     pauseBtn.style.display = "none";
     cancelBtn.style.display = "none";
