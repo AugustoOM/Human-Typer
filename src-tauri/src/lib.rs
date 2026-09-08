@@ -3,7 +3,7 @@ mod typing_engine;
 
 use serde::Serialize;
 use tauri::Manager;
-use typing_engine::{TypingController, TypingRequest};
+use typing_engine::{SpreadsheetTypingRequest, TypingController, TypingRequest};
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -21,6 +21,15 @@ fn start_typing(
     request: TypingRequest,
 ) -> Result<(), String> {
     typing_engine::start_typing(app, controller, request)
+}
+
+#[tauri::command]
+fn start_spreadsheet_typing(
+    app: tauri::AppHandle,
+    controller: tauri::State<'_, TypingController>,
+    request: SpreadsheetTypingRequest,
+) -> Result<(), String> {
+    typing_engine::start_spreadsheet_typing(app, controller, request)
 }
 
 #[tauri::command]
@@ -104,6 +113,7 @@ pub fn run() {
     builder
         .invoke_handler(tauri::generate_handler![
             start_typing,
+            start_spreadsheet_typing,
             toggle_pause,
             cancel_typing,
             get_runtime_info,

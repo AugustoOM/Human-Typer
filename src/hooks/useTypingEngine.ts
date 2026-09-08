@@ -8,6 +8,7 @@ import {
 import type {
   LanguagePreference,
   Preferences,
+  SpreadsheetTypingRequest,
   RuntimeInfo,
   TypingRequest,
   TypingState,
@@ -101,16 +102,20 @@ export function useTypingEngine(preferences?: Preferences) {
     };
   }, [refreshRuntimeInfo]);
 
-  const start = useCallback(async (request: TypingRequest) => {
+  const start = useCallback(async (request: TypingRequest | SpreadsheetTypingRequest) => {
+    const isSpreadsheet = "rows" in request;
+    const total = isSpreadsheet
+      ? request.rows.flat().reduce((sum, cell) => sum + Array.from(cell).length, 0)
+      : Array.from(request.text).length;
     setState({
       status: "countdown",
       current: 0,
-      total: Array.from(request.text).length,
+      total,
       countdown: request.countdownSeconds,
       message: null,
     });
     try {
-      await invoke("start_typing", { request });
+      await invoke(isSpreadsheet ? "start_spreadsheet_typing" : "start_typing", { request });
     } catch (error) {
       setState((current) => ({
         ...current,

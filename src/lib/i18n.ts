@@ -17,6 +17,7 @@ export function localizeNativeMessage(
   const exact: Record<string, string> = {
     "Typing cancelled": "Escritura cancelada",
     "Text typed successfully": "Texto escrito correctamente",
+    "Spreadsheet filled successfully": "Planilla completada correctamente",
     "Automatically paused: the target window lost focus. Return to it and press F8 to continue.":
       "Pausa automática: la ventana objetivo perdió el foco. Volvé a ella y presioná F8 para continuar.",
     "Add some text before starting.": "Agregá algún texto antes de comenzar.",

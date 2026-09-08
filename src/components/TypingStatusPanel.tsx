@@ -15,6 +15,8 @@ interface TypingStatusPanelProps {
   state: TypingState;
   language: LanguagePreference;
   textLength: number;
+  spreadsheetCharacterCount: number;
+  spreadsheetLoaded: boolean;
   delayMs: number;
   onStart: () => void;
   onTogglePause: () => void;
@@ -26,6 +28,8 @@ export function TypingStatusPanel({
   state,
   language,
   textLength,
+  spreadsheetCharacterCount,
+  spreadsheetLoaded,
   delayMs,
   onStart,
   onTogglePause,
@@ -46,7 +50,8 @@ export function TypingStatusPanel({
     state.status === "typing" ||
     state.status === "paused";
   const canPause = state.status === "typing" || state.status === "paused";
-  const progress = calculateProgress(state.current, state.total || textLength);
+  const selectedLength = spreadsheetLoaded ? spreadsheetCharacterCount : textLength;
+  const progress = calculateProgress(state.current, state.total || selectedLength);
 
   return (
     <section
@@ -73,8 +78,8 @@ export function TypingStatusPanel({
               </strong>
             ) : (
               <strong>
-                {textLength
-                  ? `${textLength.toLocaleString(language)} ${tr(language, "characters", "caracteres")} · ${estimateDuration(textLength, delayMs)}`
+                {selectedLength
+                  ? `${selectedLength.toLocaleString(language)} ${tr(language, "characters", "caracteres")} · ${estimateDuration(selectedLength, delayMs)}`
                   : tr(
                       language,
                       "Paste some text to get started",
@@ -120,7 +125,7 @@ export function TypingStatusPanel({
           className="button primary"
           type="button"
           onClick={onStart}
-          disabled={!textLength || active}
+          disabled={!selectedLength || active}
           title={tr(
             language,
             "Type in the active window using native keyboard input",
@@ -134,7 +139,9 @@ export function TypingStatusPanel({
           )}
           {state.status === "completed" || state.status === "cancelled"
             ? tr(language, "Type again", "Escribir de nuevo")
-            : tr(language, "Start (Desktop)", "Comenzar (Escritorio)")}
+            : spreadsheetLoaded
+              ? tr(language, "Fill sheet", "Completar planilla")
+              : tr(language, "Start (Desktop)", "Comenzar (Escritorio)")}
         </button>
 
         <button

@@ -46,6 +46,16 @@ pub struct TypingRequest {
     pub pause_on_focus_loss: bool,
 }
 
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SpreadsheetTypingRequest {
+    pub rows: Vec<Vec<String>>,
+    pub base_delay_ms: u64,
+    pub variation_ms: u64,
+    pub countdown_seconds: u64,
+    pub pause_on_focus_loss: bool,
+}
+
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TypingEvent {
@@ -207,6 +217,72 @@ pub fn start_typing(
         );
     });
 
+    Ok(())
+}
+
+fn validate_spreadsheet_request(request: &SpreadsheetTypingRequest) -> Result<usize, String> {
+    if request.rows.is_empty() || request.rows.iter().all(|row| row.is_empty()) {
+        return Err("Choose a spreadsheet with at least one cell.".into());
+    }
+    let column_count = request.rows.first().map_or(0, Vec::len);
+    if column_count == 0 || request.rows.iter().any(|row| row.len() != column_count) {
+        return Err("The spreadsheet rows must all have the same number of columns.".into());
+    }
+    let cell_count = request.rows.len().saturating_mul(column_count);
+    if cell_count > 100_000 {
+        return Err("The spreadsheet exceeds the 100,000-cell limit.".into());
+    }
+    let total = request
+        .rows
+        .iter()
+        .flatten()
+        .map(|cell| cell.chars().count())
+        .sum();
+    if total == 0 {
+        return Err("The spreadsheet does not contain any values.".into());
+    }
+    if total > MAX_CHARACTERS {
+        return Err(format!(
+            "The spreadsheet exceeds the {MAX_CHARACTERS}-character limit."
+        ));
+    }
+    if !(15..=2_000).contains(&request.base_delay_ms) {
+        return Err("The base speed must be between 15 and 2000 ms.".into());
+    }
+    if request.variation_ms > 1_000 {
+        return Err("Variation cannot exceed 1000 ms.".into());
+    }
+    if !(1..=30).contains(&request.countdown_seconds) {
+        return Err("The countdown must be between 1 and 30 seconds.".into());
+    }
+    Ok(total)
+}
+
+pub fn start_spreadsheet_typing(
+    app: AppHandle,
+    controller: tauri::State<'_, TypingController>,
+    request: SpreadsheetTypingRequest,
+) -> Result<(), String> {
+    if request.pause_on_focus_loss && !platform::focus_guard_supported() {
+        return Err("Target window protection is only available on macOS and Windows.".into());
+    }
+    if !platform::accessibility_granted() {
+        platform::request_accessibility();
+        return Err("Human Typer needs Accessibility permission. Enable it in System Settings → Privacy & Security → Accessibility. If it is already enabled, quit and reopen Human Typer; a new build may require you to remove and add the app again.".into());
+    }
+    let total = validate_spreadsheet_request(&request)?;
+    let generation = controller.begin(total)?;
+    let app_for_worker = app.clone();
+    tauri::async_runtime::spawn_blocking(move || {
+        let controller = app_for_worker.state::<TypingController>();
+        run_spreadsheet_typing(
+            app_for_worker.clone(),
+            &controller,
+            generation,
+            request,
+            total,
+        );
+    });
     Ok(())
 }
 
@@ -389,6 +465,204 @@ fn run_typing(
         event_from_runtime(&runtime, Some("Text typed successfully".into()))
     };
     emit_event(&app, event);
+}
+
+fn run_spreadsheet_typing(
+    app: AppHandle,
+    controller: &TypingController,
+    generation: u64,
+    request: SpreadsheetTypingRequest,
+    total: usize,
+) {
+    for remaining in (1..=request.countdown_seconds).rev() {
+        if !is_generation_active(controller, generation) {
+            return;
+        }
+        emit_event(
+            &app,
+            TypingEvent {
+                status: TypingStatus::Countdown,
+                current: 0,
+                total,
+                countdown: Some(remaining),
+                message: None,
+            },
+        );
+        if !interruptible_sleep(
+            &app,
+            controller,
+            generation,
+            Duration::from_secs(1),
+            false,
+            None,
+        ) {
+            return;
+        }
+    }
+    let focus_target = if request.pause_on_focus_loss {
+        match platform::FocusedWindow::capture() {
+            Ok(target) => Some(target),
+            Err(error) => {
+                finish_with_error(&app, controller, generation, error);
+                return;
+            }
+        }
+    } else {
+        None
+    };
+    {
+        let mut runtime = controller.lock();
+        if runtime.generation != generation || runtime.status == TypingStatus::Cancelled {
+            return;
+        }
+        runtime.status = TypingStatus::Typing;
+        emit_event(&app, event_from_runtime(&runtime, None));
+    }
+    let mut enigo = match Enigo::new(&Settings::default()) {
+        Ok(enigo) => enigo,
+        Err(error) => {
+            finish_with_error(
+                &app,
+                controller,
+                generation,
+                format!("Could not start the simulated keyboard: {error}"),
+            );
+            return;
+        }
+    };
+    let started_at = Instant::now();
+    let mut rng = rand::rng();
+    let mut current = 0;
+    let last_row = request.rows.len() - 1;
+    let last_column = request.rows[0].len() - 1;
+
+    for (row_index, row) in request.rows.iter().enumerate() {
+        for (column_index, value) in row.iter().enumerate() {
+            for character in value.chars() {
+                if started_at.elapsed() > MAX_RUN_TIME {
+                    finish_with_error(
+                        &app,
+                        controller,
+                        generation,
+                        "The 8-hour safety limit was reached and typing was stopped.".into(),
+                    );
+                    return;
+                }
+                if !wait_until_ready(&app, controller, generation, focus_target.as_ref()) {
+                    return;
+                }
+                if let Err(error) = type_character(&mut enigo, character) {
+                    finish_with_error(
+                        &app,
+                        controller,
+                        generation,
+                        format!(
+                            "Could not type a character. Check the system permissions: {error}"
+                        ),
+                    );
+                    return;
+                }
+                current += 1;
+                {
+                    let mut runtime = controller.lock();
+                    if runtime.generation != generation {
+                        return;
+                    }
+                    runtime.current = current;
+                    emit_event(&app, event_from_runtime(&runtime, None));
+                }
+                let delay = randomized_delay(
+                    request.base_delay_ms,
+                    request.variation_ms,
+                    character,
+                    false,
+                    &mut rng,
+                );
+                if !interruptible_sleep(
+                    &app,
+                    controller,
+                    generation,
+                    delay,
+                    true,
+                    focus_target.as_ref(),
+                ) {
+                    return;
+                }
+            }
+            if column_index < last_column {
+                if !press_key(
+                    &mut enigo,
+                    Key::Tab,
+                    &app,
+                    controller,
+                    generation,
+                    focus_target.as_ref(),
+                ) {
+                    return;
+                }
+            }
+        }
+        if row_index < last_row {
+            // Excel's Home key moves to the first cell in the current row. This
+            // preserves blank cells and starts each source row in column A.
+            if !press_key(
+                &mut enigo,
+                Key::Home,
+                &app,
+                controller,
+                generation,
+                focus_target.as_ref(),
+            ) || !press_key(
+                &mut enigo,
+                Key::DownArrow,
+                &app,
+                controller,
+                generation,
+                focus_target.as_ref(),
+            ) {
+                return;
+            }
+        }
+    }
+    let event = {
+        let mut runtime = controller.lock();
+        if runtime.generation != generation {
+            return;
+        }
+        runtime.status = TypingStatus::Completed;
+        event_from_runtime(&runtime, Some("Spreadsheet filled successfully".into()))
+    };
+    emit_event(&app, event);
+}
+
+fn press_key(
+    enigo: &mut Enigo,
+    key: Key,
+    app: &AppHandle,
+    controller: &TypingController,
+    generation: u64,
+    focus_target: Option<&platform::FocusedWindow>,
+) -> bool {
+    if !wait_until_ready(app, controller, generation, focus_target) {
+        return false;
+    }
+    if let Err(error) = enigo.key(key, Direction::Click) {
+        finish_with_error(
+            app,
+            controller,
+            generation,
+            format!("Could not move to the next spreadsheet cell: {error}"),
+        );
+        return false;
+    }
+    interruptible_sleep(
+        app,
+        controller,
+        generation,
+        Duration::from_millis(20),
+        true,
+        focus_target,
+    )
 }
 
 fn type_character(enigo: &mut Enigo, character: char) -> Result<(), String> {

@@ -12,6 +12,7 @@ It is built with Tauri 2, React 19, TypeScript, and Rust. Everything runs locall
 ## Features
 
 - Types every character individually instead of pasting the whole text.
+- Imports the first worksheet of a local `.xlsx` or `.csv` file and fills the foreground spreadsheet cell by cell.
 - Supports Unicode, accented characters, `ñ`, `¿`, `¡`, symbols, spaces, tabs, and line breaks.
 - Includes predefined speeds and fine-grained adjustment from 15 to 350 ms.
 - Adds random timing variation and subtle natural fluctuations.
@@ -102,6 +103,14 @@ In CI or a macOS session that cannot automate Finder, run `CI=true npm run tauri
 7. Press `F8` to pause or resume, or `Esc` to cancel. After an automatic focus-loss pause, return to the target window before pressing `F8`.
 
 Editing and settings are locked while a run is active so the displayed progress always matches the text being typed.
+
+### Filling a spreadsheet
+
+1. Open a blank workbook in Excel (or a compatible spreadsheet application) and select the starting cell, normally `A1`.
+2. In Human Typer, choose **XLSX / CSV** in the **Spreadsheet** section. The first worksheet in an XLSX file is used.
+3. Select **Fill sheet**, then return to the workbook during the countdown. Keep it in the foreground.
+
+The spreadsheet mode writes each value as native keyboard input, uses `Tab` to advance through columns, and returns to the first column before moving to the next row. Blank cells are preserved. It reads files locally and limits imports to 100,000 cells and 250,000 characters. Embedded line breaks are converted to spaces because they would otherwise move Excel's selection to a different row.
 
 ## Shortcuts and safety
 

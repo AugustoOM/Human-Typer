@@ -44,6 +44,14 @@ export interface TypingRequest {
   pauseOnFocusLoss: boolean;
 }
 
+export interface SpreadsheetTypingRequest {
+  rows: string[][];
+  baseDelayMs: number;
+  variationMs: number;
+  countdownSeconds: number;
+  pauseOnFocusLoss: boolean;
+}
+
 export interface RuntimeInfo {
   platform: string;
   shortcutWarning: string | null;

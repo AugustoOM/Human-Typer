@@ -3,6 +3,7 @@ import { IconAlertTriangle } from "@tabler/icons-react";
 import { BrandMark } from "./components/BrandMark";
 import { LanguagePicker } from "./components/LanguagePicker";
 import { TextComposer } from "./components/TextComposer";
+import { SpreadsheetImporter } from "./components/SpreadsheetImporter";
 import { ThemePicker } from "./components/ThemePicker";
 import { TypingSettings } from "./components/TypingSettings";
 import { TypingStatusPanel } from "./components/TypingStatusPanel";
@@ -13,9 +14,11 @@ import { useTypingEngine } from "./hooks/useTypingEngine";
 import { countCharacters, isActiveStatus } from "./lib/typing";
 import { localizeNativeMessage, tr } from "./lib/i18n";
 import "./App.css";
+import type { SpreadsheetData } from "./lib/spreadsheet";
 
 function App() {
   const [text, setText] = useState("");
+  const [spreadsheet, setSpreadsheet] = useState<SpreadsheetData | null>(null);
   const [webCompanionOpen, setWebCompanionOpen] = useState(false);
   const { preferences, updatePreferences } = usePreferences();
   const {
@@ -55,6 +58,16 @@ function App() {
       : tr(preferences.language, "READY", "LISTO");
 
   function beginTyping() {
+    if (spreadsheet) {
+      void start({
+        rows: spreadsheet.rows,
+        baseDelayMs: preferences.baseDelayMs,
+        variationMs: preferences.variationMs,
+        countdownSeconds: preferences.countdownSeconds,
+        pauseOnFocusLoss: preferences.pauseOnFocusLoss,
+      });
+      return;
+    }
     void start({
       text,
       baseDelayMs: preferences.baseDelayMs,
@@ -139,10 +152,19 @@ function App() {
           />
         </div>
 
+        <SpreadsheetImporter
+          disabled={active}
+          language={preferences.language}
+          data={spreadsheet}
+          onChange={setSpreadsheet}
+        />
+
         <TypingStatusPanel
           state={state}
           language={preferences.language}
           textLength={textLength}
+          spreadsheetCharacterCount={spreadsheet?.characterCount ?? 0}
+          spreadsheetLoaded={Boolean(spreadsheet)}
           delayMs={preferences.baseDelayMs}
           onStart={beginTyping}
           onTogglePause={() => void togglePause()}

@@ -309,6 +309,42 @@ footer {
   text-transform: uppercase;
 }
 
+.section-heading p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font: 700 12px/1.35 var(--mono);
+}
+
+.spreadsheet-card {
+  margin-top: 18px;
+}
+
+.spreadsheet-card .section-heading > div {
+  min-width: 0;
+}
+
+.spreadsheet-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border: 2px solid var(--line);
+  background: var(--green-soft);
+}
+
+.spreadsheet-summary strong,
+.spreadsheet-summary span {
+  display: block;
+  font-family: var(--mono);
+}
+
+.spreadsheet-summary strong { font-size: 14px; }
+.spreadsheet-summary span { margin-top: 4px; color: var(--muted); font-size: 12px; }
+.spreadsheet-upload { width: 100%; justify-content: center; }
+.spreadsheet-error { margin: 10px 0 0; color: var(--red); font: 800 12px/1.35 var(--mono); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+
 .composer-actions {
   display: flex;
   align-items: center;
