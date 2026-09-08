@@ -189,7 +189,7 @@ jobs:
           tagName: v__VERSION__
           releaseName: Human Typer v__VERSION__
           releaseBody: |
-            Human Typer 0.7.1 adds a Mozilla-signed Firefox package, while retaining the optional self-correcting typing mistakes introduced in 0.7.0.
+            Human Typer 0.8.0 adds local XLSX and CSV import to fill a foreground spreadsheet cell by cell.
 
             The desktop app, browser extension, and web companion share this behavior. The extension also adopts the same cream color palette and Tabler icon system as the desktop app.
 
