@@ -104,6 +104,31 @@ In CI or a macOS session that cannot automate Finder, run `CI=true npm run tauri
 
 Editing and settings are locked while a run is active so the displayed progress always matches the text being typed.
 
+### Formatting and importing documents
+
+The text editor supports normal paragraphs, six heading levels, bold, italic,
+underline, and strikethrough. Select text to apply emphasis and use the paragraph
+style selector for headings. Subtitle uses Heading 2. Customize Heading 1–6 in
+Google Docs to apply your document's own fonts, sizes, and spacing.
+
+Enable **Apply formatting in Google Docs** before starting a formatted run. The
+native engine sends Google's formatting shortcuts at each style change while
+continuing to type character by character. Keep Google Docs in the foreground
+for desktop typing. Leave the option disabled to type plain text into other apps.
+The generated console script also includes formatting when enabled; browser
+editors may ignore synthetic formatting shortcuts, so use desktop typing if this
+happens. The standalone browser extension uses its own plain-text field.
+
+Choose **Attach DOCX / TXT** to replace the editor content with a local file.
+Word `.docx` files preserve headings and supported emphasis; `.txt` files preserve
+paragraphs. Old binary `.doc` files must first be saved as `.docx` in Word or Google
+Docs. For a Google Doc, download it as Microsoft Word (`.docx`) before attaching.
+Files are processed locally, with limits of 20 MB and 250,000 characters.
+Tables and lists become text. Images, page layout, fonts, and other unsupported
+styles are omitted; check the editor before starting transcription. Import errors
+leave the previous editor content intact. Neither the document nor its formatting
+is stored permanently.
+
 ### Filling a spreadsheet
 
 1. Open a blank workbook in Excel (or a compatible spreadsheet application) and select the starting cell, normally `A1`.
@@ -180,7 +205,7 @@ Only the speed, variation, countdown, theme, punctuation, typing-mistake, and ta
 
 ## Testing
 
-Pure frontend logic tests cover Unicode counting, progress, persistence, and duration estimates. Rust tests cover delay components, the minimum delay, punctuation, and the main control-state transitions. Real keystrokes are validated manually on each platform because automating them would create fragile tests and could type into the wrong application.
+Pure frontend logic tests cover Unicode counting, progress, persistence, duration estimates, document formatting ranges, sanitized imports, and an actual DOCX fixture. Rust tests cover delay components, the minimum delay, punctuation, and the main control-state transitions. Real keystrokes are validated manually on each platform because automating them would create fragile tests and could type into the wrong application.
 
 ```bash
 npm run check

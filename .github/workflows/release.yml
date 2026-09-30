@@ -189,11 +189,16 @@ jobs:
           tagName: v__VERSION__
           releaseName: Human Typer v__VERSION__
           releaseBody: |
-            Human Typer 0.8.0 adds local XLSX and CSV import to fill a foreground spreadsheet cell by cell.
+            Human Typer 0.9.0 adds a formatted text editor and local document import.
 
-            The desktop app, browser extension, and web companion share this behavior. The extension also adopts the same cream color palette and Tabler icon system as the desktop app.
+            - Format normal text, headings, subtitles (Heading 2), bold, italic, underline, and strikethrough.
+            - Import local Word (.docx) and text (.txt) files, preserving headings and supported emphasis. Convert legacy .doc files to .docx first.
+            - Enable Apply formatting in Google Docs to transcribe text character by character with formatting shortcuts. Customize Heading 1–6 in Google Docs for your own document design.
+            - Files are processed locally, with limits of 20 MB and 250,000 characters. Tables and lists become text; images and page layout are omitted.
 
-            It includes the browser companion for Google Docs, Word Online, and other editors, plus optional target-window protection on macOS and Windows.
+            The generated console companion can include the editor's formatting. Browser editors may ignore synthetic formatting shortcuts; use foreground desktop typing when this happens. The standalone extension retains its own plain-text field.
+
+            Existing XLSX / CSV spreadsheet import, typing controls, and target-window protection remain available.
 
             On macOS, the package retains valid ad-hoc signing and supports Developer ID signing with notarization when Apple credentials are configured.
 

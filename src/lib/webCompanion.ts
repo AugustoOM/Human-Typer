@@ -4,7 +4,10 @@
  * or watches videos in another window.
  */
 
+import type { FormattedRun } from "../types";
+
 export interface WebCompanionOptions {
+  formatRuns?: FormattedRun[];
   text: string;
   baseDelayMs: number;
   variationMs: number;
@@ -19,6 +22,7 @@ export function generateWebCompanionScript(
 ): string {
   const jsonConfig = JSON.stringify({
     text: options.text,
+    formatRuns: options.formatRuns ?? [],
     baseDelayMs: options.baseDelayMs,
     variationMs: options.variationMs,
     punctuationPauses: options.punctuationPauses,
@@ -206,7 +210,44 @@ export function generateWebCompanionScript(
     return { element: fallback, document: document, isDocs: false };
   }
 
-  function insertChar(char, targetInfo) {
+  const mac = /Mac|iPhone|iPad/.test(navigator.platform);
+  let activeMarks = [false, false, false, false];
+  function shortcut(targetInfo, key, alt = false, shift = false, primary = true) {
+    const opts = { key, code: key === "Enter" ? "Enter" : /^[0-9]$/.test(key) ? "Digit" + key : "Key" + key.toUpperCase(),
+      keyCode: key === "Enter" ? 13 : key.toUpperCase().charCodeAt(0),
+      bubbles: true, cancelable: true, altKey: alt, shiftKey: shift,
+      metaKey: primary && mac, ctrlKey: primary && !mac };
+    targetInfo.element.dispatchEvent(new KeyboardEvent("keydown", opts));
+    targetInfo.element.dispatchEvent(new KeyboardEvent("keyup", opts));
+  }
+  function applyFormat(run, targetInfo) {
+    const doc = targetInfo.document;
+    const commands = ["bold", "italic", "underline", "strikeThrough"];
+    const desired = [run.bold, run.italic, run.underline, run.strike];
+    if (targetInfo.isDocs) {
+      if (run.paragraphStart) {
+        shortcut(targetInfo, String.fromCharCode(92));
+        shortcut(targetInfo, String(run.heading), true);
+        activeMarks = [false, false, false, false];
+      }
+      commands.forEach((command, i) => {
+        if (desired[i] !== activeMarks[i]) {
+          shortcut(targetInfo, i === 3 ? (mac ? "x" : "5") : ["b", "i", "u"][i], i === 3 && !mac, i === 3, i !== 3 || mac);
+          activeMarks[i] = desired[i];
+        }
+      });
+    } else if (targetInfo.element.isContentEditable) {
+      if (run.paragraphStart) {
+        doc.execCommand("removeFormat", false, null);
+        doc.execCommand("formatBlock", false, run.heading ? "h" + run.heading : "p");
+      }
+      commands.forEach((command, i) => {
+        if (doc.queryCommandState(command) !== desired[i]) doc.execCommand(command, false, null);
+      });
+    }
+  }
+
+  function insertChar(char, targetInfo, softBreak = false) {
     if (!targetInfo) targetInfo = getActiveOrDocsTarget();
     const target = targetInfo.element || targetInfo;
     const doc = targetInfo.document || document;
@@ -215,10 +256,10 @@ export function generateWebCompanionScript(
     if (targetInfo.isDocs) {
       try {
         if (char === '\\n') {
-          target.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
-          target.dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
-          doc.execCommand('insertParagraph', false, null) || doc.execCommand('insertLineBreak', false, null);
-          target.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
+          target.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, shiftKey: softBreak, bubbles: true }));
+          target.dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, shiftKey: softBreak, bubbles: true }));
+          doc.execCommand(softBreak ? 'insertLineBreak' : 'insertParagraph', false, null);
+          target.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, shiftKey: softBreak, bubbles: true }));
           return;
         }
 
@@ -235,7 +276,7 @@ export function generateWebCompanionScript(
     try {
       if (char === '\\n') {
         target.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true }));
-        doc.execCommand('insertParagraph', false, null) || doc.execCommand('insertLineBreak', false, null);
+        doc.execCommand(softBreak ? 'insertLineBreak' : 'insertParagraph', false, null);
         return;
       }
       
@@ -389,6 +430,7 @@ export function generateWebCompanionScript(
     const chars = Array.from(config.text);
     const total = chars.length;
 
+    let runIndex = 0;
     while (currentIndex < total) {
       if (isCancelled) {
         statusText.innerText = config.labels.cancelled;
@@ -401,6 +443,9 @@ export function generateWebCompanionScript(
         continue;
       }
 
+      while (runIndex + 1 < config.formatRuns.length && currentIndex >= config.formatRuns[runIndex].end) runIndex++;
+      const run = config.formatRuns[runIndex];
+      if (run && run.start === currentIndex) applyFormat(run, targetElement);
       const char = chars[currentIndex];
       const typo = nearbyTypo(char);
       if (typo) {
@@ -410,7 +455,7 @@ export function generateWebCompanionScript(
         await waitFor(45 + Math.random() * 75);
         if (isCancelled) return;
       }
-      insertChar(char, targetElement);
+      insertChar(char, targetElement, run && run.softBreak);
       currentIndex++;
 
       const pct = Math.round((currentIndex / total) * 100);

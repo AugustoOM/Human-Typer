@@ -26,6 +26,44 @@ describe("webCompanion", () => {
     expect(() => new Function(script)).not.toThrow();
   });
 
+  it("includes Unicode format ranges and executable formatting commands", () => {
+    const script = generateWebCompanionScript({
+      text: "😀\nBold",
+      baseDelayMs: 60,
+      variationMs: 0,
+      punctuationPauses: false,
+      typingMistakes: false,
+      notifyOnComplete: false,
+      language: "es",
+      formatRuns: [
+        {
+          start: 0,
+          end: 2,
+          heading: 2,
+          paragraphStart: true,
+          bold: false,
+          italic: false,
+          underline: false,
+          strike: false,
+        },
+        {
+          start: 2,
+          end: 6,
+          heading: 0,
+          paragraphStart: true,
+          bold: true,
+          italic: true,
+          underline: true,
+          strike: true,
+        },
+      ],
+    });
+    expect(script).toContain('"start":2,"end":6');
+    expect(script).toContain("applyFormat(run, targetElement)");
+    expect(script).toContain('mac ? "x" : "5"');
+    expect(() => new Function(script)).not.toThrow();
+  });
+
   it("generates valid javascript: URL for bookmarklet", () => {
     const href = generateBookmarkletHref({
       text: "Prueba bookmarklet",

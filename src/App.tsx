@@ -14,10 +14,13 @@ import { useTypingEngine } from "./hooks/useTypingEngine";
 import { countCharacters, isActiveStatus } from "./lib/typing";
 import { localizeNativeMessage, tr } from "./lib/i18n";
 import "./App.css";
+import type { FormattedRun } from "./types";
 import type { SpreadsheetData } from "./lib/spreadsheet";
 
 function App() {
   const [text, setText] = useState("");
+  const [formatRuns, setFormatRuns] = useState<FormattedRun[]>([]);
+  const [preserveFormatting, setPreserveFormatting] = useState(false);
   const [spreadsheet, setSpreadsheet] = useState<SpreadsheetData | null>(null);
   const [webCompanionOpen, setWebCompanionOpen] = useState(false);
   const { preferences, updatePreferences } = usePreferences();
@@ -70,6 +73,7 @@ function App() {
     }
     void start({
       text,
+      formatRuns: preserveFormatting ? formatRuns : undefined,
       baseDelayMs: preferences.baseDelayMs,
       variationMs: preferences.variationMs,
       countdownSeconds: preferences.countdownSeconds,
@@ -138,11 +142,14 @@ function App() {
 
         <div className="workspace-grid">
           <TextComposer
-            text={text}
             disabled={active}
             language={preferences.language}
-            onChange={setText}
-            onClear={() => setText("")}
+            preserveFormatting={preserveFormatting}
+            onFormattingChange={setPreserveFormatting}
+            onChange={(value, runs) => {
+              setText(value);
+              setFormatRuns(runs);
+            }}
           />
           <TypingSettings
             preferences={preferences}
@@ -176,6 +183,7 @@ function App() {
           isOpen={webCompanionOpen}
           onClose={() => setWebCompanionOpen(false)}
           text={text}
+          formatRuns={preserveFormatting ? formatRuns : undefined}
           preferences={preferences}
         />
       </main>

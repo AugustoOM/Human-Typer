@@ -12,12 +12,13 @@ import {
 import { downloadExtensionZip } from "../lib/extensionPacker";
 import { generateWebCompanionScript } from "../lib/webCompanion";
 import { tr } from "../lib/i18n";
-import type { Preferences } from "../types";
+import type { FormattedRun, Preferences } from "../types";
 
 interface WebCompanionModalProps {
   isOpen: boolean;
   onClose: () => void;
   text: string;
+  formatRuns?: FormattedRun[];
   preferences: Preferences;
 }
 
@@ -25,6 +26,7 @@ export function WebCompanionModal({
   isOpen,
   onClose,
   text,
+  formatRuns,
   preferences,
 }: WebCompanionModalProps) {
   const [copiedCode, setCopiedCode] = useState(false);
@@ -56,6 +58,7 @@ export function WebCompanionModal({
         "Sample text for Human Typer...",
         "Texto de ejemplo para Human Typer...",
       ),
+    formatRuns,
     baseDelayMs: preferences.baseDelayMs,
     variationMs: preferences.variationMs,
     punctuationPauses: preferences.punctuationPauses,
@@ -127,6 +130,16 @@ export function WebCompanionModal({
         </header>
 
         <div className="modal-body">
+          {Boolean(formatRuns?.length) && (
+            <p className="modal-tip-box">
+              {tr(
+                language,
+                "To include this editor's text and formatting, use Copy Code for Console below. The extension has its own text field. If Google Docs ignores background formatting, use the desktop Start button with the document in the foreground.",
+                "Para incluir el texto y formato de este editor, usá Copiar código para la consola. La extensión tiene su propio campo de texto. Si Google Docs ignora el formato en segundo plano, usá Comenzar en la app de escritorio con el documento en primer plano.",
+              )}
+            </p>
+          )}
+
           <div className="feature-banner">
             <IconSparkles size={20} className="feature-icon" />
             <div>

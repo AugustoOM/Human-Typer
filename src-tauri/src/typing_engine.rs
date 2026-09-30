@@ -38,12 +38,29 @@ impl TypingStatus {
 #[serde(rename_all = "camelCase")]
 pub struct TypingRequest {
     pub text: String,
+    #[serde(default)]
+    pub format_runs: Vec<FormattedRun>,
     pub base_delay_ms: u64,
     pub variation_ms: u64,
     pub countdown_seconds: u64,
     pub punctuation_pauses: bool,
     pub typing_mistakes: bool,
     pub pause_on_focus_loss: bool,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FormattedRun {
+    start: usize,
+    end: usize,
+    heading: u8,
+    paragraph_start: bool,
+    #[serde(default)]
+    soft_break: bool,
+    bold: bool,
+    italic: bool,
+    underline: bool,
+    strike: bool,
 }
 
 #[derive(Debug, Deserialize)]
@@ -173,6 +190,7 @@ fn validate_request(request: &TypingRequest) -> Result<usize, String> {
             "The text exceeds the {MAX_CHARACTERS}-character limit. Split it into smaller sections."
         ));
     }
+    validate_format_runs(&request.text, &request.format_runs)?;
     if !(15..=2_000).contains(&request.base_delay_ms) {
         return Err("The base speed must be between 15 and 2000 ms.".into());
     }
@@ -183,6 +201,30 @@ fn validate_request(request: &TypingRequest) -> Result<usize, String> {
         return Err("The countdown must be between 1 and 30 seconds.".into());
     }
     Ok(total)
+}
+
+fn validate_format_runs(text: &str, runs: &[FormattedRun]) -> Result<(), String> {
+    if runs.is_empty() {
+        return Ok(());
+    }
+    let chars: Vec<char> = text.chars().collect();
+    let mut end = 0;
+    for run in runs {
+        if run.start != end || run.end <= run.start || run.end > chars.len() || run.heading > 6 {
+            return Err("Invalid document formatting ranges.".into());
+        }
+        if run.paragraph_start && run.start > 0 && chars[run.start - 1] != '\n' {
+            return Err("Paragraph formatting must start at a paragraph boundary.".into());
+        }
+        if run.soft_break && (run.end != run.start + 1 || chars[run.start] != '\n') {
+            return Err("Invalid document line break.".into());
+        }
+        end = run.end;
+    }
+    if end != chars.len() || !runs[0].paragraph_start {
+        return Err("Document formatting must cover the entire text.".into());
+    }
+    Ok(())
 }
 
 pub fn start_typing(
@@ -355,6 +397,8 @@ fn run_typing(
 
     let started_at = Instant::now();
     let mut rng = rand::rng();
+    let mut run_index = 0;
+    let mut active_marks = [false; 4];
     for (index, character) in request.text.chars().enumerate() {
         if started_at.elapsed() > MAX_RUN_TIME {
             finish_with_error(
@@ -368,6 +412,36 @@ fn run_typing(
 
         if !wait_until_ready(&app, controller, generation, focus_target.as_ref()) {
             return;
+        }
+
+        while run_index + 1 < request.format_runs.len()
+            && index >= request.format_runs[run_index].end
+        {
+            run_index += 1;
+        }
+        let format = request.format_runs.get(run_index);
+        if let Some(run) = format {
+            if index == run.start {
+                if let Err(error) = apply_document_format(&mut enigo, run, &mut active_marks) {
+                    finish_with_error(
+                        &app,
+                        controller,
+                        generation,
+                        format!("Could not apply document formatting: {error}"),
+                    );
+                    return;
+                }
+                if !interruptible_sleep(
+                    &app,
+                    controller,
+                    generation,
+                    Duration::from_millis(40),
+                    true,
+                    focus_target.as_ref(),
+                ) {
+                    return;
+                }
+            }
         }
 
         if request.typing_mistakes
@@ -418,7 +492,12 @@ fn run_typing(
             }
         }
 
-        if let Err(error) = type_character(&mut enigo, character) {
+        let typed = if character == '\n' && format.is_some_and(|run| run.soft_break) {
+            keyboard_shortcut(&mut enigo, &[Key::Shift], Key::Return)
+        } else {
+            type_character(&mut enigo, character)
+        };
+        if let Err(error) = typed {
             finish_with_error(
                 &app,
                 controller,
@@ -665,6 +744,79 @@ fn press_key(
     )
 }
 
+fn primary_modifier() -> Key {
+    if cfg!(target_os = "macos") {
+        Key::Meta
+    } else {
+        Key::Control
+    }
+}
+
+// Always release modifiers, even if a keyboard event fails.
+fn keyboard_shortcut(enigo: &mut Enigo, modifiers: &[Key], key: Key) -> Result<(), String> {
+    let mut pressed = Vec::new();
+    let mut result = Ok(());
+    for modifier in modifiers {
+        if let Err(error) = enigo.key(*modifier, Direction::Press) {
+            result = Err(error.to_string());
+            break;
+        }
+        pressed.push(*modifier);
+    }
+    if result.is_ok() {
+        result = enigo
+            .key(key, Direction::Click)
+            .map_err(|error| error.to_string());
+    }
+    for modifier in pressed.into_iter().rev() {
+        if let Err(error) = enigo.key(modifier, Direction::Release) {
+            if result.is_ok() {
+                result = Err(error.to_string());
+            }
+        }
+    }
+    result
+}
+
+fn apply_document_format(
+    enigo: &mut Enigo,
+    run: &FormattedRun,
+    active: &mut [bool; 4],
+) -> Result<(), String> {
+    let primary = primary_modifier();
+    if run.paragraph_start {
+        keyboard_shortcut(enigo, &[primary], Key::Unicode('\\'))?;
+        keyboard_shortcut(
+            enigo,
+            &[primary, Key::Alt],
+            Key::Unicode(char::from(b'0' + run.heading)),
+        )?;
+        *active = [false; 4];
+    }
+    let desired = [run.bold, run.italic, run.underline, run.strike];
+    for (index, key) in ['b', 'i', 'u', '5'].into_iter().enumerate() {
+        if desired[index] != active[index] {
+            let modifiers = if index == 3 {
+                if cfg!(target_os = "macos") {
+                    vec![primary, Key::Shift]
+                } else {
+                    vec![Key::Alt, Key::Shift]
+                }
+            } else {
+                vec![primary]
+            };
+            let shortcut_key = if index == 3 && cfg!(target_os = "macos") {
+                'x'
+            } else {
+                key
+            };
+            keyboard_shortcut(enigo, &modifiers, Key::Unicode(shortcut_key))?;
+            active[index] = desired[index];
+        }
+    }
+    Ok(())
+}
+
 fn type_character(enigo: &mut Enigo, character: char) -> Result<(), String> {
     match character {
         '\n' => enigo
@@ -868,6 +1020,52 @@ pub fn apply_delay_components(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn format_run(start: usize, end: usize, paragraph_start: bool) -> FormattedRun {
+        FormattedRun {
+            start,
+            end,
+            paragraph_start,
+            heading: 0,
+            soft_break: false,
+            bold: false,
+            italic: false,
+            underline: false,
+            strike: false,
+        }
+    }
+
+    #[test]
+    fn format_ranges_count_unicode_and_reject_gaps_overlap_and_out_of_bounds() {
+        assert!(
+            validate_format_runs("😀a\nb", &[format_run(0, 3, true), format_run(3, 4, true)])
+                .is_ok()
+        );
+        for runs in [
+            vec![format_run(0, 5, true)],
+            vec![format_run(1, 4, true)],
+            vec![format_run(0, 2, true), format_run(1, 4, false)],
+            vec![format_run(0, 1, true), format_run(2, 4, false)],
+            vec![format_run(0, 0, true)],
+        ] {
+            assert!(validate_format_runs("😀a\nb", &runs).is_err());
+        }
+        assert!(validate_format_runs("plain", &[]).is_ok());
+    }
+
+    #[test]
+    fn formatting_rejects_invalid_heading_and_paragraph_boundaries() {
+        let mut run = format_run(0, 1, true);
+        run.heading = 7;
+        assert!(validate_format_runs("a", &[run]).is_err());
+        assert!(
+            validate_format_runs("ab", &[format_run(0, 1, true), format_run(1, 2, true)]).is_err()
+        );
+        let mut soft = format_run(1, 2, false);
+        soft.soft_break = true;
+        assert!(validate_format_runs("a\n", &[format_run(0, 1, true), soft.clone()]).is_ok());
+        assert!(validate_format_runs("ab", &[format_run(0, 1, true), soft]).is_err());
+    }
 
     #[test]
     fn detects_supported_punctuation() {

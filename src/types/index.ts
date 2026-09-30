@@ -34,7 +34,20 @@ export interface TypingState {
   message: string | null;
 }
 
+export interface FormattedRun {
+  start: number;
+  end: number;
+  heading: number;
+  paragraphStart: boolean;
+  softBreak?: boolean;
+  bold: boolean;
+  italic: boolean;
+  underline: boolean;
+  strike: boolean;
+}
+
 export interface TypingRequest {
+  formatRuns?: FormattedRun[];
   text: string;
   baseDelayMs: number;
   variationMs: number;
