@@ -189,18 +189,18 @@ jobs:
           tagName: v__VERSION__
           releaseName: Human Typer v__VERSION__
           releaseBody: |
-            Human Typer 0.9.0 adds a formatted text editor and local document import.
+            Human Typer 0.11.0 adds extension pairing and import previews.
 
-            - Format normal text, headings, subtitles (Heading 2), bold, italic, underline, and strikethrough.
-            - Import local Word (.docx) and text (.txt) files, preserving headings and supported emphasis. Convert legacy .doc files to .docx first.
-            - Enable Apply formatting in Google Docs to transcribe text character by character with formatting shortcuts. Customize Heading 1–6 in Google Docs for your own document design.
-            - Files are processed locally, with limits of 20 MB and 250,000 characters. Tables and lists become text; images and page layout are omitted.
+            - Send formatted text and typing settings from the desktop app to a paired extension, select a Google Docs tab, and control preparation, start, pause, and cancellation.
+            - Preview DOCX / TXT before replacing editor content; cancel preserves the previous text.
+            - Preview XLSX / CSV, select a worksheet and source range, and optionally skip the first row. Original values, formulas, and number formats remain available for future API integration.
+            - Display character and word counts in the editor and import previews.
+            - Share the web typing runner between the extension and console companion.
+            - Correct installer asset names to use a single dot before the extension.
 
-            The generated console companion can include the editor's formatting. Browser editors may ignore synthetic formatting shortcuts; use foreground desktop typing when this happens. The standalone extension retains its own plain-text field.
+            Google OAuth sign-in and live Docs / Sheets API calls are not included yet. Request builders and developer setup documentation are prepared; version 1.0.0 is reserved until Google configuration and integration are complete.
 
-            Existing XLSX / CSV spreadsheet import, typing controls, and target-window protection remain available.
-
-            On macOS, the package retains valid ad-hoc signing and supports Developer ID signing with notarization when Apple credentials are configured.
+            End-to-end pairing and synthetic Google Docs formatting still require validation with installed browser extensions. Browser editors may ignore synthetic input; foreground desktop typing remains available.
 
             Downloads:
             - Windows: 64-bit `.exe` installer.
@@ -213,7 +213,7 @@ jobs:
           prerelease: false
           generateReleaseNotes: true
           args: ${{ matrix.args }}
-          releaseAssetNamePattern: Human-Typer_[version]_[platform]_[arch][_setup].[ext]
+          releaseAssetNamePattern: Human-Typer_[version]_[platform]_[arch][_setup][ext]
 
       - name: Verify macOS signature and notarization
         if: runner.os == 'macOS'

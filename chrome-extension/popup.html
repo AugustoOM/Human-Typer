@@ -26,6 +26,19 @@
       </header>
 
       <main class="main">
+        <section class="settings-block">
+          <label for="bridge-code">Human Typer desktop / escritorio</label>
+          <input
+            id="bridge-code"
+            type="text"
+            autocomplete="off"
+            placeholder="Código de conexión / Pairing code"
+          />
+          <button id="bridge-connect" type="button" class="btn btn-secondary">
+            Conectar / Connect
+          </button>
+          <span id="bridge-status" role="status"></span>
+        </section>
         <div class="field-group">
           <label for="text-input">
             <span data-i18n="textToType">Text to type</span>
@@ -148,6 +161,7 @@
         </div>
       </main>
     </div>
+    <script src="runner.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>

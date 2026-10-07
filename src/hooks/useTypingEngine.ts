@@ -102,29 +102,37 @@ export function useTypingEngine(preferences?: Preferences) {
     };
   }, [refreshRuntimeInfo]);
 
-  const start = useCallback(async (request: TypingRequest | SpreadsheetTypingRequest) => {
-    const isSpreadsheet = "rows" in request;
-    const total = isSpreadsheet
-      ? request.rows.flat().reduce((sum, cell) => sum + Array.from(cell).length, 0)
-      : Array.from(request.text).length;
-    setState({
-      status: "countdown",
-      current: 0,
-      total,
-      countdown: request.countdownSeconds,
-      message: null,
-    });
-    try {
-      await invoke(isSpreadsheet ? "start_spreadsheet_typing" : "start_typing", { request });
-    } catch (error) {
-      setState((current) => ({
-        ...current,
-        status: "error",
-        countdown: null,
-        message: friendlyError(error, preferencesRef.current?.language),
-      }));
-    }
-  }, []);
+  const start = useCallback(
+    async (request: TypingRequest | SpreadsheetTypingRequest) => {
+      const isSpreadsheet = "rows" in request;
+      const total = isSpreadsheet
+        ? request.rows
+            .flat()
+            .reduce((sum, cell) => sum + Array.from(cell).length, 0)
+        : Array.from(request.text).length;
+      setState({
+        status: "countdown",
+        current: 0,
+        total,
+        countdown: request.countdownSeconds,
+        message: null,
+      });
+      try {
+        await invoke(
+          isSpreadsheet ? "start_spreadsheet_typing" : "start_typing",
+          { request },
+        );
+      } catch (error) {
+        setState((current) => ({
+          ...current,
+          status: "error",
+          countdown: null,
+          message: friendlyError(error, preferencesRef.current?.language),
+        }));
+      }
+    },
+    [],
+  );
 
   const togglePause = useCallback(async () => {
     try {

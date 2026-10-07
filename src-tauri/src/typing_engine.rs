@@ -203,7 +203,7 @@ fn validate_request(request: &TypingRequest) -> Result<usize, String> {
     Ok(total)
 }
 
-fn validate_format_runs(text: &str, runs: &[FormattedRun]) -> Result<(), String> {
+pub(crate) fn validate_format_runs(text: &str, runs: &[FormattedRun]) -> Result<(), String> {
     if runs.is_empty() {
         return Ok(());
     }

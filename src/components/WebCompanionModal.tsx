@@ -134,8 +134,8 @@ export function WebCompanionModal({
             <p className="modal-tip-box">
               {tr(
                 language,
-                "To include this editor's text and formatting, use Copy Code for Console below. The extension has its own text field. If Google Docs ignores background formatting, use the desktop Start button with the document in the foreground.",
-                "Para incluir el texto y formato de este editor, usá Copiar código para la consola. La extensión tiene su propio campo de texto. Si Google Docs ignora el formato en segundo plano, usá Comenzar en la app de escritorio con el documento en primer plano.",
+                "To include this editor's text and formatting, use Copy Code for Console below. You can also send the editor content through the paired extension. If Google Docs ignores background formatting, use the desktop Start button with the document in the foreground.",
+                "Para incluir el texto y formato de este editor, usá Copiar código para la consola. También podés enviar el contenido del editor mediante la extensión emparejada. Si Google Docs ignora el formato en segundo plano, usá Comenzar en la app de escritorio con el documento en primer plano.",
               )}
             </p>
           )}

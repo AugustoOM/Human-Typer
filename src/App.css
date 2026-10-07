@@ -339,11 +339,31 @@ footer {
   font-family: var(--mono);
 }
 
-.spreadsheet-summary strong { font-size: 14px; }
-.spreadsheet-summary span { margin-top: 4px; color: var(--muted); font-size: 12px; }
-.spreadsheet-upload { width: 100%; justify-content: center; }
-.spreadsheet-error { margin: 10px 0 0; color: var(--red); font: 800 12px/1.35 var(--mono); }
-.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+.spreadsheet-summary strong {
+  font-size: 14px;
+}
+.spreadsheet-summary span {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.spreadsheet-upload {
+  width: 100%;
+  justify-content: center;
+}
+.spreadsheet-error {
+  margin: 10px 0 0;
+  color: var(--red);
+  font: 800 12px/1.35 var(--mono);
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
 
 .composer-actions {
   display: flex;
@@ -1525,7 +1545,8 @@ textarea:focus {
   }
 }
 
-.format-toolbar, .document-controls {
+.format-toolbar,
+.document-controls {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1541,11 +1562,22 @@ textarea:focus {
   color: var(--ink);
   font: inherit;
 }
-.format-toolbar button[aria-pressed="true"] { background: var(--yellow); color: #1d1a16; }
-.format-italic { font-style: italic; }
-.format-underline { text-decoration: underline; }
-.format-strike { text-decoration: line-through; }
-.document-editor { position: relative; }
+.format-toolbar button[aria-pressed="true"] {
+  background: var(--yellow);
+  color: #1d1a16;
+}
+.format-italic {
+  font-style: italic;
+}
+.format-underline {
+  text-decoration: underline;
+}
+.format-strike {
+  text-decoration: line-through;
+}
+.document-editor {
+  position: relative;
+}
 .document-editor .tiptap {
   min-height: 280px;
   max-height: 480px;
@@ -1558,14 +1590,96 @@ textarea:focus {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
-.document-editor .tiptap:focus { outline: 2px solid var(--yellow); outline-offset: -2px; }
-.document-editor[data-disabled="true"] { opacity: .65; }
-.document-editor .tiptap p { margin: 0 0 .5em; }
-.document-editor .tiptap h1 { font-size: 2em; }
-.document-editor .tiptap h2 { font-size: 1.5em; }
-.document-editor .tiptap h3 { font-size: 1.25em; }
-.document-editor .tiptap h4, .document-editor .tiptap h5, .document-editor .tiptap h6 { font-size: 1em; }
-.document-editor .tiptap :is(h1,h2,h3,h4,h5,h6) { margin: .3em 0 .5em; }
-.editor-placeholder { position: absolute; top: 15px; left: 15px; color: var(--faint); pointer-events: none; }
-.format-option { display: flex; align-items: center; gap: 6px; font-size: 13px; }
-.document-hint { margin: 8px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.document-editor .tiptap:focus {
+  outline: 2px solid var(--yellow);
+  outline-offset: -2px;
+}
+.document-editor[data-disabled="true"] {
+  opacity: 0.65;
+}
+.document-editor .tiptap p {
+  margin: 0 0 0.5em;
+}
+.document-editor .tiptap h1 {
+  font-size: 2em;
+}
+.document-editor .tiptap h2 {
+  font-size: 1.5em;
+}
+.document-editor .tiptap h3 {
+  font-size: 1.25em;
+}
+.document-editor .tiptap h4,
+.document-editor .tiptap h5,
+.document-editor .tiptap h6 {
+  font-size: 1em;
+}
+.document-editor .tiptap :is(h1, h2, h3, h4, h5, h6) {
+  margin: 0.3em 0 0.5em;
+}
+.editor-placeholder {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  color: var(--faint);
+  pointer-events: none;
+}
+.format-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+.document-hint {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.import-preview {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.preview-grid {
+  overflow: auto;
+  max-height: 360px;
+  border: 1px solid var(--line);
+  margin: 12px 0;
+}
+.preview-grid table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+}
+.preview-grid th,
+.preview-grid td {
+  border: 1px solid var(--line);
+  padding: 6px 10px;
+  min-width: 80px;
+  max-width: 300px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.preview-grid thead th {
+  position: sticky;
+  top: 0;
+  background: var(--paper-bright);
+}
+.import-preview :is(input[type="text"], input:not([type]), select),
+.document-controls select {
+  background: var(--paper-bright);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  padding: 7px;
+  max-width: 100%;
+}
+.document-preview {
+  max-height: 320px;
+  overflow: auto;
+  padding: 14px;
+  border: 1px solid var(--line);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

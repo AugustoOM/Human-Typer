@@ -12,7 +12,7 @@ It is built with Tauri 2, React 19, TypeScript, and Rust. Everything runs locall
 ## Features
 
 - Types every character individually instead of pasting the whole text.
-- Imports the first worksheet of a local `.xlsx` or `.csv` file and fills the foreground spreadsheet cell by cell.
+- Previews local `.xlsx` or `.csv` files, lets you choose a worksheet and source range, and fills the foreground spreadsheet cell by cell.
 - Supports Unicode, accented characters, `ñ`, `¿`, `¡`, symbols, spaces, tabs, and line breaks.
 - Includes predefined speeds and fine-grained adjustment from 15 to 350 ms.
 - Adds random timing variation and subtle natural fluctuations.
@@ -119,23 +119,58 @@ The generated console script also includes formatting when enabled; browser
 editors may ignore synthetic formatting shortcuts, so use desktop typing if this
 happens. The standalone browser extension uses its own plain-text field.
 
-Choose **Attach DOCX / TXT** to replace the editor content with a local file.
+Choose **Attach DOCX / TXT** to preview a local file before confirming its import.
+Canceling the preview or an import error preserves the current editor content.
 Word `.docx` files preserve headings and supported emphasis; `.txt` files preserve
 paragraphs. Old binary `.doc` files must first be saved as `.docx` in Word or Google
 Docs. For a Google Doc, download it as Microsoft Word (`.docx`) before attaching.
 Files are processed locally, with limits of 20 MB and 250,000 characters.
-Tables and lists become text. Images, page layout, fonts, and other unsupported
-styles are omitted; check the editor before starting transcription. Import errors
-leave the previous editor content intact. Neither the document nor its formatting
-is stored permanently.
+Tables and lists become text. Images, page layout, fonts, and unsupported styles
+are omitted. Neither the document nor its formatting is stored permanently.
+
+### Sending to the browser extension
+
+1. Install or reload the updated bundled extension.
+2. Open Human Typer **desktop** and choose **Copy connection code** under
+   **Send to browser**.
+3. Open the extension popup, paste that code and choose **Connect**.
+4. Select the Google Docs tab in the desktop app and choose **Send text and formatting**.
+5. Review the prepared job and choose **Start in document**. Pause or cancel from
+   either the desktop bridge controls or the floating controls in the document.
+
+The bridge uses a WebSocket bound to `127.0.0.1` on a random port, accepts only
+extension origins and requires a random session pairing code. The code expires
+when the app closes. No server or Google login is needed for this mode. Keep the
+extension connection active; disconnection cancels its active job. A received job
+is coordinated outside the popup, so closing the popup does not discard it.
+Only Google Docs text jobs are supported by the bridge at this stage. The
+extension requests host access to Google Docs/Sheets for discovering destinations
+and to loopback for the local connection. Real browser/platform validation of the
+new bridge remains pending; synthetic Docs formatting still has browser limits.
 
 ### Filling a spreadsheet
 
-1. Open a blank workbook in Excel (or a compatible spreadsheet application) and select the starting cell, normally `A1`.
-2. In Human Typer, choose **XLSX / CSV** in the **Spreadsheet** section. The first worksheet in an XLSX file is used.
-3. Select **Fill sheet**, then return to the workbook during the countdown. Keep it in the foreground.
+1. Choose **XLSX / CSV** and review the imported workbook.
+2. Choose the source worksheet, enter a range such as `A2:D20`, and optionally
+   skip its first row. The grid displays at most 50 rows and 20 columns per page.
+3. Confirm the import. This replaces the currently prepared spreadsheet.
+4. Open a blank workbook in Excel and select the starting cell, normally `A1`.
+5. Select **Fill sheet**, then return to the workbook during the countdown.
 
-The spreadsheet mode writes each value as native keyboard input, uses `Tab` to advance through columns, and returns to the first column before moving to the next row. Blank cells are preserved. It reads files locally and limits imports to 100,000 cells and 250,000 characters. Embedded line breaks are converted to spaces because they would otherwise move Excel's selection to a different row.
+The native mode types displayed values, advances with Tab and returns to column
+A between rows. Embedded cell line breaks become spaces. Raw values, cell types,
+formulas and number formats are retained in memory for future Sheets API transfer.
+Limits: 20 MB per file, 100,000 selected cells and 250,000 characters. Canceling a
+preview or failing to read a file preserves the previous prepared spreadsheet.
+
+### Planned Google account integration
+
+Each end user will sign in with their own Google account through the app and
+select authorized Drive files. No service account is planned. Request preparation
+for Docs and Sheets is implemented and tested, but OAuth, secure credential
+storage, Drive file selection and API execution are not connected yet.
+See [Google configuration](docs/CONFIGURACION_GOOGLE.md) for the app owner's setup
+and [the action plan](docs/PLAN_INTEGRACION_GOOGLE.md) for the remaining stages.
 
 ## Shortcuts and safety
 
@@ -198,7 +233,7 @@ React invokes Tauri commands and listens for state events. A native worker owns 
 
 Only the speed, variation, countdown, theme, punctuation, typing-mistake, and target-window protection preferences are stored in `localStorage`. Text exists only in memory and is discarded when the application closes or reloads.
 
-- Text is never sent over the network.
+- The desktop app does not send text to an external service. The optional extension bridge sends it only over loopback on the same device; typing into a Google document is handled by that website.
 - There are no analytics, crash reporting services, or user accounts.
 - Text is never written to logs.
 - Tauri's content security policy restricts external resources.

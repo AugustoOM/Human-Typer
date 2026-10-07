@@ -1,3 +1,4 @@
+mod browser_bridge;
 mod platform;
 mod typing_engine;
 
@@ -57,6 +58,27 @@ fn request_accessibility() -> bool {
     platform::request_accessibility()
 }
 
+#[tauri::command]
+fn browser_bridge_state(
+    bridge: tauri::State<'_, browser_bridge::BrowserBridge>,
+) -> browser_bridge::BridgeSnapshot {
+    bridge.snapshot()
+}
+#[tauri::command]
+fn send_browser_job(
+    bridge: tauri::State<'_, browser_bridge::BrowserBridge>,
+    job: browser_bridge::BrowserJob,
+) -> Result<(), String> {
+    bridge.send(job)
+}
+#[tauri::command]
+fn browser_job_control(
+    bridge: tauri::State<'_, browser_bridge::BrowserBridge>,
+    action: String,
+) -> Result<(), String> {
+    bridge.control(&action)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     #[cfg(desktop)]
@@ -68,7 +90,9 @@ pub fn run() {
         tauri_plugin_global_shortcut::Code::Escape,
     );
 
-    let builder = tauri::Builder::default().manage(TypingController::default());
+    let builder = tauri::Builder::default()
+        .manage(TypingController::default())
+        .manage(browser_bridge::BrowserBridge::default());
 
     #[cfg(desktop)]
     let builder = {
@@ -92,6 +116,8 @@ pub fn run() {
                 .build(),
         )
         .setup(move |app| {
+            let bridge = app.state::<browser_bridge::BrowserBridge>();
+            if let Err(error) = bridge.start() { bridge.record_error(error); }
             let shortcuts = app.global_shortcut();
             let mut unavailable = Vec::new();
             if shortcuts.register(pause_shortcut).is_err() {
@@ -117,7 +143,10 @@ pub fn run() {
             toggle_pause,
             cancel_typing,
             get_runtime_info,
-            request_accessibility
+            request_accessibility,
+            browser_bridge_state,
+            send_browser_job,
+            browser_job_control
         ])
         .run(tauri::generate_context!())
         .expect("Human Typer failed to start");

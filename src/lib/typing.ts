@@ -13,6 +13,10 @@ export function countCharacters(text: string): number {
   return Array.from(text).length;
 }
 
+export function countWords(text: string): number {
+  return text.match(/[\p{L}\p{N}]+(?:[’'-][\p{L}\p{N}]+)*/gu)?.length ?? 0;
+}
+
 export function calculateProgress(current: number, total: number): number {
   if (total <= 0) return 0;
   return Math.min(100, Math.max(0, Math.round((current / total) * 100)));

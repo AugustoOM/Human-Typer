@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { Extension, createDocument } from "@tiptap/core";
+import { Extension, createDocument, type JSONContent } from "@tiptap/core";
 import { Plugin } from "@tiptap/pm/state";
 import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { IconEraser, IconFileUpload } from "@tabler/icons-react";
-import { countCharacters } from "../lib/typing";
+import { countCharacters, countWords } from "../lib/typing";
 import {
   importDocument,
   MAX_DOCUMENT_CHARACTERS,
@@ -33,6 +33,14 @@ export function TextComposer({
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [text, setText] = useState("");
+  const [pending, setPending] = useState<{
+    name: string;
+    content: JSONContent;
+    html: string;
+    length: number;
+    words: number;
+    simplified: boolean;
+  } | null>(null);
   const disabledRef = useRef(disabled);
   useEffect(() => {
     disabledRef.current = disabled;
@@ -103,9 +111,9 @@ export function TextComposer({
     }),
   });
   useEffect(() => {
-    editor?.setEditable(!disabled && !importing);
-  }, [editor, disabled, importing]);
-  const locked = disabled || importing;
+    editor?.setEditable(!disabled && !importing && !pending);
+  }, [editor, disabled, importing, pending]);
+  const locked = disabled || importing || Boolean(pending);
 
   async function loadFile(file: File) {
     if (locked || !editor) return;
@@ -122,10 +130,14 @@ export function TextComposer({
         MAX_DOCUMENT_CHARACTERS
       )
         throw new Error("tooLong");
-      editor.commands.setContent(content.toJSON());
-      setMessage(
-        `${file.name} — ${tr(language, "Document loaded.", "Documento cargado.")} ${result.simplified ? tr(language, "Headings and emphasis preserved. Tables and lists become text; images, fonts and page layout are omitted.", "Se conservan encabezados y énfasis. Tablas y listas pasan a texto; se omiten imágenes, fuentes y diseño de página.") : ""}`,
-      );
+      setPending({
+        name: file.name,
+        content: content.toJSON(),
+        html: result.html,
+        length: countCharacters(serializeDocument(content.toJSON()).text),
+        words: countWords(serializeDocument(content.toJSON()).text),
+        simplified: result.simplified,
+      });
     } catch (cause) {
       const code = cause instanceof Error ? cause.message : "";
       setError(
@@ -166,6 +178,9 @@ export function TextComposer({
           <span className="character-count">
             {countCharacters(text).toLocaleString(language)}{" "}
             {tr(language, "characters", "caracteres")}
+            {" · "}
+            {countWords(text).toLocaleString(language)}{" "}
+            {tr(language, "words", "palabras")}
           </span>
           <button
             className="icon-text-button"
@@ -302,10 +317,69 @@ export function TextComposer({
       <p className="document-hint">
         {tr(
           language,
-          "Select text to format it. Customize the Heading 1–6 styles in Google Docs to use your own document design. Files are read locally and replace the editor content. Limit: 20 MB / 250,000 characters.",
-          "Seleccioná texto para darle formato. Personalizá los estilos de Encabezado 1–6 en Google Docs para usar tu propio diseño. Los archivos se leen localmente y reemplazan el contenido del editor. Límite: 20 MB / 250.000 caracteres.",
+          "Select text to format it. Customize the Heading 1–6 styles in Google Docs to use your own document design. Files are read locally and previewed before replacing the editor content. Limit: 20 MB / 250,000 characters.",
+          "Seleccioná texto para darle formato. Personalizá los estilos de Encabezado 1–6 en Google Docs para usar tu propio diseño. Los archivos se leen localmente y se revisan antes de reemplazar el contenido del editor. Límite: 20 MB / 250.000 caracteres.",
         )}
       </p>
+      {pending && (
+        <div className="import-preview">
+          <h3>
+            {tr(language, "Document preview", "Vista previa del documento")} ·{" "}
+            {pending.name}
+          </h3>
+          <p>
+            {pending.length.toLocaleString(language)}{" "}
+            {tr(language, "characters", "caracteres")}
+            {" · "}
+            {pending.words.toLocaleString(language)}{" "}
+            {tr(language, "words", "palabras")}
+          </p>
+          <div
+            className="document-preview"
+            dangerouslySetInnerHTML={{ __html: pending.html }}
+          />
+          {pending.simplified && (
+            <p className="document-hint">
+              {tr(
+                language,
+                "Headings and emphasis are preserved. Tables and lists become text; images, fonts and page layout are omitted.",
+                "Se conservan encabezados y énfasis. Tablas y listas pasan a texto; se omiten imágenes, fuentes y diseño de página.",
+              )}
+            </p>
+          )}
+          {text && (
+            <p>
+              {tr(
+                language,
+                "Confirming will replace your current editor content.",
+                "Al confirmar se reemplazará el contenido actual del editor.",
+              )}
+            </p>
+          )}
+          <div className="document-controls">
+            <button
+              className="button secondary"
+              disabled={disabled}
+              onClick={() => {
+                editor?.commands.setContent(pending.content);
+                setMessage(
+                  `${pending.name} — ${tr(language, "Document loaded.", "Documento cargado.")}`,
+                );
+                setPending(null);
+              }}
+            >
+              {tr(language, "Confirm import", "Confirmar importación")}
+            </button>
+            <button
+              className="icon-text-button"
+              disabled={disabled}
+              onClick={() => setPending(null)}
+            >
+              {tr(language, "Cancel", "Cancelar")}
+            </button>
+          </div>
+        </div>
+      )}
       {message && (
         <p className="document-hint" role="status">
           {message}

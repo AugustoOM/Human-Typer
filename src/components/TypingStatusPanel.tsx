@@ -12,9 +12,11 @@ import { localizeNativeMessage, tr } from "../lib/i18n";
 import type { LanguagePreference, TypingState } from "../types";
 
 interface TypingStatusPanelProps {
+  externalBusy?: boolean;
   state: TypingState;
   language: LanguagePreference;
   textLength: number;
+  wordCount: number;
   spreadsheetCharacterCount: number;
   spreadsheetLoaded: boolean;
   delayMs: number;
@@ -25,9 +27,11 @@ interface TypingStatusPanelProps {
 }
 
 export function TypingStatusPanel({
+  externalBusy = false,
   state,
   language,
   textLength,
+  wordCount,
   spreadsheetCharacterCount,
   spreadsheetLoaded,
   delayMs,
@@ -50,8 +54,13 @@ export function TypingStatusPanel({
     state.status === "typing" ||
     state.status === "paused";
   const canPause = state.status === "typing" || state.status === "paused";
-  const selectedLength = spreadsheetLoaded ? spreadsheetCharacterCount : textLength;
-  const progress = calculateProgress(state.current, state.total || selectedLength);
+  const selectedLength = spreadsheetLoaded
+    ? spreadsheetCharacterCount
+    : textLength;
+  const progress = calculateProgress(
+    state.current,
+    state.total || selectedLength,
+  );
 
   return (
     <section
@@ -79,7 +88,7 @@ export function TypingStatusPanel({
             ) : (
               <strong>
                 {selectedLength
-                  ? `${selectedLength.toLocaleString(language)} ${tr(language, "characters", "caracteres")} · ${estimateDuration(selectedLength, delayMs)}`
+                  ? `${selectedLength.toLocaleString(language)} ${tr(language, "characters", "caracteres")} · ${wordCount.toLocaleString(language)} ${tr(language, "words", "palabras")} · ${estimateDuration(selectedLength, delayMs)}`
                   : tr(
                       language,
                       "Paste some text to get started",
@@ -125,7 +134,7 @@ export function TypingStatusPanel({
           className="button primary"
           type="button"
           onClick={onStart}
-          disabled={!selectedLength || active}
+          disabled={!selectedLength || active || externalBusy}
           title={tr(
             language,
             "Type in the active window using native keyboard input",

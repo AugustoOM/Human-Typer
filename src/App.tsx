@@ -1,3 +1,5 @@
+import { BrowserBridgePanel } from "./components/BrowserBridgePanel";
+import { useBrowserBridge } from "./hooks/useBrowserBridge";
 import { useEffect, useState } from "react";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { BrandMark } from "./components/BrandMark";
@@ -11,7 +13,7 @@ import { WebCompanionModal } from "./components/WebCompanionModal";
 import { usePreferences } from "./hooks/usePreferences";
 import { useTheme } from "./hooks/useTheme";
 import { useTypingEngine } from "./hooks/useTypingEngine";
-import { countCharacters, isActiveStatus } from "./lib/typing";
+import { countCharacters, countWords, isActiveStatus } from "./lib/typing";
 import { localizeNativeMessage, tr } from "./lib/i18n";
 import "./App.css";
 import type { FormattedRun } from "./types";
@@ -37,7 +39,16 @@ function App() {
     document.documentElement.lang = preferences.language;
   }, [preferences.language]);
 
-  const active = isActiveStatus(state.status);
+  const bridge = useBrowserBridge();
+  const nativeActive = isActiveStatus(state.status);
+  const browserBusy = [
+    "sent",
+    "prepared",
+    "countdown",
+    "typing",
+    "paused",
+  ].includes(bridge.state?.job?.status ?? "");
+  const active = nativeActive || browserBusy;
   const textLength = countCharacters(text);
   const needsAccessibility =
     runtimeInfo?.platform === "macos" && !runtimeInfo.accessibilityGranted;
@@ -53,7 +64,7 @@ function App() {
         )
       : null);
   const operationalState = active
-    ? state.status === "paused"
+    ? (nativeActive ? state.status : bridge.state?.job?.status) === "paused"
       ? tr(preferences.language, "PAUSED", "EN PAUSA")
       : tr(preferences.language, "RUNNING", "EN CURSO")
     : state.status === "error"
@@ -61,6 +72,7 @@ function App() {
       : tr(preferences.language, "READY", "LISTO");
 
   function beginTyping() {
+    if (browserBusy) return;
     if (spreadsheet) {
       void start({
         rows: spreadsheet.rows,
@@ -166,10 +178,42 @@ function App() {
           onChange={setSpreadsheet}
         />
 
+        <BrowserBridgePanel
+          state={bridge.state}
+          error={bridge.error}
+          language={preferences.language}
+          disabled={nativeActive}
+          hasText={Boolean(text)}
+          onControl={(action) => void bridge.control(action)}
+          onSend={(tabId) =>
+            void bridge.send(tabId, {
+              text,
+              formatRuns: preserveFormatting ? formatRuns : undefined,
+              baseDelayMs: preferences.baseDelayMs,
+              variationMs: preferences.variationMs,
+              punctuationPauses: preferences.punctuationPauses,
+              typingMistakes: preferences.typingMistakes,
+              notifyOnComplete: preferences.desktopNotification,
+              language: preferences.language,
+            })
+          }
+        />
+
         <TypingStatusPanel
+          externalBusy={browserBusy}
           state={state}
           language={preferences.language}
           textLength={textLength}
+          wordCount={
+            spreadsheet
+              ? spreadsheet.rows.reduce(
+                  (sum, row) =>
+                    sum +
+                    row.reduce((count, cell) => count + countWords(cell), 0),
+                  0,
+                )
+              : countWords(text)
+          }
           spreadsheetCharacterCount={spreadsheet?.characterCount ?? 0}
           spreadsheetLoaded={Boolean(spreadsheet)}
           delayMs={preferences.baseDelayMs}
